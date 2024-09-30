@@ -6,14 +6,14 @@ interface User extends Document {
     email: string;
     phone: number;
     password: string;
-    dob: string;
-    image: string;
-    gender: string;
-    address: {
+    dob?: string;
+    image?: string;
+    gender?: string;
+    address?: {
         street: string; 
         city: string;
     };
-    is_blocked: boolean;
+    isBlocked: boolean;
 }
 
 // Create the user schema
@@ -22,14 +22,14 @@ const userSchema = new Schema<User>({
     email: { type: String, required: true, unique: true },
     phone: { type: Number, required: true },
     password: { type: String, required: true },
-    dob: { type: String, required: true }, 
+    dob: { type: String, required: false }, 
     image: { type: String, required: false },
-    gender: { type: String, required: true },
+    gender: { type: String, required: false },
     address: {
-        street: { type: String, required: true },
-        city: { type: String, required: true },
+        street: { type: String, required: false },
+        city: { type: String, required: false },
     },
-    is_blocked: { type: Boolean, default: false },
+    isBlocked: { type: Boolean, default: false },
 }, { timestamps: true }); 
 
 // Export the User model
