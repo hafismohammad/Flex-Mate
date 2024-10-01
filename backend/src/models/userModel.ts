@@ -1,23 +1,9 @@
-import mongoose, { Schema, model, Document } from "mongoose";
+import  { Schema, model, Document } from "mongoose";
+import { IUser } from '../interface/userTypes'
 
-// Define the User interface extending Document
-interface User extends Document {
-    name: string;
-    email: string;
-    phone: number;
-    password: string;
-    dob?: string;
-    image?: string;
-    gender?: string;
-    address?: {
-        street: string; 
-        city: string;
-    };
-    isBlocked: boolean;
-}
 
 // Create the user schema
-const userSchema = new Schema<User>({
+const userSchema = new Schema<IUser>({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     phone: { type: Number, required: true },
@@ -33,5 +19,5 @@ const userSchema = new Schema<User>({
 }, { timestamps: true }); 
 
 // Export the User model
-const UserModel = model<User>("User", userSchema);
+const UserModel = model<IUser>("User", userSchema);
 export default UserModel;

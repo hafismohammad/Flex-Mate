@@ -8,6 +8,8 @@ export const registerUser = createAsyncThunk(
     'user/signup',
     async (userDetails: User, thunkAPI) => {
         try {
+            console.log('createAsyncThunk registerUser');
+            
             const response = await userService.register(userDetails)
             return response.data;
         } catch (error: any) {

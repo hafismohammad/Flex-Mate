@@ -1,9 +1,16 @@
-import { Router } from 'express';
-const router = Router();
+import express from "express";
+import UserRepository from "../repositories/userRepository";
+import UserService from "../services/userService";
+import UserController from "../controllers/userController";
 
-// Example route
-router.get('/signup', (req, res) => {
-  res.send('User registration');
-});
+const router = express.Router();
 
-export default router; 
+// Set up instances of the repository, service, and controller
+const userRepository = new UserRepository();
+const userService = new UserService(userRepository);
+const userController = new UserController(userService);
+
+// POST /api/users/signup
+router.post("/signup", (req, res) => userController.register(req, res));
+
+export default router;

@@ -1,11 +1,12 @@
 
 // Structure of the user object
 export interface User {
-    userId: string;
+    userId?: string;
     name: string;
     phone: string;
     email: string;
-    isBlocked: boolean;
+    password: string;
+    isBlocked?: boolean;
   }
 
   // Initial state structure for the user slice

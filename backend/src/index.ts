@@ -1,36 +1,36 @@
-import express, {Application, Request, Response} from 'express';
+import express, { Application, NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import connectDB from './utils/db';
-import cookieParser from 'cookie-parser'
-import userRoute from './routes/userRoute'
-
-// Express app initialization 
+import cookieParser from 'cookie-parser';
+import userRoute from '../src/routes/userRoute'
+// Express app initialization
 const app: Application = express();
 
 // MongoDB connection
-connectDB()
+connectDB();
+
 app.use(cookieParser());
 const corsOptions = {
-    origin: "http://localhost:5173",  
-    methods: "GET,POST,PUT",  
-    allowedHeaders: "Content-Type,Authorization", 
-    optionsSuccessStatus: 200,  
-    credentials: true,  
-  };
+  origin: "http://localhost:5173",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+  allowedHeaders: "Content-Type,Authorization",
+  optionsSuccessStatus: 200,
+  credentials: true,
+};
 
-// Middlewares 
+// Middlewares
 app.use(cors(corsOptions));
-app.use(express.urlencoded({ extended: true }));  
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.get('/', (req: Request, res: Response) => {
-    res.send('Welcome to the Home Page');
-  });
+// Test route
+// app.get('/', (req: Request, res: Response) => {
+//   res.send('Welcome to the Home Page');
+// });
 
-app.use("/api/user", userRoute);
+app.use('/user/api', userRoute); 
 
-
-
+// Server running
 app.listen(process.env.PORT || 3000, () => {
-    console.log(`Server is running on port ${process.env.PORT || 3000}`)
-})
+  console.log(`Server is running on port ${process.env.PORT || 3000}`);
+});
