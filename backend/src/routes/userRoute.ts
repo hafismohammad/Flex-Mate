@@ -10,7 +10,10 @@ const userRepository = new UserRepository();
 const userService = new UserService(userRepository);
 const userController = new UserController(userService);
 
-// POST /api/users/signup
-router.post("/signup", (req, res) => userController.register(req, res));
+
+router.post("/signup", userController.register.bind(userController));
+router.post("/otp", userController.verifyOtp.bind(userController));
+
+
 
 export default router;

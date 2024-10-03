@@ -15,3 +15,11 @@ export interface IUser {
    };
    isBlocked: boolean;
 };
+
+export interface IOtp {
+    _id?: mongoose.Types.ObjectId; 
+    otp: string,
+    email: string,
+    createdAt: Date,
+    expiresAt: Date
+}

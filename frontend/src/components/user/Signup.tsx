@@ -3,6 +3,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../app/store";
 import { registerUser } from "../../actions/userAction";
 import { User } from "../../features/user/userTypes";
+import bg_img from "../../assets/signup-img.jpg";
+import logo from "../../assets/logo_1 (2).png";
+import { useNavigate } from "react-router-dom";
 
 interface Errors {
   name?: string;
@@ -22,11 +25,12 @@ const Signup: React.FC = () => {
   const [errors, setErrors] = useState<Errors>({});
 
   const dispatch = useDispatch<AppDispatch>();
-
+  const navigate = useNavigate();
   const { userInfo, loading, error } = useSelector(
     (state: RootState) => state.user
   );
 
+  console.log("userInfo register------------->", userInfo);
   const validate = (): Errors => {
     const newErrors: Errors = {};
 
@@ -64,7 +68,7 @@ const Signup: React.FC = () => {
   const clearErrors = () => {
     setTimeout(() => {
       setErrors({});
-    }, 3000); 
+    }, 3000);
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -89,20 +93,25 @@ const Signup: React.FC = () => {
 
     // Dispatch the action to register the user
     dispatch(registerUser(userData));
+    navigate("/user/otp", { state: userData });
   };
 
   return (
     <div className="min-h-screen bg-slate-100 flex items-center justify-center">
       <div className="w-10/12 md:w-8/12 bg-white rounded-xl shadow-lg overflow-hidden flex flex-row">
         {/* Left section: Image/Logo */}
-        <div className="w-1/2 flex flex-col items-center justify-center p-8 bg-gray-50">
-          <img
-            src="path/to/your/logo.png" // Replace with your logo image path
-            alt="FlexMate Logo"
-            className="w-32 h-auto mb-4"
-          />
-          <h1 className="text-2xl font-bold">Welcome to FlexMate</h1>
-          <p>Your platform for flexible work solutions.</p>
+
+        <div
+          className="w-1/2 flex flex-col items-center justify-center p-8 bg-cover bg-center"
+          style={{
+            backgroundImage: `url(${bg_img})`,
+          }} // Replace with your image path
+        >
+          <img src={logo} alt="FlexMate Logo" className="w-32 h-auto" />
+          <h1 className="text-2xl font-bold text-white">Welcome to FlexMate</h1>
+          <p className="text-white">
+            Your platform for flexible work solutions.
+          </p>
         </div>
 
         {/* Right section: Registration Form */}

@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { UserState, User } from './userTypes'; 
-import { registerUser } from "../../actions/userAction";
+import { registerUser, verifyOtp } from "../../actions/userAction";
 
 // Initial state
 const initialState: UserState = {
@@ -14,34 +14,47 @@ const userSlice = createSlice({
     name: 'user',
     initialState,
     reducers: {
-         clearUser(state) {
-            state.userInfo = null;  // Clear user information on logout
-         },
-         setLoading(state, action: PayloadAction<boolean>) {
-            state.loading = action.payload;  // Set loading state (true or false)
-         },
-         setError(state, action: PayloadAction<string>) {
-            state.error = action.payload;  // Set error message
-         },
+        clearUser(state) {
+            state.userInfo = null;  
+        },
+        setLoading(state, action: PayloadAction<boolean>) {
+            state.loading = action.payload;  
+        },
+        setError(state, action: PayloadAction<string>) {
+            state.error = action.payload;  
+        },
     },
     extraReducers: (builder) => {
         builder
-        // Register User - Pending
-        .addCase(registerUser.pending, (state) => {
-          state.loading = true;
-          state.error = null;
-        })
-        // Register User - Fulfilled
-        .addCase(registerUser.fulfilled, (state, action: PayloadAction<User>) => {  // Ensure PayloadAction<User>
-          state.loading = false;
-          state.userInfo = action.payload;  // Assign the user data returned from the action
-          state.error = null;
-        })
-        // Register User - Rejected (Optional, if needed)
-        .addCase(registerUser.rejected, (state, action: PayloadAction<any>) => {
-          state.loading = false;
-          state.error = action.payload;  // Set error message
-        })
+            .addCase(registerUser.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(registerUser.fulfilled, (state, action: PayloadAction<User>) => {  
+                state.loading = false;
+                state.userInfo = action.payload;  
+                console.log('userslice register---- ', state.userInfo)
+                state.error = null;
+            })
+            .addCase(registerUser.rejected, (state, action: PayloadAction<any>) => {
+                state.loading = false;
+                state.error = action.payload; 
+            })
+            
+            .addCase(verifyOtp.pending, (state) => {
+                state.loading = true;            
+                state.error = null;
+            })
+            .addCase(verifyOtp.fulfilled, (state, action: PayloadAction<User>) => {  
+                state.loading = false;
+                state.userInfo = action.payload;  
+                console.log('userslice OTP---- ', state.userInfo)
+                state.error = null;
+            })
+            .addCase(verifyOtp.rejected, (state, action: PayloadAction<any>) => {
+                state.loading = false;
+                state.error = action.payload; 
+            });
     }
 });
 

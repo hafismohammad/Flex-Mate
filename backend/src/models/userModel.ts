@@ -1,5 +1,5 @@
 import  { Schema, model, Document } from "mongoose";
-import { IUser } from '../interface/userTypes'
+import { IUser } from '../interface/common'
 
 
 // Create the user schema
