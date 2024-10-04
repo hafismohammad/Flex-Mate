@@ -1,6 +1,8 @@
-import { IUser } from '../interface/common';
-import UserRepository from '../repositories/userRepository';
-import sendOTPmail from '../config/email_config';
+import { IUser, ILoginUser } from "../interface/common";
+import {generateAccessToken, generateRefreshToken} from '../utils/jwtHelper'
+import UserRepository from "../repositories/userRepository";
+import sendOTPmail from "../config/email_config";
+import bcrypt from "bcryptjs";
 
 class UserService {
   private userRepository: UserRepository;
@@ -14,32 +16,38 @@ class UserService {
   // User registration with OTP generation and sending logic
   async register(userData: IUser): Promise<void> {
     try {
-      console.log('generate otp', userData);
+      console.log("generate otp", userData);
       const existingUser = await this.userRepository.existsUser(userData.email);
 
       if (existingUser) {
-        console.log('User already exists');
-        throw new Error('Email already exists');
+        console.log("User already exists");
+        throw new Error("Email already exists");
       }
 
       // Generate random OTP
-      const generatedOTP: string = Math.floor(1000 + Math.random() * 9000).toString();
+      const generatedOTP: string = Math.floor(
+        1000 + Math.random() * 9000
+      ).toString();
       this.OTP = generatedOTP;
 
-      console.log('Generated OTP is', this.OTP);
+      console.log("Generated OTP is", this.OTP);
 
       // Send OTP to user's email
       const isMailSent = await sendOTPmail(userData.email, this.OTP);
       if (!isMailSent) {
-        throw new Error('Email not sent');
+        throw new Error("Email not sent");
       }
 
       // Set OTP expiration time (2 minutes from current time)
       const OTP_createdTime = new Date();
-      this.expiryOTP_time = new Date(OTP_createdTime.getTime() + 2 * 60 * 1000); // 2 minutes
+      this.expiryOTP_time = new Date(OTP_createdTime.getTime() + 1 * 60 * 1000); // 2 minutes
 
       // Save OTP in the database
-      await this.userRepository.saveOTP(userData.email, this.OTP, this.expiryOTP_time);
+      await this.userRepository.saveOTP(
+        userData.email,
+        this.OTP,
+        this.expiryOTP_time
+      );
 
       console.log(`OTP will expire at: ${this.expiryOTP_time}`);
     } catch (error) {
@@ -51,38 +59,111 @@ class UserService {
   // OTP verification logic
   async verifyOTP(userData: IUser, otp: string): Promise<void> {
     try {
-      const validOtps = await this.userRepository.getOtpsByEmail(userData.email);
+      console.log("user service");
+
+      const validOtps = await this.userRepository.getOtpsByEmail(
+        userData.email
+      );
 
       if (validOtps.length === 0) {
-        console.log('No OTP found for this email');
-        throw new Error('No OTP found for this email');
+        console.log("No OTP found for this email");
+        throw new Error("No OTP found for this email");
       }
 
-      const latestOtp = validOtps.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())[0];
+      const latestOtp = validOtps.sort(
+        (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
+      )[0];
 
       if (latestOtp.otp === otp) {
         if (latestOtp.expiresAt > new Date()) {
-          console.log('OTP is valid and verified');
-          
+          console.log("OTP is valid and verified");
+
+          const hashedPassword = await bcrypt.hash(userData.password, 10);
+          const newUserData = { ...userData, password: hashedPassword };
+
           // Create new user
-          await this.userRepository.createNewUser(userData);
+          await this.userRepository.createNewUser(newUserData);
 
           // Delete OTP after verification
-          await this.userRepository.deleteOtpById(latestOtp._id); 
+          await this.userRepository.deleteOtpById(latestOtp._id);
         } else {
-          console.log('OTP has expired');
-          throw new Error('OTP has expired');
+          console.log("OTP has expired");
+          throw new Error("OTP has expired");
         }
       } else {
-        console.log('Invalid OTP');
-        throw new Error('Invalid OTP');
+        console.log("Invalid OTP");
+        throw new Error("Invalid OTP");
       }
     } catch (error) {
-      const errorMessage = (error as Error).message || 'An unknown error occurred';
-      console.error('Error in OTP verification:', errorMessage);
+      const errorMessage =
+        (error as Error).message || "An unknown error occurred";
+      console.error("Error in OTP verification:", errorMessage);
       throw error;
     }
   }
+
+  async resendOTP(email: string): Promise<void> {
+    try {
+      const generatedOTP: string = Math.floor(
+        1000 + Math.random() * 9000
+      ).toString();
+      this.OTP = generatedOTP;
+
+      const OTP_createdTime = new Date();
+      this.expiryOTP_time = new Date(OTP_createdTime.getTime() + 1 * 60 * 1000);
+
+      await this.userRepository.saveOTP(email, this.OTP, this.expiryOTP_time);
+
+      const isMailSent = await sendOTPmail(email, this.OTP);
+      if (!isMailSent) {
+        throw new Error("Failed to resend OTP email.");
+      }
+
+      console.log(`Resent OTP ${this.OTP} to ${email}`);
+    } catch (error) {
+      console.error("Error in resendOTP:", (error as Error).message);
+      throw error;
+    }
+  }
+
+  // login user
+async login({ email, password }: ILoginUser): Promise<any> {
+  try {
+    const userData: IUser | null = await this.userRepository.findUser(email);
+
+    if (userData && userData.password) {
+      const isPasswordMatch = await bcrypt.compare(password, userData.password);
+
+      if (isPasswordMatch) {
+        // Ensure userData._id exists before proceeding
+        if (!userData._id) {
+          throw new Error('User ID is missing');
+        }
+
+        // Generate access and refresh tokens
+        const accessToken = generateAccessToken({ id: userData._id.toString(), email: userData.email });
+        const refreshToken = generateRefreshToken({ id: userData._id.toString(), email: userData.email });
+
+        return {
+          accessToken,
+          refreshToken,
+          user: {
+            id: userData._id.toString(),
+            name: userData.name,
+            email: userData.email,
+            phone: userData.phone,
+          },
+        };
+      }
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Login error:', error);
+    return null;
+  }
+}
+
 }
 
 export default UserService;

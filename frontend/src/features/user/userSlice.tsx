@@ -26,6 +26,7 @@ const userSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
+            // Register user actions
             .addCase(registerUser.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -33,22 +34,22 @@ const userSlice = createSlice({
             .addCase(registerUser.fulfilled, (state, action: PayloadAction<User>) => {  
                 state.loading = false;
                 state.userInfo = action.payload;  
-                console.log('userslice register---- ', state.userInfo)
                 state.error = null;
             })
             .addCase(registerUser.rejected, (state, action: PayloadAction<any>) => {
                 state.loading = false;
                 state.error = action.payload; 
             })
-            
+    
+            // Verify OTP actions
             .addCase(verifyOtp.pending, (state) => {
-                state.loading = true;            
+                state.loading = true;
                 state.error = null;
             })
             .addCase(verifyOtp.fulfilled, (state, action: PayloadAction<User>) => {  
                 state.loading = false;
                 state.userInfo = action.payload;  
-                console.log('userslice OTP---- ', state.userInfo)
+                // console.log('userslice OTP---- ', state.userInfo)
                 state.error = null;
             })
             .addCase(verifyOtp.rejected, (state, action: PayloadAction<any>) => {
@@ -56,6 +57,7 @@ const userSlice = createSlice({
                 state.error = action.payload; 
             });
     }
+    
 });
 
 // Export actions and reducer

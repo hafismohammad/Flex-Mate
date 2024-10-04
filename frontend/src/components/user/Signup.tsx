@@ -6,6 +6,7 @@ import { User } from "../../features/user/userTypes";
 import bg_img from "../../assets/signup-img.jpg";
 import logo from "../../assets/logo_1 (2).png";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 interface Errors {
   name?: string;
@@ -15,12 +16,11 @@ interface Errors {
   cpassword?: string;
 }
 
-const Signup: React.FC = () => {
+const Signup = () => {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [cpassword, setCpassword] = useState<string>("");
 
   const [errors, setErrors] = useState<Errors>({});
 
@@ -31,18 +31,19 @@ const Signup: React.FC = () => {
   );
 
   console.log("userInfo register------------->", userInfo);
+  
   const validate = (): Errors => {
     const newErrors: Errors = {};
 
     if (!name.trim()) {
       newErrors.name = "Please fill the name field";
     }
-
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email.trim()) {
-      newErrors.email = "Please fill the email field";
-    } else if (!email.includes("@")) {
-      newErrors.email = "Valid email is required";
-    }
+        newErrors.email = "Please fill the email field";
+      } else if (!emailRegex.test(email)) {
+        newErrors.email = "Valid email is required";
+      }
 
     if (!phone.trim()) {
       newErrors.phone = "Please fill the phone field";
@@ -54,12 +55,6 @@ const Signup: React.FC = () => {
       newErrors.password = "Please fill the password field";
     } else if (password.length < 6) {
       newErrors.password = "Password must be at least 6 characters";
-    }
-
-    if (!cpassword.trim()) {
-      newErrors.cpassword = "Please fill the confirm password field";
-    } else if (password !== cpassword) {
-      newErrors.cpassword = "Passwords do not match";
     }
 
     return newErrors;
@@ -98,110 +93,99 @@ const Signup: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-100 flex items-center justify-center">
-      <div className="w-10/12 md:w-8/12 bg-white rounded-xl shadow-lg overflow-hidden flex flex-row">
-        {/* Left section: Image/Logo */}
-
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col lg:flex-row w-full max-w-4xl">
+        {/* Left Section */}
         <div
-          className="w-1/2 flex flex-col items-center justify-center p-8 bg-cover bg-center"
+          className="w-full md:w-1/2 flex flex-col items-center justify-center p-8 bg-cover bg-center"
           style={{
             backgroundImage: `url(${bg_img})`,
-          }} // Replace with your image path
+          }}
         >
-          <img src={logo} alt="FlexMate Logo" className="w-32 h-auto" />
-          <h1 className="text-2xl font-bold text-white">Welcome to FlexMate</h1>
-          <p className="text-white">
+          <h1 className="text-xl md:text-2xl font-bold text-white text-center">
+            Welcome to FlexMate
+          </h1>
+          <p className="text-white text-center">
             Your platform for flexible work solutions.
           </p>
         </div>
-
-        {/* Right section: Registration Form */}
-        <div
-          className="w-1/2 p-8 overflow-y-auto"
-          style={{ maxHeight: "90vh" }}
-        >
-          <h1 className="text-2xl font-bold mb-4">Register</h1>
+  
+        {/* Right Section */}
+        <div className="w-full md:w-1/2 p-8 overflow-y-auto" style={{ maxHeight: '90vh' }}>
+          {/* Center the logo */}
+          <div className="flex justify-center">
+            <img src={logo} alt="Logo" className="w-40 h-40" />
+          </div>
+  
+          <h1 className="text-xl md:text-2xl font-bold mb-4 text-center md:text-left">Register</h1>
           <form onSubmit={handleSubmit}>
-            {/* Name Field */}
             <div className="mt-4">
               <input
                 type="text"
                 placeholder="Name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:border-blue-500 focus:ring focus:ring-blue-200"
+                className="w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              {errors.name && (
-                <p className="text-red-500 text-sm mt-1">{errors.name}</p>
-              )}
+              {errors.name && (<p className="text-red-500 text-sm mt-1">{errors.name}</p>)}
             </div>
-
-            {/* Email Field */}
+  
             <div className="mt-4">
               <input
-                type="email"
+                type="text"
                 placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:border-blue-500 focus:ring focus:ring-blue-200"
+                className="w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {errors.email && (
                 <p className="text-red-500 text-sm mt-1">{errors.email}</p>
               )}
             </div>
-
-            {/* Phone Field */}
+  
             <div className="mt-4">
               <input
-                type="tel"
+                type="text"
                 placeholder="Phone"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:border-blue-500 focus:ring focus:ring-blue-200"
+                className="w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {errors.phone && (
                 <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
               )}
             </div>
-
-            {/* Password Field */}
+  
             <div className="mt-4">
               <input
-                type="password"
+                type="text"
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:border-blue-500 focus:ring focus:ring-blue-200"
+                className="w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {errors.password && (
                 <p className="text-red-500 text-sm mt-1">{errors.password}</p>
               )}
             </div>
-
-            {/* Confirm Password Field */}
-            <div className="mt-4">
-              <input
-                type="password"
-                placeholder="Confirm Password"
-                value={cpassword}
-                onChange={(e) => setCpassword(e.target.value)}
-                className="block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:border-blue-500 focus:ring focus:ring-blue-200"
-              />
-              {errors.cpassword && (
-                <p className="text-red-500 text-sm mt-1">{errors.cpassword}</p>
-              )}
-            </div>
-
+  
             <button
               type="submit"
               className="w-full mt-6 py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200"
             >
               Register
             </button>
+            <div className="text-center mt-4">
+              <p className="text-gray-600">
+                Already have an account?{" "}
+                <Link to='/user/login' className="text-blue-500 hover:underline">Login</Link>
+              </p>
+            </div>
           </form>
         </div>
       </div>
     </div>
   );
+  
 };
 
 export default Signup;

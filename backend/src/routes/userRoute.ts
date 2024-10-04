@@ -13,6 +13,10 @@ const userController = new UserController(userService);
 
 router.post("/signup", userController.register.bind(userController));
 router.post("/otp", userController.verifyOtp.bind(userController));
+router.post("/resend-otp", userController.resendOtp.bind(userController));
+router.post("/login", userController.login.bind(userController));
+
+
 
 
 

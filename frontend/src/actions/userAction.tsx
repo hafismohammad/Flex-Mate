@@ -1,13 +1,11 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { User } from "../features/user/userTypes";
 import userService from "../services/userServices";
-import Otp from "../components/user/Otp";
 
 export const registerUser = createAsyncThunk(
   "user/signup",
   async (userDetails: User, thunkAPI) => {
     try {
-      // console.log('createAsyncThunk registerUser');
       const response = await userService.register(userDetails);
       return response.data;
     } catch (error: any) {
@@ -17,7 +15,7 @@ export const registerUser = createAsyncThunk(
 );
 
 interface VerifyOtpArgs {
-  userData: User; // Complete user details
+  userData: User; 
   otp: string;
 }
 
@@ -25,12 +23,30 @@ export const verifyOtp = createAsyncThunk(
   "user/otp",
   async ({ userData, otp }: VerifyOtpArgs, thunkAPI) => {
     try {
-      console.log("createAsyncThunk", userData, otp);
-
       const response = await userService.verifyOtp({ userData, otp });
-      return response.data;
+      return response;
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.response.data);
     }
   }
 );
+
+interface loginUser {
+  email: string;
+  password: string;
+}
+
+export const loginUser = createAsyncThunk(
+  'user/login',
+  async ({ email, password }: loginUser, thunkAPI) => {
+    try {
+      const response = await userService.login({ email, password });
+      console.log('user login response data', response.data);
+      
+      return response.data; 
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+

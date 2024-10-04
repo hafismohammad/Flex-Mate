@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import UserService from "../services/userService";
-import { IUser } from "../interface/common";
+import { IUser, ILoginUser } from "../interface/common";
 
 class UserController {
   private userService: UserService;
@@ -12,41 +12,89 @@ class UserController {
   // Register user and send OTP to email
   async register(req: Request, res: Response) {
     try {
-      const userData: IUser = req.body; 
-      console.log('User data received for registration:', userData);
-      
+      const userData: IUser = req.body;
+      // console.log('User data received for registration:', userData);
+
       await this.userService.register(userData);
       res.status(200).json({ message: "OTP sent to email" });
     } catch (error) {
       console.error("Register Controller error:", error);
-      
-      if ((error as Error).message === 'Email already exists') {
+
+      if ((error as Error).message === "Email already exists") {
         res.status(409).json({ message: "Email already exists" });
       } else {
-        res.status(500).json({ message: "Something went wrong, please try again later" });
+        res
+          .status(500)
+          .json({ message: "Something went wrong, please try again later" });
       }
+    }
+  }
+
+  // Login user
+  async login(req: Request, res: Response): Promise<void> {
+    try {
+      const { email, password }: ILoginUser = req.body;
+      const user = await this.userService.login({ email, password });
+      if (user) {
+        console.log(user);    
+        res.json(user);
+      } else {
+        console.log('Not found User');
+        res.status(401).json({ message: "Invalid email or password" });
+      }
+    } catch (error) {
+      console.log("Login controller:", error);
+      res.status(500).json({ message: "Internal server error" });
     }
   }
 
   // Verify OTP
   async verifyOtp(req: Request, res: Response) {
     try {
+      console.log("verify otp controller");
+
       const { userData, otp } = req.body;
-      
+
       await this.userService.verifyOTP(userData, otp);
-      
-      res.status(200).json({ message: "OTP verified successfully" });
+
+      res
+        .status(200)
+        .json({ message: "OTP verified successfully", user: userData });
     } catch (error) {
       console.error("OTP Verification Controller error:", error);
-      
-      if ((error as Error).message === 'OTP has expired') {
-        res.status(400).json({ message: 'OTP has expired' });
-      } else if ((error as Error).message === 'Invalid OTP') {
-        res.status(400).json({ message: 'Invalid OTP' });
-      } else if ((error as Error).message === 'No OTP found for this email') {
-        res.status(404).json({ message: 'No OTP found for this email' });
+
+      if ((error as Error).message === "OTP has expired") {
+        res.status(400).json({ message: "OTP has expired" });
+      } else if ((error as Error).message === "Invalid OTP") {
+        res.status(400).json({ message: "Invalid OTP" });
+      } else if ((error as Error).message === "No OTP found for this email") {
+        res.status(404).json({ message: "No OTP found for this email" });
       } else {
-        res.status(500).json({ message: "Something went wrong, please try again later" });
+        res
+          .status(500)
+          .json({ message: "Something went wrong, please try again later" });
+      }
+    }
+  }
+
+  // Resend OTP
+  async resendOtp(
+    req: Request<{ email: string }>,
+    res: Response
+  ): Promise<void> {
+    try {
+      const { email } = req.body;
+
+      await this.userService.resendOTP(email);
+      res.status(200).json({ message: "OTP resent successfully" });
+    } catch (error) {
+      console.error("Resend OTP Controller error:", error);
+      if ((error as Error).message === "User not found") {
+        res.status(404).json({ message: "User not found" });
+      } else {
+        res
+          .status(500)
+          .json({ message: "Failed to resend OTP. Please try again later." });
       }
     }
   }

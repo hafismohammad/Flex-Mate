@@ -1,8 +1,7 @@
-import { IUser, IOtp } from '../interface/common';
-import UserModel from '../models/userModel';
-import OtpModel from '../models/otpModel';
+import { IUser, IOtp } from "../interface/common";
+import UserModel from "../models/userModel";
+import OtpModel from "../models/otpModel";
 import mongoose from "mongoose";
-
 
 class UserRepository {
   private userModel = UserModel;
@@ -45,6 +44,8 @@ class UserRepository {
 
   // Create new user
   async createNewUser(userData: IUser): Promise<void> {
+    console.log("create new user", userData);
+
     try {
       await this.userModel.create(userData);
       console.log("User created successfully.");
@@ -67,6 +68,16 @@ class UserRepository {
     } catch (error) {
       console.error("Error in deleting OTP:", error);
       throw error;
+    }
+  }
+
+  // Find user for login
+  async findUser(email: string): Promise<IUser | null> {
+    try {
+      return await this.userModel.findOne({ email });
+    } catch (error) {
+      console.log("Error finding user:", error);
+      return null;
     }
   }
 }

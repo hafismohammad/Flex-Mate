@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 export interface IUser {
    _id?: mongoose.Types.ObjectId;
+    id?: string; 
    name: string;
    email: string;
    phone: number;
@@ -23,3 +24,9 @@ export interface IOtp {
     createdAt: Date,
     expiresAt: Date
 }
+
+export interface ILoginUser {
+    email: string;
+    password: string;
+  }
+  
