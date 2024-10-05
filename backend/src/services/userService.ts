@@ -130,12 +130,12 @@ class UserService {
 async login({ email, password }: ILoginUser): Promise<any> {
   try {
     const userData: IUser | null = await this.userRepository.findUser(email);
+console.log(userData);
 
     if (userData && userData.password) {
       const isPasswordMatch = await bcrypt.compare(password, userData.password);
 
       if (isPasswordMatch) {
-        // Ensure userData._id exists before proceeding
         if (!userData._id) {
           throw new Error('User ID is missing');
         }
@@ -155,6 +155,9 @@ async login({ email, password }: ILoginUser): Promise<any> {
           },
         };
       }
+    } else {
+      console.log('User not found');
+      
     }
 
     return null;

@@ -1,6 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { UserState, User } from './userTypes'; 
-import { registerUser, verifyOtp } from "../../actions/userAction";
+import { registerUser, verifyOtp, loginUser } from "../../actions/userAction";
+import { stat } from "fs";
+import { userInfo } from "os";
 
 // Initial state
 const initialState: UserState = {
@@ -49,13 +51,28 @@ const userSlice = createSlice({
             .addCase(verifyOtp.fulfilled, (state, action: PayloadAction<User>) => {  
                 state.loading = false;
                 state.userInfo = action.payload;  
-                // console.log('userslice OTP---- ', state.userInfo)
                 state.error = null;
             })
             .addCase(verifyOtp.rejected, (state, action: PayloadAction<any>) => {
                 state.loading = false;
                 state.error = action.payload; 
-            });
+            })
+
+            .addCase(loginUser.pending, (state, action: PayloadAction<any>) => {
+                state.loading = true
+                state.error = action.payload
+            })
+            .addCase(loginUser.fulfilled, (state, action) => {
+                state.loading = false
+                state.userInfo = action.payload.user
+                state.userInfo = action.payload.token
+                localStorage.setItem('user', JSON.stringify(action.payload.user))
+                localStorage.setItem('access_token', action.payload.token);
+            })
+            .addCase(loginUser.rejected, (state, action: PayloadAction<any>) => {
+                state.loading = false
+                state.error = action.payload
+            })
     }
     
 });

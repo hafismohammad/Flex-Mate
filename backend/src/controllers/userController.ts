@@ -34,12 +34,30 @@ class UserController {
   async login(req: Request, res: Response): Promise<void> {
     try {
       const { email, password }: ILoginUser = req.body;
+      
       const user = await this.userService.login({ email, password });
+  
       if (user) {
-        console.log(user);    
-        res.json(user);
+        const { accessToken, refreshToken } = user;
+
+        res.cookie("refresh_token", refreshToken, {
+          httpOnly: true,
+          sameSite: 'none',
+          secure: true, 
+          maxAge: 7 * 24 * 60 * 60 * 1000, 
+        });
+  
+        res.status(200).json({
+          message: "Login successful",
+          user: {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            phone: user.phone
+          },
+          token: accessToken,
+        });
       } else {
-        console.log('Not found User');
         res.status(401).json({ message: "Invalid email or password" });
       }
     } catch (error) {
@@ -47,6 +65,7 @@ class UserController {
       res.status(500).json({ message: "Internal server error" });
     }
   }
+  
 
   // Verify OTP
   async verifyOtp(req: Request, res: Response) {

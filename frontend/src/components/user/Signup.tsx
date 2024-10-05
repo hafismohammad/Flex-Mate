@@ -4,9 +4,10 @@ import { AppDispatch, RootState } from "../../app/store";
 import { registerUser } from "../../actions/userAction";
 import { User } from "../../features/user/userTypes";
 import bg_img from "../../assets/signup-img.jpg";
-import logo from "../../assets/logo_1 (2).png";
+import logo from "../../assets/LOGO-3 (2).png";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { Toaster, toast } from 'react-hot-toast';
 
 interface Errors {
   name?: string;
@@ -88,11 +89,12 @@ const Signup = () => {
 
     // Dispatch the action to register the user
     dispatch(registerUser(userData));
-    navigate("/user/otp", { state: userData });
+    navigate("/otp", { state: userData });
   };
 
   return (
     <div className="min-h-screen bg-slate-100 flex items-center justify-center">
+      <Toaster />
       <div className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col lg:flex-row w-full max-w-4xl">
         {/* Left Section */}
         <div
@@ -113,7 +115,7 @@ const Signup = () => {
         <div className="w-full md:w-1/2 p-8 overflow-y-auto" style={{ maxHeight: '90vh' }}>
           {/* Center the logo */}
           <div className="flex justify-center">
-            <img src={logo} alt="Logo" className="w-40 h-40" />
+          <img src={logo} alt="Logo" className="w-20 h-10" />
           </div>
   
           <h1 className="text-xl md:text-2xl font-bold mb-4 text-center md:text-left">Register</h1>
@@ -177,7 +179,7 @@ const Signup = () => {
             <div className="text-center mt-4">
               <p className="text-gray-600">
                 Already have an account?{" "}
-                <Link to='/user/login' className="text-blue-500 hover:underline">Login</Link>
+                <Link to='/login' className="text-blue-500 hover:underline">Login</Link>
               </p>
             </div>
           </form>
