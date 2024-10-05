@@ -40,7 +40,7 @@ function Header() {
 
       {/* Get Started Button for Desktop */}
       <div className='hidden md:block'>
-        <Link to='/get-started'>
+        <Link to='/login'>
           <button className='bg-white hover:bg-slate-200 text-blue-800 px-4 py-2 rounded'>
             Get Started
           </button>
@@ -66,7 +66,7 @@ function Header() {
             <Link to='#' className='hover:text-gray-300' onClick={() => setIsOpen(false)}>Contact</Link>
           </li>
           <li>
-            <Link to='/get-started'>
+            <Link to='/login'>
               <button className='bg-white hover:bg-slate-200 text-blue-800 px-4 py-2 rounded w-full'>
                 Get Started
               </button>

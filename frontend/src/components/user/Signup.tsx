@@ -113,9 +113,8 @@ const Signup = () => {
   
         {/* Right Section */}
         <div className="w-full md:w-1/2 p-8 overflow-y-auto" style={{ maxHeight: '90vh' }}>
-          {/* Center the logo */}
-          <div className="flex justify-center">
-          <img src={logo} alt="Logo" className="w-20 h-10" />
+          <div className="flex justify-center mb-6">
+          <img src={logo} alt="Logo" className="w-21 h-10" />
           </div>
   
           <h1 className="text-xl md:text-2xl font-bold mb-4 text-center md:text-left">Register</h1>

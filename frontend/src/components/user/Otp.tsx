@@ -5,6 +5,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { verifyOtp } from "../../actions/userAction";
 import axios from 'axios'
 import API_URL from '../../../axios/API_URL'; 
+import { Toaster, toast } from 'react-hot-toast';
 
 
 interface Errors {
@@ -40,8 +41,9 @@ const Otp = () => {
 
   console.log('timer', seconds);
 
-  // const { userInfo, loading, error } = useSelector((state: RootState) => state.user);
-  // This will now show the email from the route
+  const { userInfo, loading, error } = useSelector((state: RootState) => state.user);
+console.log('otp error', error);
+
 
   const validate = () => {
     const newError: Errors = {};
@@ -76,9 +78,9 @@ const Otp = () => {
     if (userData) {
       dispatch(verifyOtp({ userData, otp }));
     }
-    navigate('/user/login')
   };
 
+ 
   const resendOtp = async () => {
     try {
       console.log(userData, userData.email);
@@ -96,8 +98,26 @@ const Otp = () => {
     }
   };
 
+  useEffect(() => {
+    if (error) {
+      if(error)
+      toast.error('Invalid OTP');
+    }
+  }, [error, navigate]);
+
+  useEffect(() => {
+    if (userInfo) {
+      const timer = setTimeout(() => {
+        navigate("/");
+      }, 1500); 
+
+      return () => clearTimeout(timer); 
+    }
+  }, [userInfo, navigate]);
+
   return (
     <div className="min-h-screen bg-slate-100 flex items-center justify-center">
+      <Toaster />
       <div className="w-[40%] bg-white p-6 rounded-xl shadow-lg ">
         <h2 className="text-2xl font-semibold text-gray-800 text-center mb-6">
           Enter OTP

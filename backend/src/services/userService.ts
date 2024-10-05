@@ -38,9 +38,8 @@ class UserService {
         throw new Error("Email not sent");
       }
 
-      // Set OTP expiration time (2 minutes from current time)
       const OTP_createdTime = new Date();
-      this.expiryOTP_time = new Date(OTP_createdTime.getTime() + 1 * 60 * 1000); // 2 minutes
+      this.expiryOTP_time = new Date(OTP_createdTime.getTime() + 1 * 60 * 1000); 
 
       // Save OTP in the database
       await this.userRepository.saveOTP(
@@ -76,18 +75,21 @@ class UserService {
 
       if (latestOtp.otp === otp) {
         if (latestOtp.expiresAt > new Date()) {
-          console.log("OTP is valid and verified");
+          console.log('otp expiration not working');
+          
+          console.log("OTP is valid and verified",latestOtp.expiresAt);
 
           const hashedPassword = await bcrypt.hash(userData.password, 10);
           const newUserData = { ...userData, password: hashedPassword };
 
           // Create new user
-          await this.userRepository.createNewUser(newUserData);
+          // await this.userRepository.createNewUser(newUserData);
 
           // Delete OTP after verification
           await this.userRepository.deleteOtpById(latestOtp._id);
         } else {
           console.log("OTP has expired");
+          await this.userRepository.deleteOtpById(latestOtp._id);
           throw new Error("OTP has expired");
         }
       } else {

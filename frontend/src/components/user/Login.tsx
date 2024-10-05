@@ -108,8 +108,8 @@ const Login = () => {
   
         {/* Right section */}
         <div className="w-full lg:w-1/2 p-8 overflow-y-auto">
-        <div className="flex justify-center">
-            <img src={logo} alt="Logo" className="w-20 h-10" />
+        <div className="flex justify-center mb-6">
+            <img src={logo} alt="Logo" className="w-21 h-10" />
           </div>
           <h2 className="text-2xl font-semibold mb-6 text-center lg:text-left">Login</h2>
           <form onSubmit={handleSubmit}>
