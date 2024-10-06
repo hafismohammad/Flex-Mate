@@ -83,9 +83,8 @@ class UserService {
           const newUserData = { ...userData, password: hashedPassword };
 
           // Create new user
-          // await this.userRepository.createNewUser(newUserData);
+          await this.userRepository.createNewUser(newUserData);
 
-          // Delete OTP after verification
           await this.userRepository.deleteOtpById(latestOtp._id);
         } else {
           console.log("OTP has expired");
@@ -132,7 +131,7 @@ class UserService {
 async login({ email, password }: ILoginUser): Promise<any> {
   try {
     const userData: IUser | null = await this.userRepository.findUser(email);
-console.log(userData);
+// console.log(userData);
 
     if (userData && userData.password) {
       const isPasswordMatch = await bcrypt.compare(password, userData.password);

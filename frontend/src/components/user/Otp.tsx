@@ -3,10 +3,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../app/store";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { verifyOtp } from "../../actions/userAction";
-import axios from 'axios'
-import API_URL from '../../../axios/API_URL'; 
-import { Toaster, toast } from 'react-hot-toast';
-
+import axios from "axios";
+import API_URL from "../../../axios/API_URL";
+import { Toaster, toast } from "react-hot-toast";
 
 interface Errors {
   otp?: string;
@@ -15,15 +14,17 @@ interface Errors {
 const Otp = () => {
   const [otp, setOtp] = useState<string>("");
   const [errors, setErrors] = useState<Errors>({});
-  const [seconds, setSeconds] = useState<number>(60); 
-  const [isDisabled, setIsDisabled] = useState<boolean>(true); 
+  const [seconds, setSeconds] = useState<number>(60);
+  const [isDisabled, setIsDisabled] = useState<boolean>(true);
+  const [otpVerified, setOtpVerified] = useState(false);
 
   // Get the email from the URL
   const location = useLocation();
   const userData = location.state;
 
   const dispatch = useDispatch<AppDispatch>();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const { userInfo, error } = useSelector((state: RootState) => state.user);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -38,12 +39,6 @@ const Otp = () => {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
-
-  console.log('timer', seconds);
-
-  const { userInfo, loading, error } = useSelector((state: RootState) => state.user);
-console.log('otp error', error);
-
 
   const validate = () => {
     const newError: Errors = {};
@@ -73,26 +68,29 @@ console.log('otp error', error);
     }
 
     setErrors({});
-    console.log("userData", userData, otp);
+    // console.log("userData", userData, otp);
 
     if (userData) {
-      dispatch(verifyOtp({ userData, otp }));
+      dispatch(verifyOtp({ userData, otp })).then((res) => {
+        if (res.meta.requestStatus === "fulfilled") {
+          setOtpVerified(true);
+          toast.success("Registration successful");
+        }
+      });
     }
   };
 
- 
   const resendOtp = async () => {
     try {
       console.log(userData, userData.email);
-      
+
       const response = await axios.post(`${API_URL}/resend-otp`, {
         email: userData.email,
       });
-      console.log(response.data.message); 
-      
-    
-      setSeconds(60); 
-      setIsDisabled(true); 
+      console.log(response.data.message);
+
+      setSeconds(60);
+      setIsDisabled(true);
     } catch (error) {
       console.error("Error resending OTP:", error);
     }
@@ -100,20 +98,15 @@ console.log('otp error', error);
 
   useEffect(() => {
     if (error) {
-      if(error)
-      toast.error('Invalid OTP');
+      if (error) toast.error("Invalid OTP");
     }
   }, [error, navigate]);
 
   useEffect(() => {
-    if (userInfo) {
-      const timer = setTimeout(() => {
-        navigate("/");
-      }, 1500); 
-
-      return () => clearTimeout(timer); 
+    if (otpVerified) {
+      navigate("/login");
     }
-  }, [userInfo, navigate]);
+  }, [otpVerified, navigate]);
 
   return (
     <div className="min-h-screen bg-slate-100 flex items-center justify-center">

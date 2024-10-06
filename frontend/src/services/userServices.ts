@@ -32,12 +32,17 @@ const verifyOtp = async ({
   return response.data;
 };
 
+const logout = () => {
+  return axios.post(`${API_URL}/logout`, {});  // Using POST request to logout
+}
+
 
 
 const userService = {
   register,
   verifyOtp,
-  login
+  login,
+  logout
 };
 
 export default userService;

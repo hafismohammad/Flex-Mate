@@ -1,3 +1,4 @@
+import exp from "constants";
 
 // Structure of the user object
 export interface User {
@@ -14,5 +15,7 @@ export interface User {
     userInfo: User | null;  
     loading: boolean;       
     error: string | null;   
+    token:string|null;
   }
 
+  
