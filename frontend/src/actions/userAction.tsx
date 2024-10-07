@@ -54,11 +54,11 @@ export const logoutUser = createAsyncThunk(
   'user/logout',
   async (_, thunkAPI) => {
     try {
-      const response = await userService.logout(); // Call the logout service
+      const response = await userService.logout();
       console.log('logout response', response);
-      return response.data; // Return the response data from the server
+      return response.data; 
     } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.response.data); // Handle the error case
+      return thunkAPI.rejectWithValue(error.response.data); 
     }
   }
 )

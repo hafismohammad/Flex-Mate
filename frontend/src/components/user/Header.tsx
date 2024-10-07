@@ -22,11 +22,7 @@ function Header() {
     navigate("/login");
   };
 
-  useEffect(() => {
-    if(!userInfo) {
-      navigate('/login')
-    }
-  }, [navigate, userInfo])
+
 
   return (
     <header className="w-full flex justify-between items-center bg-blue-800 text-white p-4 sticky z-50">

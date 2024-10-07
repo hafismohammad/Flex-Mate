@@ -33,7 +33,7 @@ const verifyOtp = async ({
 };
 
 const logout = () => {
-  return axios.post(`${API_URL}/logout`, {});  // Using POST request to logout
+  return axios.post(`${API_URL}/logout`, {}); 
 }
 
 

@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { UserState, User } from "./userTypes";
-import { registerUser, verifyOtp, loginUser } from "../../actions/userAction";
+import { registerUser, verifyOtp, loginUser, logoutUser } from "../../actions/userAction";
 
 // Initial state
 const user = localStorage.getItem("user");
@@ -70,7 +70,7 @@ const userSlice = createSlice({
         state.loading = false;
         state.userInfo = action.payload.user;
         state.token = action.payload.token;
-        console.log(action.payload.user);
+        // console.log(action.payload.user);
         
         localStorage.setItem("user", JSON.stringify(action.payload.user));
         localStorage.setItem("access_token", action.payload.token);
@@ -78,7 +78,17 @@ const userSlice = createSlice({
       .addCase(loginUser.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = action.payload;
-      });
+      })
+
+       // Logout user
+
+      .addCase(logoutUser.fulfilled, (state, action: PayloadAction<User>) => {
+        state.userInfo = null;
+        state.error = null;
+        localStorage.removeItem('user')
+        localStorage.removeItem('access_token')
+      })
+
   },
 });
 
