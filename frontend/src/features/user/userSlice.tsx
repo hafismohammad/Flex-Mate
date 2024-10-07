@@ -3,8 +3,12 @@ import { UserState, User } from "./userTypes";
 import { registerUser, verifyOtp, loginUser } from "../../actions/userAction";
 
 // Initial state
+const user = localStorage.getItem("user");
+console.log(user);
+
+const final = user ? JSON.parse(user) : null;
 const initialState: UserState = {
-  userInfo: null,
+  userInfo: final?final : null,
   token: localStorage.getItem("access_token") || null,
   loading: false,
   error: null,
@@ -66,6 +70,8 @@ const userSlice = createSlice({
         state.loading = false;
         state.userInfo = action.payload.user;
         state.token = action.payload.token;
+        console.log(action.payload.user);
+        
         localStorage.setItem("user", JSON.stringify(action.payload.user));
         localStorage.setItem("access_token", action.payload.token);
       })
