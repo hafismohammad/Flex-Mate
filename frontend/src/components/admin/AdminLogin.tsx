@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { AppDispatch } from '../../app/store';
+import { AppDispatch, RootState } from '../../app/store';
 import {adminLogin} from '../../actions/adminAction'
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 interface Errors {
   email?: string;
@@ -12,7 +14,9 @@ function AdminLogin() {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [errors, setErrors] = useState<Errors>({});
+
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate()
 
   const validate = (): Errors => {
     const newErrors: Errors = {};
@@ -54,6 +58,7 @@ function AdminLogin() {
 
 
       dispatch(adminLogin(adminData));
+      navigate('/admin/')
 
     }
   };

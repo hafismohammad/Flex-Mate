@@ -7,6 +7,7 @@ const user = localStorage.getItem("user");
 console.log(user);
 
 const final = user ? JSON.parse(user) : null;
+
 const initialState: UserState = {
   userInfo: final?final : null,
   token: localStorage.getItem("access_token") || null,
