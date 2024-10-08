@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import UserService from "../services/userService";
 import { IUser, ILoginUser } from "../interface/common";
-import jwt from 'jsonwebtoken'
 
 class UserController {
   private userService: UserService;
@@ -48,7 +47,7 @@ class UserController {
           secure: true, 
           maxAge: 7 * 24 * 60 * 60 * 1000, 
         });
-        console.log(user);
+        // console.log(user);
         
         res.status(200).json({
           message: "Login successful",

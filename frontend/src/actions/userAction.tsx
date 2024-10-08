@@ -1,7 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { User } from "../features/user/userTypes";
 import userService from "../services/userServices";
-import { useReducer } from "react";
 
 export const registerUser = createAsyncThunk(
   "user/signup",

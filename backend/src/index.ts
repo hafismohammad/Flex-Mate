@@ -3,6 +3,7 @@ import cors from 'cors';
 import connectDB from './utils/db';
 import cookieParser from 'cookie-parser';
 import userRoute from '../src/routes/userRoute'
+import AdminRoute from '../src/routes/adminRoute'
 // Express app initialization
 const app: Application = express();
 
@@ -29,6 +30,8 @@ app.use(express.json());
 // });
 
 app.use('/user/api', userRoute); 
+app.use('/admin/api', AdminRoute); 
+
 
 // Server running
 app.listen(process.env.PORT || 3000, () => {

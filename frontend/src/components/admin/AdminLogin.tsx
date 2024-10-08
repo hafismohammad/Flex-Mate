@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../../app/store';
+import {adminLogin} from '../../actions/adminAction'
 
 interface Errors {
   email?: string;
@@ -9,6 +12,7 @@ function AdminLogin() {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [errors, setErrors] = useState<Errors>({});
+  const dispatch = useDispatch<AppDispatch>();
 
   const validate = (): Errors => {
     const newErrors: Errors = {};
@@ -29,16 +33,28 @@ function AdminLogin() {
     return newErrors;
   };
 
+  const clearErrors = () => {
+    setTimeout(() => {
+      setErrors({});
+    }, 3000); 
+  };
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-
-      
+      clearErrors(); 
     } else {
-  
-      console.log('Form is valid. Submitting data:', { email, password });
+     
+      const adminData = {
+        email,
+        password,
+      };
+
+
+      dispatch(adminLogin(adminData));
+
     }
   };
 

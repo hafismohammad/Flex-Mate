@@ -6,7 +6,7 @@ import UserController from "../controllers/userController";
 const router = express.Router();
 
 // Set up instances of the repository, service, and controller
-const userRepository = new UserRepository();
+const userRepository = new UserRepository();    
 const userService = new UserService(userRepository);
 const userController = new UserController(userService);
 
