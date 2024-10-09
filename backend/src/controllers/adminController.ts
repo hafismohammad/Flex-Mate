@@ -12,7 +12,7 @@ class AdminController {
   async adminLogin(req: Request, res: Response) {
     try {
       const { email, password }: ILoginAdmin = req.body;
-      console.log("admin data", email, password);
+      // console.log("admin data", email, password);
 
       const admin = await this.adminService.adminLogin({ email, password });
       if (admin) {
@@ -55,6 +55,21 @@ class AdminController {
       res.status(500).json({ message: "Logout failed", error });
     }
   }
+
+  async addSpecialization(req: Request, res: Response) {
+    try {
+      const specializationData = req.body;
+      const specialization = await this.adminService.addSpecialization(specializationData);
+      res.status(201).json({ message: "Specialization added successfully", specialization });
+    } catch (error) {
+      console.error('Adding specialization error', error);
+      res.status(500).json({ message: "Failed to add specialization", error });
+    }
+  }
+  
+
+
+  
 }
 
 export default AdminController;

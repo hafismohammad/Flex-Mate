@@ -1,16 +1,23 @@
-import React, { useState } from 'react';
-import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
+import React, { useState } from "react";
+import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../app/store";
+import { addSpecialization } from '../../actions/adminAction'
 
 const SpecializationsPage = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const dispatch = useDispatch<AppDispatch>()
 
   // Mock data for Specializations
   const specializations = [
-    { id: 1, name: 'Yoga', status: 'Active' },
-    { id: 2, name: 'Pilates', status: 'Inactive' },
-    { id: 3, name: 'Strength Training', status: 'Active' },
-    { id: 4, name: 'Cardio', status: 'Active' },
+    { id: 1, name: "Yoga", status: "Active" },
+    { id: 2, name: "Pilates", status: "Inactive" },
+    { id: 3, name: "Strength Training", status: "Active" },
+    { id: 4, name: "Cardio", status: "Active" },
   ];
 
   // Filter specializations based on the search term
@@ -26,6 +33,15 @@ const SpecializationsPage = () => {
   // Function to close the modal
   const closeModal = () => {
     setIsModalOpen(false);
+  };
+
+  const handleAddSpecialization = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const specializationData = {
+      name, description
+    }
+    dispatch(addSpecialization(specializationData))
   };
 
   return (
@@ -72,7 +88,7 @@ const SpecializationsPage = () => {
               <div className="text-gray-800 font-medium">{spec.name}</div>
               <div
                 className={`font-semibold ${
-                  spec.status === 'Active' ? 'text-green-600' : 'text-red-500'
+                  spec.status === "Active" ? "text-green-600" : "text-red-500"
                 }`}
               >
                 {spec.status}
@@ -90,7 +106,9 @@ const SpecializationsPage = () => {
             </div>
           ))
         ) : (
-          <div className="text-gray-500 text-center py-6">No specializations found.</div>
+          <div className="text-gray-500 text-center py-6">
+            No specializations found.
+          </div>
         )}
       </div>
 
@@ -99,22 +117,35 @@ const SpecializationsPage = () => {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-lg shadow-lg">
             <h3 className="text-2xl font-bold mb-4">Add New Specialization</h3>
-            <input
-              type="text"
-              placeholder="Enter specialization name"
-              className="w-full p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <div className="flex justify-end space-x-4">
-              <button
-                onClick={closeModal}
-                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
-              >
-                Cancel
-              </button>
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                Save
-              </button>
-            </div>
+            <form onSubmit={handleAddSpecialization}>
+              <input
+                type="text"
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter specialization name"
+                className="w-full p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+
+              <textarea
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Enter specialization description"
+                className="w-full h-32 p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              ></textarea>
+
+              <div className="flex justify-end space-x-4">
+                <button
+                  onClick={closeModal}
+                  className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  Add
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

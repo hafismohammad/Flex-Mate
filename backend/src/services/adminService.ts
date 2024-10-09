@@ -34,6 +34,11 @@ class AdminService {
       throw error;
     }
   }
+
+  async addSpecialization({name, description}: {name: string, description: string}) {
+    const specializationData = await this.adminRepository.addSpecialization({name, description})
+  }
+
 }
 
 export default AdminService;

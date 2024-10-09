@@ -12,5 +12,6 @@ const adminController = new AdminController(adminService);
 
 router.post('/adminLogin', adminController.adminLogin.bind(adminController));
 router.post('/logout', adminController.adminLogout.bind(adminController))
+router.post('/addSpecialization', adminController.addSpecialization.bind(adminController))
 
 export default router;

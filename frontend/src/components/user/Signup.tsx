@@ -31,7 +31,7 @@ const Signup = () => {
     (state: RootState) => state.user
   );
 
-  console.log("userInfo register------------->", userInfo);
+  // console.log("userInfo register------------->", userInfo);
   
   const validate = (): Errors => {
     const newErrors: Errors = {};
