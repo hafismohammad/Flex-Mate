@@ -29,8 +29,8 @@ app.use(express.json());
 //   res.send('Welcome to the Home Page');
 // });
 
-app.use('/user/api', userRoute); 
-app.use('/admin/api', AdminRoute); 
+app.use('/api/user/', userRoute); 
+app.use('/api/admin/', AdminRoute); 
 
 
 // Server running

@@ -11,5 +11,6 @@ const adminService = new AdminService(adminRepository);
 const adminController = new AdminController(adminService);
 
 router.post('/adminLogin', adminController.adminLogin.bind(adminController));
+router.post('/logout', adminController.adminLogout.bind(adminController))
 
 export default router;

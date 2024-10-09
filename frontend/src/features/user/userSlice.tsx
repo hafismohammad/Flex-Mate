@@ -4,7 +4,6 @@ import { registerUser, verifyOtp, loginUser, logoutUser } from "../../actions/us
 
 // Initial state
 const user = localStorage.getItem("user");
-console.log(user);
 
 const final = user ? JSON.parse(user) : null;
 

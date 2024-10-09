@@ -3,7 +3,7 @@ import { User } from "../features/user/userTypes";
 import API_URL from '../../axios/API_URL'; 
 
 const register = async (userDetails: User) => {
-  const response = await axios.post(`${API_URL}/user/api/signup`, userDetails);
+  const response = await axios.post(`${API_URL}/api/user/signup`, userDetails);
 
   if (response.data) {
     console.log('register', response.data);
@@ -11,8 +11,11 @@ const register = async (userDetails: User) => {
 
   return response.data;
 };
-const login = (userData: { email: string; password: string }) => {
-  return axios.post(`${API_URL}/user/api/login`, userData);
+const login = async (userData: { email: string; password: string }) => {
+  console.log('kljj');
+  
+  const response =   await axios.post(`${API_URL}/api/user/login`, userData);
+  return response
 };
 
 const verifyOtp = async ({
@@ -22,7 +25,7 @@ const verifyOtp = async ({
   userData: User;
   otp: string;
 }) => {
-  const response = await axios.post(`${API_URL}/user/api/otp`, { userData, otp });
+  const response = await axios.post(`${API_URL}/api/user/otp`, { userData, otp });
 
   if (response.data) {
     // Store the user data in localStorage after successful OTP verification
@@ -33,7 +36,7 @@ const verifyOtp = async ({
 };
 
 const logout = () => {
-  return axios.post(`${API_URL}/user/api/logout`, {}); 
+  return axios.post(`${API_URL}/api/user/logout`, {}); 
 }
 
 

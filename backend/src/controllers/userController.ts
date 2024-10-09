@@ -33,25 +33,26 @@ class UserController {
   // Login user
   async login(req: Request, res: Response): Promise<void> {
     try {
+      console.log("login route hit");
+
       const { email, password }: ILoginUser = req.body;
-      
+
       const user = await this.userService.login({ email, password });
-      
-  
+
       if (user) {
         const { accessToken, refreshToken } = user;
 
         res.cookie("refresh_token", refreshToken, {
           httpOnly: true,
-          sameSite: 'none',
-          secure: true, 
-          maxAge: 7 * 24 * 60 * 60 * 1000, 
+          sameSite: "none",
+          secure: true,
+          maxAge: 7 * 24 * 60 * 60 * 1000,
         });
         // console.log(user);
-        
+
         res.status(200).json({
           message: "Login successful",
-          user:user.user,
+          user: user.user,
           token: accessToken,
         });
       } else {
@@ -62,7 +63,6 @@ class UserController {
       res.status(500).json({ message: "Internal server error" });
     }
   }
-  
 
   // Verify OTP
   async verifyOtp(req: Request, res: Response) {
@@ -115,27 +115,21 @@ class UserController {
     }
   }
 
- 
-
   logout = async (req: Request, res: Response): Promise<void> => {
     try {
-      
-        res.clearCookie("refresh_token", {
-            httpOnly: true,
-            sameSite: "none", 
-            secure: true      
-        });
+      res.clearCookie("refresh_token", {
+        httpOnly: true,
+        sameSite: "none",
+        secure: true,
+      });
 
-        res.status(200).json({ message: "Logged out successfully" });
+      res.status(200).json({ message: "Logged out successfully" });
     } catch (error) {
-        console.error("Logout error:", error);
+      console.error("Logout error:", error);
 
-        res.status(500).json({ message: "Logout failed", error });
+      res.status(500).json({ message: "Logout failed", error });
     }
-};
-
-  
-
+  };
 }
 
 export default UserController;

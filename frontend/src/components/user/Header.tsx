@@ -26,21 +26,18 @@ function Header() {
 
   return (
     <header className="w-full flex justify-between items-center bg-blue-800 text-white p-4 sticky z-50">
-      {/* Logo Section */}
       <div>
         <Link to="/">
           <img src={LOGO} alt="Logo" className="w-max h-7" />
         </Link>
       </div>
 
-      {/* Mobile Menu Button */}
       <div className="md:hidden">
         <button onClick={() => setIsOpen(!isOpen)} className="text-white">
           {isOpen ? <FiX size={24} /> : <FiMenu size={24} />}
         </button>
       </div>
 
-      {/* Desktop Navigation */}
       <nav className={`hidden md:flex space-x-8 ${isOpen ? 'block' : ''}`}>
         <ul className="flex space-x-8">
           <li>
@@ -66,14 +63,12 @@ function Header() {
         </ul>
       </nav>
 
-      {/* Profile Menu */}
       <div className="hidden md:block relative">
         {token ? (
           <div>
             <img
               alt="user profile"
               src={ProfileIcon}
-              // src={userInfo?.profilePicture || "https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=1480&amp;q=80"}
               className="h-10 w-10 cursor-pointer rounded-full object-cover"
               onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
             />
