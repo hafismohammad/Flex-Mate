@@ -71,6 +71,7 @@ const Otp = () => {
     // console.log("userData", userData, otp);
 
     if (userData) {
+      
       dispatch(verifyOtp({ userData, otp })).then((res) => {
         if (res.meta.requestStatus === "fulfilled") {
           setOtpVerified(true);

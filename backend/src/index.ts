@@ -4,6 +4,7 @@ import connectDB from './utils/db';
 import cookieParser from 'cookie-parser';
 import userRoute from '../src/routes/userRoute'
 import AdminRoute from '../src/routes/adminRoute'
+import TrainerRoute from '../src/routes/trainerRoute'
 // Express app initialization
 const app: Application = express();
 
@@ -31,6 +32,7 @@ app.use(express.json());
 
 app.use('/api/user/', userRoute); 
 app.use('/api/admin/', AdminRoute); 
+app.use('/api/trainer/', TrainerRoute)
 
 
 // Server running

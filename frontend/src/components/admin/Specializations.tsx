@@ -2,15 +2,21 @@ import React, { useState } from "react";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../app/store";
-import { addSpecialization } from '../../actions/adminAction'
+import { addSpecialization } from '../../actions/adminAction';
+
+interface Errors {
+  name?: string;
+  description?: string;
+}
 
 const SpecializationsPage = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [errors, setErrors] = useState<Errors>({});
 
-  const dispatch = useDispatch<AppDispatch>()
+  const dispatch = useDispatch<AppDispatch>();
 
   // Mock data for Specializations
   const specializations = [
@@ -33,15 +39,48 @@ const SpecializationsPage = () => {
   // Function to close the modal
   const closeModal = () => {
     setIsModalOpen(false);
+    setErrors({}); // Clear errors when closing the modal
+    setName(""); // Clear name input
+    setDescription(""); // Clear description input
+  };
+
+  const validate = (): boolean => {
+    let isValid = true;
+    const newErrors: Errors = {};
+
+    if (!name.trim()) {
+      newErrors.name = "Please fill the name field";
+      isValid = false;
+    }
+
+    if (!description.trim()) {
+      newErrors.description = "Please fill the description field";
+      isValid = false;
+    }
+
+    if (!isValid) {
+      setErrors(newErrors);
+      setTimeout(() => {
+        setErrors({}); // Clear errors after 3000 ms
+      }, 3000);
+    }
+
+    return isValid;
   };
 
   const handleAddSpecialization = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const specializationData = {
-      name, description
+    if (!validate()) {
+      return; // Exit if validation fails
     }
-    dispatch(addSpecialization(specializationData))
+
+    const specializationData = {
+      name,
+      description,
+    };
+    dispatch(addSpecialization(specializationData));
+    closeModal(); // Close the modal after submission
   };
 
   return (
@@ -120,16 +159,20 @@ const SpecializationsPage = () => {
             <form onSubmit={handleAddSpecialization}>
               <input
                 type="text"
+                value={name} // Ensure input reflects state
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Enter specialization name"
-                className="w-full p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={`w-full p-2 border ${errors.name ? "border-red-500" : "border-gray-300"} rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500`}
               />
+              {errors.name && <div className="text-red-500 mb-2">{errors.name}</div>}
 
               <textarea
+                value={description} // Ensure textarea reflects state
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Enter specialization description"
-                className="w-full h-32 p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={`w-full h-32 p-2 border ${errors.description ? "border-red-500" : "border-gray-300"} rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500`}
               ></textarea>
+              {errors.description && <div className="text-red-500 mb-2">{errors.description}</div>}
 
               <div className="flex justify-end space-x-4">
                 <button

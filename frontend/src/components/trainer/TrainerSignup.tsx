@@ -1,15 +1,24 @@
 import BG_IMG from "../../assets/signup-img.jpg";
 import LOGO from "../../assets/LOGO-3 (2).png";
-import { Link } from "react-router-dom";
-import React, { useState } from "react";
-import { setError } from "../../features/user/userSlice";
+import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { AppDispatch, RootState } from "../../app/store";
+import { fetchSpecializations } from "../../actions/trainerAction";
+import { useSelector } from "react-redux";
+import {registerTrainer} from '../../actions/trainerAction'
 
 interface Errors {
   name?: string;
   email?: string;
   phone?: string;
   password?: string;
-  cpassword?: string;
+  specialization?: string;
+}
+
+interface Specialization {
+  id: string;
+  name: string;
 }
 
 function TrainerSignup() {
@@ -17,8 +26,18 @@ function TrainerSignup() {
   const [email, setEmail] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-
+  const [specialization, setSpecialization] = useState<string>(""); 
   const [errors, setErrors] = useState<Errors>({});
+
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate()
+  const specializationsData = useSelector(
+    (state: RootState) => state.trainer.specializations
+  );
+
+  useEffect(() => {
+    dispatch(fetchSpecializations());
+  }, [dispatch]);
 
   const validate = (): Errors => {
     const newErrors: Errors = {};
@@ -26,6 +45,7 @@ function TrainerSignup() {
     if (!name.trim()) {
       newErrors.name = "Please fill the name field";
     }
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email.trim()) {
       newErrors.email = "Please fill the email field";
@@ -43,6 +63,10 @@ function TrainerSignup() {
       newErrors.password = "Please fill the password field";
     } else if (password.length < 6) {
       newErrors.password = "Password must be at least 6 characters";
+    }
+
+    if (!specialization) { 
+      newErrors.specialization = "Please select a specialization";
     }
 
     return newErrors;
@@ -63,11 +87,24 @@ function TrainerSignup() {
       return;
     }
     setErrors({});
+    
+    
+     const trainerData = {
+      name,
+      email,
+      phone,
+      password,
+      specialization,
+     }
+   
+     dispatch(registerTrainer(trainerData))
+    navigate("/trainer/otp", { state: trainerData });
+
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex items-center justify-center">
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col lg:flex-row w-full max-w-4xl">
+    <div className="min-h-screen bg-slate-100 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col md:flex-row w-full max-w-4xl">
         <div
           className="w-full md:w-1/2 flex flex-col items-center justify-center p-8 bg-cover bg-center"
           style={{ backgroundImage: `url(${BG_IMG})` }}
@@ -79,15 +116,12 @@ function TrainerSignup() {
             Your platform for flexible work solutions.
           </p>
         </div>
-        <div
-          className="w-full md:w-1/2 p-8 overflow-y-auto"
-          style={{ maxHeight: "90vh" }}
-        >
+        <div className="w-full md:w-1/2 p-6 sm:p-8 overflow-y-auto" style={{ maxHeight: "90vh" }}>
           <div className="flex justify-center mb-6">
-            <img src={LOGO} alt="logo" className="w-21 h-10" />
+            <img src={LOGO} alt="logo" className="w-30 h-10 object-contain" />
           </div>
           <h1 className="text-xl md:text-2xl font-bold mb-4 text-center md:text-left">
-            Trainer Register{" "}
+            Trainer Register
           </h1>
 
           <form onSubmit={handleSubmit}>
@@ -97,24 +131,20 @@ function TrainerSignup() {
                 placeholder="Name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              {errors.name && (
-                <p className="text-red-500 text-sm mt-1">{errors.name}</p>
-              )}
+              {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
             </div>
 
             <div className="mt-4">
               <input
-                type="text"
+                type="email"
                 placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              {errors.email && (
-                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-              )}
+              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
             </div>
 
             <div className="mt-4">
@@ -123,38 +153,40 @@ function TrainerSignup() {
                 placeholder="Phone"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              {errors.phone && (
-                <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
-              )}
+              {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
             </div>
 
             <div className="mt-4">
               <input
-                type="text"
+                type="password"
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              {errors.password && (
-                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
-              )}
+              {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
             </div>
 
             <div className="mt-4">
               <select
-                className="bg-white font-normal border border-gray-300 text-gray-400 text-md  rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full h-10 p-2.5"
+                value={specialization}
+                onChange={(e) => setSpecialization(e.target.value)} // Update specialization state
+                className="bg-white font-normal border border-gray-300 text-gray-700 text-md rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 transition duration-200 ease-in-out hover:border-blue-500 hover:shadow-md"
               >
-                <option value="" selected disabled>
+                <option value="" disabled>
                   Choose a Specialization
                 </option>
-                <option value="US">United States</option>
-                <option value="CA">Canada</option>
-                <option value="FR">France</option>
-                <option value="DE">Germany</option>
+                {specializationsData.map((specializationItem: Specialization) => (
+                  <option key={specializationItem.id} value={specializationItem.id}>
+                    {specializationItem.name}
+                  </option>
+                ))}
               </select>
+              {errors.specialization && (
+                <p className="text-red-500 text-sm mt-1">{errors.specialization}</p>
+              )}
             </div>
 
             <button
