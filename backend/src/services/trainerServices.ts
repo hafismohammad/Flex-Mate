@@ -44,7 +44,7 @@ class TrainerService {
       console.log("Generated OTP is", this.OTP);
 // console.log('trainerData.email',trainerData.email);
 
-      // Send OTP to user's email
+      // Send OTP to trainer's email
     //   const isMailSent = await sendOTPmail(trainerData.email, this.OTP);
     //   if (!isMailSent) {
     //     throw new Error("Email not sent");
@@ -92,8 +92,8 @@ class TrainerService {
           const hashedPassword = await bcrypt.hash(trainerData.password, 10);
           const newtrainerData = { ...trainerData, password: hashedPassword };
 
-          // Create new user
-          await this.trainerRepository.createNewUser(newtrainerData);
+          // Create new traienr
+          await this.trainerRepository.createNewTrainer(newtrainerData);
 
           await this.trainerRepository.deleteOtpById(latestOtp._id);
         } else {
@@ -113,45 +113,47 @@ class TrainerService {
     }
   }
 
-    // login trainer
-async login({ email, password }: ILoginTrainer): Promise<any> {
+// login trainer
+async trainerLogin({ email, password }: { email: string; password: string }) {
   try {
-    const trainerData: ITrainer | null = await this.trainerRepository.findUser(email);
+    const trainerData = await this.trainerRepository.findTrainer(email);
+console.log(trainerData);
 
-    if (trainerData && trainerData.password) {
-      const isPasswordMatch = await bcrypt.compare(password, trainerData.password);
+    // Ensure both trainerData and trainerData._id are defined
+    if (trainerData && trainerData._id) {
+      const isPasswordValid = await bcrypt.compare(password, trainerData.password);
 
-      if (isPasswordMatch) {
-        if (!trainerData._id) {
-          throw new Error('User ID is missing');
-        }
-
-        // Generate access and refresh tokens
-        const accessToken = generateAccessToken({ id: trainerData._id.toString(), email: trainerData.email });
-        const refreshToken = generateRefreshToken({ id: trainerData._id.toString(), email: trainerData.email });
-
-        return {
-          accessToken,
-          refreshToken,
-          user: {
-            id: trainerData._id.toString(),
-            name: trainerData.name,
-            email: trainerData.email,
-            phone: trainerData.phone,
-          },
-        };
+      if (!isPasswordValid) {
+        console.log('Invalid password:', password);
+        throw new Error('Password is wrong');
       }
-    } else {
-      console.log('Trainer not found');
-      
-    }
 
-    return null;
+
+      // Generate access and refresh tokens
+      const accessToken = generateAccessToken({ id: trainerData._id.toString(), email: trainerData.email });
+      const refreshToken = generateRefreshToken({ id: trainerData._id.toString(), email: trainerData.email });
+
+      return {
+        accessToken,
+        refreshToken,
+        trainer: {
+          id: trainerData._id.toString(),
+          email: trainerData.email,
+          password: trainerData.password,
+          phone: trainerData.phone,
+          specialization: trainerData.specialization
+        }
+      };
+    } else {
+      console.log("Trainer not exists");
+    }
   } catch (error) {
-    console.error('Login error:', error);
-    return null;
+    console.error("Error in trainer login:", error);
+    throw error;
   }
 }
+
+  
 
 }
 

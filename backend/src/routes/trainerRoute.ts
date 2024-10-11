@@ -16,7 +16,7 @@ const trainerController = new TrainerController(trainerService);
 router.get('/getSpecializations', trainerController.getAllSpecializations.bind(trainerController));
 router.post('/signup', trainerController.registerTrainer.bind(trainerController))
 router.post('/otp', trainerController.verifyOtp.bind(trainerController))
-router.post('/login', trainerController.login.bind(trainerController))
+router.post('/login', trainerController.trainerLogin.bind(trainerController))
 
 
 

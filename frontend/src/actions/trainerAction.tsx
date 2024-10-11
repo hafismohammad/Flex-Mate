@@ -57,10 +57,10 @@ interface loginTrainer {
 }
 
 export const loginTrainer = createAsyncThunk(
-  'user/login',
+  'trainer/login',
   async ({ email, password }: loginTrainer, thunkAPI) => {
     try {
-      const response = await trainerService.login({ email, password });
+      const response = await trainerService.trainerLogin({ email, password });
       console.log('Trainer login response data', response.data);    
       return response.data; 
       

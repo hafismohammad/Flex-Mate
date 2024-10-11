@@ -17,6 +17,23 @@ export interface ITrainer {
     specialization: string
     isBlocked?: boolean;
   }
+  // src/interface/kyc_interface.ts
+
+  export interface IKYC {
+    trainerId: string; 
+    kycDocuments: string[]; 
+    address?: {
+        street: string; 
+        city: string;
+        state: string;
+        pinCode: string;
+        country: string;
+    };
+    kycStatus: 'pending' | 'approved' | 'rejected'; 
+    kycSubmissionDate?: Date; 
+    kycComments?: string;
+}
+
 
 
   export interface ILoginTrainer {

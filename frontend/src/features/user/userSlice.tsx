@@ -74,6 +74,8 @@ const userSlice = createSlice({
         
         localStorage.setItem("user", JSON.stringify(action.payload.user));
         localStorage.setItem("access_token", action.payload.token);
+        console.log('user slice is workind ', action.payload);
+        
       })
       .addCase(loginUser.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
@@ -81,7 +83,6 @@ const userSlice = createSlice({
       })
 
        // Logout user
-
       .addCase(logoutUser.fulfilled, (state, action: PayloadAction<User>) => {
         state.userInfo = null;
         state.error = null;

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { fetchSpecializations, registerTrainer, trainerVerifyOtp } from '../../actions/trainerAction';
+import { fetchSpecializations, registerTrainer, trainerVerifyOtp, loginTrainer } from '../../actions/trainerAction';
 
 interface TrainerState {
   trainerInfo: null | any; 
@@ -9,9 +9,12 @@ interface TrainerState {
   error: null | string;
 }
 
+const trainer = localStorage.getItem('trainer')
+const parsedTrainer = trainer ? JSON.parse(trainer) : null
+
 const initialState: TrainerState = {
-  trainerInfo: null,
-  trainerToken: null,
+  trainerInfo: parsedTrainer,
+  trainerToken: localStorage.getItem('trainer_access_token') || null,
   specializations: [], 
   loading: false,
   error: null,
@@ -77,6 +80,26 @@ const trainerSlice = createSlice({
           state.loading = false;
           state.error = action.payload;
         })
+
+         // Login trainer actions
+      .addCase(loginTrainer.pending, (state, action: PayloadAction<any>) => {
+        state.loading = true;
+        state.error = action.payload;
+      })
+      .addCase(loginTrainer.fulfilled, (state, action) => {
+        state.loading = false;
+        state.trainerInfo = action.payload.trainer;
+        state.trainerToken = action.payload.token;
+        
+        localStorage.setItem("trainer", JSON.stringify(action.payload.trainer));
+        localStorage.setItem("trainer_access_token", action.payload.token);
+        // console.log('treiner slice',action.payload.trainer);
+      })
+      .addCase(loginTrainer.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
   },
 });
 

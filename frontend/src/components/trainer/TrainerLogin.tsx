@@ -139,7 +139,7 @@ function TrainerLogin() {
           <div className="text-center mt-4">
             <p className="text-gray-600">
               Don't have an account?{" "}
-              <Link to="/signup" className="text-blue-500 hover:underline">
+              <Link to="/trainer/signup" className="text-blue-500 hover:underline">
                 Signup
               </Link>
             </p>

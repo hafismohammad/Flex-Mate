@@ -50,7 +50,7 @@ class TrainerController {
 
       // Call the service method to verify the OTP
       await this.trainerService.verifyOTP(trainerData, otp);
-      res.status(200).json({ message: "OTP verified successfully", user: trainerData });
+      res.status(200).json({ message: "OTP verified successfully", treiner: trainerData });
     } catch (error) {
       console.error("OTP Verification Controller error:", error);
   
@@ -66,29 +66,25 @@ class TrainerController {
       }
     }
   }
-
-  async login(req: Request, res: Response): Promise<void> {
+  async trainerLogin(req: Request, res: Response): Promise<void> {
     try {
-      console.log("login route hit");
-
       const { email, password }: ITrainer = req.body;
-
-      const user = await this.trainerService.login({ email, password });
-
-      if (user) {
-        const { accessToken, refreshToken } = user;
-
+  
+      const trainerData = await this.trainerService.trainerLogin({ email, password });
+  
+      if (trainerData) {
+        const { accessToken, refreshToken, trainer } = trainerData;
+  
         res.cookie("trainer_refresh_token", refreshToken, {
           httpOnly: true,
           sameSite: "none",
           secure: true,
-          maxAge: 7 * 24 * 60 * 60 * 1000,
+          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         });
-        // console.log(user);
-
+  
         res.status(200).json({
           message: "Login successful",
-          user: user.user,
+          trainer: trainer,
           token: accessToken,
         });
       } else {
@@ -99,6 +95,8 @@ class TrainerController {
       res.status(500).json({ message: "Internal server error" });
     }
   }
+  
+  
   
 }
 

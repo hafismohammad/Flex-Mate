@@ -56,7 +56,7 @@ class TrainerRepository {
   }
   
 
-  async createNewUser(trainerData: ITrainer): Promise<void> {
+  async createNewTrainer(trainerData: ITrainer): Promise<void> {
 
     try {
       await this.trainerModel.create(trainerData);
@@ -84,7 +84,7 @@ class TrainerRepository {
   }
 
     // Find trainer for login
-    async findUser(email: string): Promise<ITrainer | null> {
+    async findTrainer(email: string): Promise<ITrainer | null> {
       try {
         return await this.trainerModel.findOne({ email });
       } catch (error) {

@@ -54,7 +54,7 @@ const verifyOtp = async ({
   return response.data;
 };
 
-const login = async (trainerData: { email: string; password: string }) => {
+const trainerLogin = async (trainerData: { email: string; password: string }) => {
   
   const response =   await axios.post(`${API_URL}/api/trainer/login`, trainerData);
   return response
@@ -65,7 +65,7 @@ const trainerService = {
   getAllSpecializations,
   registerTrainer,
   verifyOtp,
-  login
+  trainerLogin
 };
 
 export default trainerService;
