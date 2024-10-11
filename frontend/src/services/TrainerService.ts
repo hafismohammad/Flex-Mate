@@ -34,11 +34,38 @@ const registerTrainer = async (trainerData: ITrainer) => {
     throw error; // Propagates the error so that the calling code can handle it
   }
 };
+
+const verifyOtp = async ({
+  trainerData,
+  otp,
+}: {
+  trainerData: ITrainer;
+  otp: string;
+}) => {
+  console.log('trainer otp verify');
+  
+  const response = await axios.post(`${API_URL}/api/trainer/otp`, { trainerData, otp });
+
+  if (response.data) {
+    // Store the user data in localStorage after successful OTP verification
+    localStorage.setItem("trainer", JSON.stringify(response.data));
+  }
+
+  return response.data;
+};
+
+const login = async (trainerData: { email: string; password: string }) => {
+  
+  const response =   await axios.post(`${API_URL}/api/trainer/login`, trainerData);
+  return response
+};
  
 
 const trainerService = {
   getAllSpecializations,
-  registerTrainer
+  registerTrainer,
+  verifyOtp,
+  login
 };
 
 export default trainerService;

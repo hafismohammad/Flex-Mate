@@ -19,3 +19,9 @@ export interface ITrainer {
   }
 
 
+  export interface ILoginTrainer {
+    email: string;
+    password: string;
+  }
+
+

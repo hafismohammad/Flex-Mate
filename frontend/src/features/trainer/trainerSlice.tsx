@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { fetchSpecializations } from '../../actions/trainerAction';
+import { fetchSpecializations, registerTrainer, trainerVerifyOtp } from '../../actions/trainerAction';
 
 interface TrainerState {
   trainerInfo: null | any; 
@@ -47,7 +47,36 @@ const trainerSlice = createSlice({
       .addCase(fetchSpecializations.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = action.payload?.message || 'Failed to fetch specializations';
-      });
+      })
+
+      .addCase(registerTrainer.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(registerTrainer.fulfilled, (state, action: PayloadAction<any>) => {
+        state.loading = false
+        state.trainerInfo = action.payload;
+        state.error = null
+      })
+      .addCase(registerTrainer.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+        // Verify OTP actions
+        .addCase(trainerVerifyOtp.pending, (state) => {
+          state.loading = true;
+          state.error = null;
+        })
+        .addCase(trainerVerifyOtp.fulfilled, (state, action: PayloadAction<TrainerState>) => {
+          state.loading = false;
+          state.trainerInfo = action.payload;
+          state.error = null;
+        })
+        .addCase(trainerVerifyOtp.rejected, (state, action: PayloadAction<any>) => {
+          state.loading = false;
+          state.error = action.payload;
+        })
   },
 });
 

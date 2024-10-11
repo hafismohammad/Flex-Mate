@@ -25,7 +25,7 @@ function Header() {
 
 
   return (
-    <header className="w-full flex justify-between items-center bg-blue-800 text-white p-4 sticky z-50">
+    <header className="sticky w-full flex justify-between items-center bg-blue-800 text-white p-4 z-50">
       <div>
         <Link to="/">
           <img src={LOGO} alt="Logo" className="w-max h-7" />

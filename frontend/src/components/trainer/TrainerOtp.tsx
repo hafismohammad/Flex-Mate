@@ -1,7 +1,9 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AppDispatch } from '../../app/store';
+import { trainerVerifyOtp } from '../../actions/trainerAction'
+import toast, { Toaster } from 'react-hot-toast';
 
 interface Errors {
     otp?: string;
@@ -10,6 +12,8 @@ interface Errors {
 function TrainerOtp() {
     const [otp, setOtp] = useState<string>("");
     const [errors, setErrors] = useState<Errors>({});
+    const [otpVerified, setOtpVerified] = useState(false);
+
 
     const location = useLocation();
     const trainerData = location.state;
@@ -46,20 +50,26 @@ function TrainerOtp() {
 
     setErrors({});
 
-    // if (userData) {
+    if (trainerData) {
       
-    //     dispatch(verifyOtp({ userData, otp })).then((res) => {
-    //       if (res.meta.requestStatus === "fulfilled") {
-    //         setOtpVerified(true);
-    //         toast.success("Registration successful");
-    //       }
-    //     });
-    //   }
+        dispatch(trainerVerifyOtp({ trainerData, otp })).then((res) => {
+          if (res.meta.requestStatus === "fulfilled") {
+            setOtpVerified(true);
+            toast.success("Registration successful");
+          }
+        });
+      }
     }
+
+    useEffect(() => {
+      if (otpVerified) {
+        navigate("/trainer/login");
+      }
+    }, [otpVerified, navigate]);
 
   return (
     <div className="min-h-screen bg-slate-100 flex items-center justify-center">
-    {/* <Toaster /> */}
+    <Toaster />
     <div className="w-[40%] bg-white p-6 rounded-xl shadow-lg ">
       <h2 className="text-2xl font-semibold text-gray-800 text-center mb-6">
         Enter OTP

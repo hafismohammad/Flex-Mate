@@ -67,7 +67,7 @@ class UserController {
   // Verify OTP
   async verifyOtp(req: Request, res: Response) {
     try {
-      console.log("verify otp controller");
+      // console.log("verify otp controller");
 
       const { userData, otp } = req.body;
 

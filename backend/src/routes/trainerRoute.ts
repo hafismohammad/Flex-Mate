@@ -15,5 +15,9 @@ const trainerController = new TrainerController(trainerService);
 // Bind the controller method to the route
 router.get('/getSpecializations', trainerController.getAllSpecializations.bind(trainerController));
 router.post('/signup', trainerController.registerTrainer.bind(trainerController))
+router.post('/otp', trainerController.verifyOtp.bind(trainerController))
+router.post('/login', trainerController.login.bind(trainerController))
+
+
 
 export default router;
