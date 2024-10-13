@@ -5,12 +5,14 @@ import {IOtp} from '../interface/common'
 import SpecializationModel from "../models/specializationModel";
 import TrainerModel from "../models/trainerModel";
 import OtpModel from "../models/otpModel";
+import KYCModel from "../models/KYC_Model";
 import mongoose from "mongoose";
 
 class TrainerRepository {
     private specializationModel = SpecializationModel;
     private trainerModel = TrainerModel
     private otpModel = OtpModel
+    private kycModel = KYCModel
 
     // Method to find all specializations
     async findAllSpecializations() {
@@ -24,6 +26,7 @@ class TrainerRepository {
 
     async existsTrainer(email: string): Promise<ITrainer | null>  {
         try {
+          
             return await this.trainerModel.findOne({ email });
           } catch (error) {
             throw error;
@@ -93,6 +96,27 @@ class TrainerRepository {
       }
     }
 
+    async saveKyc(formData: any, documents: any) {
+      try {
+          // Create a new KYC document to save in the database
+          const kycData = {
+              trainerId: formData.trainer_id,
+              address: formData.address,
+              pinCode: formData.pinCode,
+              kycDocuments: documents, // document filenames
+              kycComments: formData.comment,
+              kycStatus: 'pending',
+              kycSubmissionDate: new Date(),
+          };
+  
+          const savedKyc = await KYCModel.create(kycData);
+          return savedKyc;
+      } catch (error) {
+          console.error('Error in saveKyc repository:', error);
+          throw new Error('Failed to save KYC data');
+      }
+  }
+  
  
 }
 

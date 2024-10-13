@@ -153,6 +153,15 @@ console.log(trainerData);
   }
 }
 
+async kycSubmit(formData: any, documents: any) {
+  try {
+      await this.trainerRepository.saveKyc(formData, documents);
+  } catch (error) {
+      console.error('Error in kycSubmit service:', error);
+      throw new Error('Failed to submit KYC data');
+  }
+}
+
   
 
 }

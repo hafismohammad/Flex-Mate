@@ -25,11 +25,6 @@ app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Test route
-// app.get('/', (req: Request, res: Response) => {
-//   res.send('Welcome to the Home Page');
-// });
-
 app.use('/api/user/', userRoute); 
 app.use('/api/admin/', AdminRoute); 
 app.use('/api/trainer/', TrainerRoute)

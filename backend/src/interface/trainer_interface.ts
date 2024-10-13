@@ -19,20 +19,23 @@ export interface ITrainer {
   }
   // src/interface/kyc_interface.ts
 
-  export interface IKYC {
-    trainerId: string; 
-    kycDocuments: string[]; 
-    address?: {
-        street: string; 
-        city: string;
-        state: string;
-        pinCode: string;
-        country: string;
+  import { Document } from 'mongoose';
+
+  export interface IKYC extends Document {
+    trainerId: string;
+    address: {
+      street: string;
+      city: string;
+      state: string;
+      pinCode: string;
+      country: string;
     };
-    kycStatus: 'pending' | 'approved' | 'rejected'; 
-    kycSubmissionDate?: Date; 
-    kycComments?: string;
-}
+    kycDocuments: string[];
+    kycStatus: 'pending' | 'approved' | 'rejected';
+    kycSubmissionDate: Date;
+    kycComments: string;
+  }
+  
 
 
 

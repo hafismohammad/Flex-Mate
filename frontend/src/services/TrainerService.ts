@@ -1,5 +1,6 @@
 import axios from "axios";
 import API_URL from "../../axios/API_URL";
+import {KycSubmission} from '../types/trainer'
 
 const getAllSpecializations = async () => {
   try {
@@ -59,13 +60,34 @@ const trainerLogin = async (trainerData: { email: string; password: string }) =>
   const response =   await axios.post(`${API_URL}/api/trainer/login`, trainerData);
   return response
 };
- 
+
+
+
+const kycSubmission = async (kycData: FormData, token: string) => {
+  try {
+  
+    const response = await axios.post(`${API_URL}/api/trainer/kyc`, kycData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'Authorization': `Bearer ${token}`, 
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error kyc submission trainer:', error);
+    throw error; 
+  }
+};
+
+
+
 
 const trainerService = {
   getAllSpecializations,
   registerTrainer,
   verifyOtp,
-  trainerLogin
+  trainerLogin,
+  kycSubmission
 };
 
 export default trainerService;
