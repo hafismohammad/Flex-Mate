@@ -15,6 +15,7 @@ export interface ITrainer {
         city: string;
     };
     specialization: string
+    kycStatus: 'pending' | 'approved' | 'rejected';
     isBlocked?: boolean;
   }
   // src/interface/kyc_interface.ts

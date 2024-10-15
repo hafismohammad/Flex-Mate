@@ -4,25 +4,11 @@ import AdminSideBar from './AdminSideBar';
 
 function AdminLayout() {
   return (
-    <div className="flex flex-col h-screen">
-      {/* Header */}
-      {/* <header className="bg-blue-800 text-white py-4 px-6 flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-        <div>
-          <span className="mr-4">Welcome, Admin!</span>
-          <button 
-            className="bg-red-600 hover:bg-red-700 text-white py-1 px-4 rounded"
-            onClick={() => console.log('Logout action')}
-          >
-            Logout
-          </button>
-        </div>
-      </header> */}
-
-      {/* Main Content */}
+    <div className="flex  h-screen">
       <div className="flex flex-1">
+        {/* Make the sidebar sticky */}
         <AdminSideBar />
-        <div className="flex-1 p-6 bg-slate-100">
+        <div className="flex-1 p-6 bg-slate-100 overflow-y-auto">
           <Outlet />
         </div>
       </div>

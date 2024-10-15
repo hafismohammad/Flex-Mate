@@ -1,4 +1,4 @@
-import Specializations from "../../components/admin/specializations"
+import Specializations from "../../components/admin/Specializations"
 
 
 function SpecializationsPage() {

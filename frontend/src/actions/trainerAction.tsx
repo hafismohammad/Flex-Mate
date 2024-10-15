@@ -83,3 +83,14 @@ export const submitKyc = createAsyncThunk(
   }
 );
 
+export const logoutTrainer = createAsyncThunk(
+  'trainer/logout',
+  async (_, thunkAPI) => {
+    try {
+      const response = await trainerService.logoutTrainer()      
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.response)
+    }
+  }
+)
+

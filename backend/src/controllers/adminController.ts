@@ -67,8 +67,47 @@ class AdminController {
     }
   }
   
+  async getAllTrainersKycDatas(req: Request, res: Response) {
+    try {
+      
+      const allTrainersKycData = await this.adminService.TraienrsKycData();
+      res.status(200).json({ message: "Trainers KYC data fetched successfully", data: allTrainersKycData });
+    } catch (error) {
+      console.error("Error fetching KYC data:", error);
+      res.status(500).json({ message: "Failed to fetch KYC data", error });
+    }
+  }
+  
+  async allTrainersKycData(req: Request, res: Response) {
+    try {
+      
+      const trainerId = req.params.trainer_id; 
+      console.log('hit');
+      console.log('trainerId', trainerId);
+      
+    } catch (error) {
+      console.error("Error fetching KYC data:", error);
+      res.status(500).json({ message: "Failed to fetch KYC data", error });
+    }
+  }
+async changeKycStatus(req: Request, res: Response) {
+  try {
+    const status = String(req.body.status); 
+    const trainer_id = req.params.trainer_id; 
+    
+    console.log('Status:', status); 
+    console.log('Trainer ID:', trainer_id); 
 
+    await this.adminService.updateKycStatus(status, trainer_id);
 
+    res.status(200).json({ message: 'Trainer status updated successfully' });
+  } catch (error) {
+    console.error('Error updating trainer status:', error);
+    res.status(500).json({ message: 'Failed to update trainer status' });
+  }
+}
+
+  
   
 }
 

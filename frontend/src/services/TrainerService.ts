@@ -79,6 +79,17 @@ const kycSubmission = async (kycData: FormData, token: string) => {
   }
 };
 
+const logoutTrainer = async () => {
+  try {
+    const response = await axios.post(`${API_URL}/api/trainer/logout`);
+    return response.data;
+  } catch (error) {
+    console.error('Error during trainer logout:', error);
+    throw error;
+  }
+};
+
+
 
 
 
@@ -87,7 +98,8 @@ const trainerService = {
   registerTrainer,
   verifyOtp,
   trainerLogin,
-  kycSubmission
+  kycSubmission,
+  logoutTrainer
 };
 
 export default trainerService;

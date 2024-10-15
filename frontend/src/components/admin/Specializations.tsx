@@ -9,7 +9,7 @@ interface Errors {
   description?: string;
 }
 
-const SpecializationsPage = () => {
+const Specializations = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -26,22 +26,19 @@ const SpecializationsPage = () => {
     { id: 4, name: "Cardio", status: "Active" },
   ];
 
-  // Filter specializations based on the search term
   const filteredSpecializations = specializations.filter((spec) =>
     spec.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Function to open the modal
   const openModal = () => {
     setIsModalOpen(true);
   };
 
-  // Function to close the modal
   const closeModal = () => {
     setIsModalOpen(false);
-    setErrors({}); // Clear errors when closing the modal
-    setName(""); // Clear name input
-    setDescription(""); // Clear description input
+    setErrors({}); 
+    setName(""); 
+    setDescription(""); 
   };
 
   const validate = (): boolean => {
@@ -61,7 +58,7 @@ const SpecializationsPage = () => {
     if (!isValid) {
       setErrors(newErrors);
       setTimeout(() => {
-        setErrors({}); // Clear errors after 3000 ms
+        setErrors({}); 
       }, 3000);
     }
 
@@ -72,7 +69,7 @@ const SpecializationsPage = () => {
     e.preventDefault();
 
     if (!validate()) {
-      return; // Exit if validation fails
+      return; 
     }
 
     const specializationData = {
@@ -80,16 +77,14 @@ const SpecializationsPage = () => {
       description,
     };
     dispatch(addSpecialization(specializationData));
-    closeModal(); // Close the modal after submission
+    closeModal(); 
   };
 
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
-      {/* Page Header */}
       <div className="mb-8 flex flex-col md:flex-row items-center justify-between gap-4">
         <h2 className="text-4xl font-bold text-gray-800">Specializations</h2>
         <div className="flex items-center space-x-4">
-          {/* Search Bar */}
           <input
             type="text"
             placeholder="Search Specializations..."
@@ -97,7 +92,6 @@ const SpecializationsPage = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          {/* Add Button */}
           <button
             onClick={openModal}
             className="flex items-center space-x-2 text-white bg-blue-600 hover:bg-blue-700 py-2 px-4 rounded-lg font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -196,4 +190,4 @@ const SpecializationsPage = () => {
   );
 };
 
-export default SpecializationsPage;
+export default Specializations;

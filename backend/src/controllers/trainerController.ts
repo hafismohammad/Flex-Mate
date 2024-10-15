@@ -46,15 +46,15 @@ class TrainerController {
 
   async verifyOtp(req: Request, res: Response) {
     try {
-      const { trainerData, otp } = req.body;   
+      const { trainerData, otp } = req.body;
 
-      // Call the service method to verify the OTP
       await this.trainerService.verifyOTP(trainerData, otp);
-      res.status(200).json({ message: "OTP verified successfully", treiner: trainerData });
+      res
+        .status(200)
+        .json({ message: "OTP verified successfully", treiner: trainerData });
     } catch (error) {
       console.error("OTP Verification Controller error:", error);
-  
-      // Handle specific error messages and send appropriate responses
+
       if ((error as Error).message === "OTP has expired") {
         res.status(400).json({ message: "OTP has expired" });
       } else if ((error as Error).message === "Invalid OTP") {
@@ -62,26 +62,31 @@ class TrainerController {
       } else if ((error as Error).message === "No OTP found for this email") {
         res.status(404).json({ message: "No OTP found for this email" });
       } else {
-        res.status(500).json({ message: "Something went wrong, please try again later" });
+        res
+          .status(500)
+          .json({ message: "Something went wrong, please try again later" });
       }
     }
   }
   async trainerLogin(req: Request, res: Response): Promise<void> {
     try {
       const { email, password }: ITrainer = req.body;
-  
-      const trainerData = await this.trainerService.trainerLogin({ email, password });
-  
+
+      const trainerData = await this.trainerService.trainerLogin({
+        email,
+        password,
+      });
+
       if (trainerData) {
         const { accessToken, refreshToken, trainer } = trainerData;
-  
+
         res.cookie("trainer_refresh_token", refreshToken, {
           httpOnly: true,
           sameSite: "none",
           secure: true,
           maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         });
-  
+
         res.status(200).json({
           message: "Login successful",
           trainer: trainer,
@@ -95,37 +100,64 @@ class TrainerController {
       res.status(500).json({ message: "Internal server error" });
     }
   }
-  
 
   async kycSubmission(req: Request, res: Response) {
     try {
-        const formData = req.body; 
-        console.log('Form data:', formData);
-        
-        // `req.files` will be an object with keys corresponding to the field names
-        const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-        
-        const documents = [];
-        if (files.document1) {
-            documents.push(files.document1[0].filename);
-        }
-        if (files.document2) {
-            documents.push(files.document2[0].filename);
-        }
+      const formData = req.body;
+      console.log("Form data:", formData);
 
-        console.log('Documents:', documents);
-        
-        await this.trainerService.kycSubmit(formData, documents);
-        res.status(200).json({ message: 'KYC submission successful' });
+      // `req.files` will be an object with keys corresponding to the field names
+      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+
+      const documents = [];
+      if (files.document1) {
+        documents.push(files.document1[0].filename);
+      }
+      if (files.document2) {
+        documents.push(files.document2[0].filename);
+      }
+
+      console.log("Documents:", documents);
+
+      await this.trainerService.kycSubmit(formData, documents);
+      res.status(200).json({ message: "KYC submission successful" });
     } catch (error) {
-        console.error('Error in KYC submission:', error);
-        res.status(500).json({ message: 'Error in KYC submission', error });
+      console.error("Error in KYC submission:", error);
+      res.status(500).json({ message: "Error in KYC submission", error });
     }
-}
+  }
 
-  
-  
-  
+  async logoutTrainer(req: Request, res: Response) {
+    try {
+      res.clearCookie("trainer_refresh_token", {
+        httpOnly: true,
+        sameSite: "none",
+        secure: true,
+      });
+
+      res.status(200).json({ message: "Logged out successfully" });
+    } catch (error) {
+      console.error("Logout error:", error);
+
+      res.status(500).json({ message: "Logout failed", error });
+    }
+  }
+
+  async getAllKycStatus(req: Request, res: Response) {
+    console.log("hit kyc statsu");
+  }
+
+  async trainerKycStatus(req: Request, res: Response) {
+    try {
+      const trainerId = req.params.trainerId;
+      const kycStatus = await this.trainerService.kycStatus(trainerId);
+
+      res.status(200).json({ kycStatus });
+    } catch (error) {
+      console.error("Error fetching trainer KYC status:", error);
+      res.status(500).json({ message: "Failed to fetch trainer KYC status" });
+    }
+  }
 }
 
 export default TrainerController;

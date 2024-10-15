@@ -1,7 +1,7 @@
 // trainerRepository.js
 
 import { ITrainer } from "../interface/trainer_interface";
-import {IOtp} from '../interface/common'
+import { IOtp } from "../interface/common";
 import SpecializationModel from "../models/specializationModel";
 import TrainerModel from "../models/trainerModel";
 import OtpModel from "../models/otpModel";
@@ -9,31 +9,30 @@ import KYCModel from "../models/KYC_Model";
 import mongoose from "mongoose";
 
 class TrainerRepository {
-    private specializationModel = SpecializationModel;
-    private trainerModel = TrainerModel
-    private otpModel = OtpModel
-    private kycModel = KYCModel
+  private specializationModel = SpecializationModel;
+  private trainerModel = TrainerModel;
+  private otpModel = OtpModel;
+  private kycModel = KYCModel;
 
-    // Method to find all specializations
-    async findAllSpecializations() {
-        try {
-            return await this.specializationModel.find({});
-        } catch (error) {
-            console.error('Error fetching specializations:', error);
-            throw error; 
-        }
+  // Method to find all specializations
+  async findAllSpecializations() {
+    try {
+      return await this.specializationModel.find({});
+    } catch (error) {
+      console.error("Error fetching specializations:", error);
+      throw error;
     }
+  }
 
-    async existsTrainer(email: string): Promise<ITrainer | null>  {
-        try {
-          
-            return await this.trainerModel.findOne({ email });
-          } catch (error) {
-            throw error;
-          }
+  async existsTrainer(email: string): Promise<ITrainer | null> {
+    try {
+      return await this.trainerModel.findOne({ email });
+    } catch (error) {
+      throw error;
     }
+  }
 
-     // Save OTP to the OTP collection with expiration time
+  // Save OTP to the OTP collection with expiration time
   async saveOTP(email: string, OTP: string, OTPExpiry: Date): Promise<void> {
     try {
       const newOtp = new this.otpModel({
@@ -57,10 +56,8 @@ class TrainerRepository {
       throw error;
     }
   }
-  
 
   async createNewTrainer(trainerData: ITrainer): Promise<void> {
-
     try {
       await this.trainerModel.create(trainerData);
       console.log("Trainer created successfully.");
@@ -86,38 +83,53 @@ class TrainerRepository {
     }
   }
 
-    // Find trainer for login
-    async findTrainer(email: string): Promise<ITrainer | null> {
-      try {
-        return await this.trainerModel.findOne({ email });
-      } catch (error) {
-        console.log("Error finding user:", error);
-        return null;
-      }
+  // Find trainer for login
+  async findTrainer(email: string): Promise<ITrainer | null> {
+    try {
+      console.log('repository ', email);
+      
+      return await this.trainerModel.findOne({ email });
+    } catch (error) {
+      console.log("Error finding user:", error);
+      return null;
     }
-
-    async saveKyc(formData: any, documents: any) {
-      try {
-          // Create a new KYC document to save in the database
-          const kycData = {
-              trainerId: formData.trainer_id,
-              address: formData.address,
-              pinCode: formData.pinCode,
-              kycDocuments: documents, // document filenames
-              kycComments: formData.comment,
-              kycStatus: 'pending',
-              kycSubmissionDate: new Date(),
-          };
-  
-          const savedKyc = await KYCModel.create(kycData);
-          return savedKyc;
-      } catch (error) {
-          console.error('Error in saveKyc repository:', error);
-          throw new Error('Failed to save KYC data');
-      }
   }
-  
- 
+
+  async saveKyc(formData: any, documents: any) {
+    try {
+      const kycData = {
+        trainerId: formData.trainer_id,
+        address: formData.address,
+        pinCode: formData.pinCode,
+        kycDocuments: documents, 
+        kycComments: formData.comment,
+        kycStatus: "pending",
+        kycSubmissionDate: new Date(),
+      };
+
+      const savedKyc = await KYCModel.create(kycData);
+      return savedKyc;
+    } catch (error) {
+      console.error("Error in saveKyc repository:", error);
+      throw new Error("Failed to save KYC data");
+    }
+  }
+
+  async getTrainerStatus(trainerId: string) {
+    try {
+      const trainer = await this.trainerModel
+        .findById(trainerId)
+        .select("kycStatus");
+      if (!trainer) {
+        throw new Error(`Trainer with ID ${trainerId} not found`);
+      }
+
+      return trainer.kycStatus;
+    } catch (error) {
+      console.error("Error fetching trainer KYC status:", error);
+      throw new Error("Failed to fetch trainer KYC status");
+    }
+  }
 }
 
 export default TrainerRepository;

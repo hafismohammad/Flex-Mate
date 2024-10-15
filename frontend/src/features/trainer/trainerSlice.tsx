@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { fetchSpecializations, registerTrainer, trainerVerifyOtp, loginTrainer } from '../../actions/trainerAction';
+import { fetchSpecializations, registerTrainer, trainerVerifyOtp, loginTrainer, logoutTrainer } from '../../actions/trainerAction';
 
 interface TrainerState {
   trainerInfo: null | any; 
@@ -98,6 +98,18 @@ const trainerSlice = createSlice({
       .addCase(loginTrainer.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      // logout trainer
+      .addCase(logoutTrainer.pending, (state, action: PayloadAction<any>) => {
+        state.loading = true
+        state.error = action.payload
+      })
+      .addCase(logoutTrainer.fulfilled, (state, action) => {
+        state.loading = false
+        state.error = null;
+        localStorage.removeItem('trainer')
+        localStorage.removeItem('trainer_access_token')
       })
 
   },

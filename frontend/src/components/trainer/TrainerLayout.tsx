@@ -1,14 +1,25 @@
 import TrainerSidebar from "./TrainerSidebar";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../app/store";
+import {logoutTrainer} from '../../actions/trainerAction'
 
 function TrainerLayout() {
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
 
+  const dispath = useDispatch<AppDispatch>()
+  const navigate = useNavigate()
+
   const toggleProfileDropdown = () => {
     setIsProfileDropdownOpen(!isProfileDropdownOpen);
   };
+
+  const handleLogout = () => {
+    dispath(logoutTrainer())
+    navigate('/trainer/login')
+  }
 
   return (
     <div className="flex h-screen">
@@ -37,13 +48,12 @@ function TrainerLayout() {
                 >
                   Edit Profile
                 </a>
-                <a
-                  href="#"
+                <div
                   className="block px-4 py-2 hover:bg-gray-100"
-                  onClick={() => setIsProfileDropdownOpen(false)}
+                  onClick={handleLogout}
                 >
                   Logout
-                </a>
+                </div>
               </div>
             )}
           </div>

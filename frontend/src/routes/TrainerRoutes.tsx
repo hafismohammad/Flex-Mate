@@ -9,15 +9,13 @@ import TrainerKycPage from "../pages/trainer/TrainerKycPage";
 function TrainerRoutes() {
   return (
     <Routes>
-      {/* Public routes for login, signup, and OTP */}
       <Route path="/login" element={<TrainerLoginPage />} />
       <Route path="/signup" element={<TrainerSignupPage />} />
       <Route path="/otp" element={<TrainerOtpPage />} />
 
-      {/* Routes that require the TrainerLayout */}
       <Route path="/" element={<TrainerLayout />}>
-        <Route index element={<TrainerDashboard />} /> {/* Default Dashboard Route */}
-        <Route path="kyc" element={<TrainerKycPage />} /> {/* Nested KYC Page */}
+        <Route index element={<TrainerDashboard />} /> 
+        <Route path="kyc" element={<TrainerKycPage />} /> 
       </Route>
     </Routes>
   );

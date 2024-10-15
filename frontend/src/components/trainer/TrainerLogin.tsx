@@ -6,6 +6,8 @@ import logo from "../../assets/LOGO-3 (2).png";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../app/store";
 import {loginTrainer} from '../../actions/trainerAction'
+import axios from 'axios';
+import API_URL from '../../../axios/API_URL';
 
 interface Errors {
   email?: string;
@@ -74,6 +76,33 @@ function TrainerLogin() {
       .catch(() => {
         toast.error("Login failed");
       });
+
+
+  //   dispatch(loginTrainer(trainerData))
+  // .unwrap()
+  // .then(() => {
+  //   axios
+  //     .get(`${API_URL}/api/trainer/getKycStatus`)
+  //     .then((response) => {
+  //       if (response.data.isApproved) {
+  //         toast.success("Login successful!");
+  //         setTimeout(() => {
+  //           navigate("/trainer");
+  //         }, 1000);
+  //       } else {
+  //         // toast.warning("Please complete your KYC.");
+  //         navigate("/trainer/kyc");
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.error('Error fetching trainer status:', error);
+  //       toast.error("Error checking KYC status.");
+  //     });
+  // })
+  // .catch(() => {
+  //   toast.error("Login failed");
+  // });
+
   };
 
   return (

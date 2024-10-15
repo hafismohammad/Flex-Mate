@@ -22,8 +22,9 @@ const TrainerKyc: React.FC = () => {
   const token = trainerToken;
   const trainer_id = trainerInfo.id
 
-  
   const dispatch = useDispatch<AppDispatch>();
+
+  
 
   const handleChange1 = (e: ChangeEvent<HTMLInputElement>) => {
     const file1 = e.target.files?.[0] || null;

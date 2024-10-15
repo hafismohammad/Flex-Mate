@@ -39,6 +39,27 @@ class AdminService {
     const specializationData = await this.adminRepository.addSpecialization({name, description})
   }
 
+  async TraienrsKycData() {
+    try {
+      const allTrainersKycDatas = await this.adminRepository.getAllTrainersKycDatas();
+      console.log('allTrainersKycDatas',allTrainersKycDatas);
+      
+      return allTrainersKycDatas; 
+    } catch (error) {
+      console.error("Error fetching trainers KYC data:", error);
+      throw error; 
+    }
+  }
+  
+  async updateKycStatus(status: string, trainer_id: string): Promise<void> {
+    try {
+      await this.adminRepository.updateKycStatus(status, trainer_id);
+    } catch (error) {
+      console.error('Error updating KYC status:', error);
+    }
+  }
+  
+
 }
 
 export default AdminService;

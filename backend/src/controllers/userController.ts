@@ -13,7 +13,6 @@ class UserController {
   async register(req: Request, res: Response) {
     try {
       const userData: IUser = req.body;
-      // console.log('User data received for registration:', userData);
 
       await this.userService.register(userData);
       res.status(200).json({ message: "OTP sent to email" });
