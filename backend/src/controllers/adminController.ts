@@ -100,7 +100,7 @@ async changeKycStatus(req: Request, res: Response) {
 
     await this.adminService.updateKycStatus(status, trainer_id);
 
-    res.status(200).json({ message: 'Trainer status updated successfully' });
+    res.status(200).json({ message: 'Trainer status updated successfully', status });
   } catch (error) {
     console.error('Error updating trainer status:', error);
     res.status(500).json({ message: 'Failed to update trainer status' });

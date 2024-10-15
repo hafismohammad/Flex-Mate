@@ -1,27 +1,39 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { fetchSpecializations, registerTrainer, trainerVerifyOtp, loginTrainer, logoutTrainer } from '../../actions/trainerAction';
+import {
+  fetchSpecializations,
+  registerTrainer,
+  trainerVerifyOtp,
+  loginTrainer,
+  logoutTrainer,
+  getKycStatus,
+  submitKyc
+} from "../../actions/trainerAction";
 
 interface TrainerState {
-  trainerInfo: null | any; 
+  trainerInfo: null | any;
   trainerToken: null | string;
-  specializations: any[]; 
+  specializations: any[];
+  kycStatus: string;
   loading: boolean;
+  rejectionReason: null | string;
   error: null | string;
 }
 
-const trainer = localStorage.getItem('trainer')
-const parsedTrainer = trainer ? JSON.parse(trainer) : null
+const trainer = localStorage.getItem("trainer");
+const parsedTrainer = trainer ? JSON.parse(trainer) : null;
 
 const initialState: TrainerState = {
   trainerInfo: parsedTrainer,
-  trainerToken: localStorage.getItem('trainer_access_token') || null,
-  specializations: [], 
+  trainerToken: localStorage.getItem("trainer_access_token") || null,
+  specializations: [],
+  kycStatus: "pending",
+  rejectionReason: null,
   loading: false,
   error: null,
 };
 
 const trainerSlice = createSlice({
-  name: 'trainer',
+  name: "trainer",
   initialState,
   reducers: {
     clearTrainer(state) {
@@ -43,75 +55,109 @@ const trainerSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchSpecializations.fulfilled, (state, action: PayloadAction<any[]>) => {
-        state.loading = false;
-        state.specializations = action.payload;         
-      })
+      .addCase(
+        fetchSpecializations.fulfilled,
+        (state, action: PayloadAction<any[]>) => {
+          state.loading = false;
+          state.specializations = action.payload;
+        }
+      )
       .addCase(fetchSpecializations.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
-        state.error = action.payload?.message || 'Failed to fetch specializations';
+        state.error = action.payload?.message || "Failed to fetch specializations";
       })
 
       .addCase(registerTrainer.pending, (state) => {
-        state.loading = true
-        state.error = null
+        state.loading = true;
+        state.error = null;
       })
       .addCase(registerTrainer.fulfilled, (state, action: PayloadAction<any>) => {
-        state.loading = false
+        state.loading = false;
         state.trainerInfo = action.payload;
-        state.error = null
+        state.error = null;
       })
       .addCase(registerTrainer.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload?.message || "Registration failed";
       })
 
-        // Verify OTP actions
-        .addCase(trainerVerifyOtp.pending, (state) => {
-          state.loading = true;
-          state.error = null;
-        })
-        .addCase(trainerVerifyOtp.fulfilled, (state, action: PayloadAction<TrainerState>) => {
-          state.loading = false;
-          state.trainerInfo = action.payload;
-          state.error = null;
-        })
-        .addCase(trainerVerifyOtp.rejected, (state, action: PayloadAction<any>) => {
-          state.loading = false;
-          state.error = action.payload;
-        })
-
-         // Login trainer actions
-      .addCase(loginTrainer.pending, (state, action: PayloadAction<any>) => {
+      // Verify OTP actions
+      .addCase(trainerVerifyOtp.pending, (state) => {
         state.loading = true;
-        state.error = action.payload;
+        state.error = null;
       })
-      .addCase(loginTrainer.fulfilled, (state, action) => {
+      .addCase(trainerVerifyOtp.fulfilled, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.trainerInfo = action.payload;
+        state.error = null;
+      })
+      .addCase(trainerVerifyOtp.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload?.message || "OTP verification failed";
+      })
+
+      // Login trainer actions
+      .addCase(loginTrainer.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(loginTrainer.fulfilled, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.trainerInfo = action.payload.trainer;
         state.trainerToken = action.payload.token;
-        
         localStorage.setItem("trainer", JSON.stringify(action.payload.trainer));
         localStorage.setItem("trainer_access_token", action.payload.token);
-        // console.log('treiner slice',action.payload.trainer);
       })
       .addCase(loginTrainer.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload?.message || "Login failed";
       })
 
-      // logout trainer
-      .addCase(logoutTrainer.pending, (state, action: PayloadAction<any>) => {
-        state.loading = true
-        state.error = action.payload
-      })
-      .addCase(logoutTrainer.fulfilled, (state, action) => {
-        state.loading = false
+      // Logout trainer
+      .addCase(logoutTrainer.pending, (state) => {
+        state.loading = true;
         state.error = null;
-        localStorage.removeItem('trainer')
-        localStorage.removeItem('trainer_access_token')
+      })
+      .addCase(logoutTrainer.fulfilled, (state) => {
+        state.loading = false;
+        state.trainerInfo = null;
+        state.trainerToken = null;
+        localStorage.removeItem("trainer");
+        localStorage.removeItem("trainer_access_token");
+      })
+      // kyc status update
+      .addCase(getKycStatus.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getKycStatus.fulfilled, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.kycStatus = action.payload.kycStatus;
+        console.log('get kyc',action.payload.kycStatus);
+        
+        state.error = null;
+      })
+      .addCase(getKycStatus.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload?.message || "OTP verification failed";
       })
 
+      // kuc submit then change kycStatus to submited
+      .addCase(submitKyc.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(submitKyc.fulfilled, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.kycStatus = action.payload.kycStatus;
+        console.log('submitt kyc',action.payload.kycStatus);
+        
+        state.error = null;
+      })
+      .addCase(submitKyc.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload?.message || "OTP verification failed";
+      })
   },
 });
 

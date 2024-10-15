@@ -76,6 +76,8 @@ export const submitKyc = createAsyncThunk(
 
     try {
       const response = await trainerService.kycSubmission(formData, token); 
+      console.log('response in submit', response);
+      
       return response; 
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.response?.data || error.message); 
@@ -94,3 +96,21 @@ export const logoutTrainer = createAsyncThunk(
   }
 )
 
+export const getKycStatus = createAsyncThunk(
+  'trainer/kycStatus',
+  async (trainer_id: string, thunkAPI) => {
+   try {
+    console.log("fdf");
+    
+    const response = await trainerService.kycStatus(trainer_id)
+    // console.log(response,'dd');
+    
+    return response
+    
+   } catch (error : any) {
+    return thunkAPI.rejectWithValue(error.response)
+    
+   }
+  }
+
+)

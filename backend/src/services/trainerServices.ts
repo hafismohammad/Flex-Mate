@@ -69,48 +69,55 @@ class TrainerService {
 
   async verifyOTP(trainerData: ITrainer, otp: string): Promise<void> {
     try {
-      const validOtps = await this.trainerRepository.getOtpsByEmail(
-        trainerData.email
-      );
+        const validOtps = await this.trainerRepository.getOtpsByEmail(trainerData.email);
 
-      if (validOtps.length === 0) {
-        console.log("No OTP found for this email");
-        throw new Error("No OTP found for this email");
-      }
-
-      const latestOtp = validOtps.sort(
-        (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
-      )[0];
-
-      if (latestOtp.otp === otp) {
-        if (latestOtp.expiresAt > new Date()) {
-          console.log("otp expiration not working");
-
-          console.log("OTP is valid and verified", latestOtp.expiresAt);
-
-          const hashedPassword = await bcrypt.hash(trainerData.password, 10);
-          const newtrainerData = { ...trainerData, password: hashedPassword };
-
-          // Create new traienr
-          await this.trainerRepository.createNewTrainer(newtrainerData);
-
-          await this.trainerRepository.deleteOtpById(latestOtp._id);
-        } else {
-          console.log("OTP has expired");
-          await this.trainerRepository.deleteOtpById(latestOtp._id);
-          throw new Error("OTP has expired");
+        if (validOtps.length === 0) {
+            console.log("No OTP found for this email");
+            throw new Error("No OTP found for this email");
         }
-      } else {
-        console.log("Invalid OTP");
-        throw new Error("Invalid OTP");
-      }
+
+        const latestOtp = validOtps.sort(
+            (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
+        )[0];
+
+        if (latestOtp.otp === otp) {
+            if (latestOtp.expiresAt > new Date()) {
+                console.log("OTP is valid and verified", latestOtp.expiresAt);
+
+                const specialization = await this.trainerRepository.findTrainerSpecialization(trainerData.specialization);
+                
+                if (!specialization) {
+                    throw new Error("Specialization not found");
+                }
+
+                const hashedPassword = await bcrypt.hash(trainerData.password, 10);
+                
+                const newTrainerData: ITrainer = {
+                    ...trainerData,
+                    password: hashedPassword,
+                    specialization: specialization._id 
+                };
+
+                // Create new trainer
+                await this.trainerRepository.createNewTrainer(newTrainerData);
+                await this.trainerRepository.deleteOtpById(latestOtp._id);
+            } else {
+                console.log("OTP has expired");
+                await this.trainerRepository.deleteOtpById(latestOtp._id);
+                throw new Error("OTP has expired");
+            }
+        } else {
+            console.log("Invalid OTP");
+            throw new Error("Invalid OTP");
+        }
     } catch (error) {
-      const errorMessage =
-        (error as Error).message || "An unknown error occurred";
-      console.error("Error in OTP verification:", errorMessage);
-      throw error;
+        const errorMessage = (error as Error).message || "An unknown error occurred";
+        console.error("Error in OTP verification:", errorMessage);
+        throw error;
     }
-  }
+}
+
+  
 
   // login trainer
   async trainerLogin({ email, password }: { email: string; password: string }) {
@@ -163,7 +170,12 @@ class TrainerService {
 
   async kycSubmit(formData: any, documents: any) {
     try {
+      
       await this.trainerRepository.saveKyc(formData, documents);
+
+      return await this.trainerRepository.changeKycStatus(formData.trainer_id)
+
+
     } catch (error) {
       console.error("Error in kycSubmit service:", error);
       throw new Error("Failed to submit KYC data");

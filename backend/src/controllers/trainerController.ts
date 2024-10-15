@@ -104,9 +104,8 @@ class TrainerController {
   async kycSubmission(req: Request, res: Response) {
     try {
       const formData = req.body;
-      console.log("Form data:", formData);
+      // console.log("Form data:", formData);
 
-      // `req.files` will be an object with keys corresponding to the field names
       const files = req.files as { [fieldname: string]: Express.Multer.File[] };
 
       const documents = [];
@@ -117,10 +116,11 @@ class TrainerController {
         documents.push(files.document2[0].filename);
       }
 
-      console.log("Documents:", documents);
+      // console.log("Documents:", documents);
 
-      await this.trainerService.kycSubmit(formData, documents);
-      res.status(200).json({ message: "KYC submission successful" });
+     const kycStatus = await this.trainerService.kycSubmit(formData, documents);
+
+      res.status(200).json({ message: "KYC submission successful", kycStatus });
     } catch (error) {
       console.error("Error in KYC submission:", error);
       res.status(500).json({ message: "Error in KYC submission", error });
@@ -149,8 +149,10 @@ class TrainerController {
 
   async trainerKycStatus(req: Request, res: Response) {
     try {
+      
       const trainerId = req.params.trainerId;
       const kycStatus = await this.trainerService.kycStatus(trainerId);
+
 
       res.status(200).json({ kycStatus });
     } catch (error) {

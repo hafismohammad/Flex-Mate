@@ -5,6 +5,7 @@ import TrainerDashboard from "../components/trainer/TrainerDashboard";
 import { Route, Routes } from "react-router-dom";
 import TrainerLayout from "../components/trainer/TrainerLayout";
 import TrainerKycPage from "../pages/trainer/TrainerKycPage";
+import ProtectRoute from "./protectRoutes/TrainerProtectRoute";
 
 function TrainerRoutes() {
   return (
@@ -14,8 +15,7 @@ function TrainerRoutes() {
       <Route path="/otp" element={<TrainerOtpPage />} />
 
       <Route path="/" element={<TrainerLayout />}>
-        <Route index element={<TrainerDashboard />} /> 
-        <Route path="kyc" element={<TrainerKycPage />} /> 
+        <Route path="dashboard" element={<ProtectRoute><TrainerDashboard /></ProtectRoute>} />
       </Route>
     </Routes>
   );

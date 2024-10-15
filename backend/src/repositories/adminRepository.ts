@@ -55,14 +55,28 @@ class AdminRepository {
 
   async updateKycStatus(status: string, trainer_id: string): Promise<void> {
     try {
+     
       const updatedTrainer = await this.trainerModel.findByIdAndUpdate(
-        trainer_id, 
-        { kycStatus: status }, 
-        { new: true, runValidators: true } 
+        trainer_id,
+        { kycStatus: status },
+        { new: true, runValidators: true }
       );
   
       if (updatedTrainer) {
-        console.log('KYC status updated successfully for trainer:', updatedTrainer);
+        console.log('Trainer KYC status updated successfully:', updatedTrainer);
+  
+        // Update the KYC status in the KYC model using the trainer_id
+        const updatedKyc = await this.kycModel.findOneAndUpdate(
+          { trainerId: trainer_id },
+          { kycStatus: status },
+          { new: true, runValidators: true }
+        );
+  
+        if (updatedKyc) {
+          console.log('KYC model status updated successfully:', updatedKyc);
+        } else {
+          console.log('KYC record not found for the given trainer ID:', trainer_id);
+        }
       } else {
         console.log('Trainer not found with the given ID:', trainer_id);
       }
@@ -70,6 +84,7 @@ class AdminRepository {
       console.error('Error updating KYC status:', error);
     }
   }
+  
   
   
   

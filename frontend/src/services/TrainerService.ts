@@ -89,6 +89,18 @@ const logoutTrainer = async () => {
   }
 };
 
+const kycStatus = async (trainer_id: string) => {
+  try {
+    
+    const response = await axios.get(`${API_URL}/api/trainer/kycStatus/${trainer_id}`)
+    return response.data
+  } catch (error) {
+    console.log('Error during kyc status fetchig');
+    throw error
+    
+  }
+}
+
 
 
 
@@ -99,7 +111,8 @@ const trainerService = {
   verifyOtp,
   trainerLogin,
   kycSubmission,
-  logoutTrainer
+  logoutTrainer,
+  kycStatus
 };
 
 export default trainerService;

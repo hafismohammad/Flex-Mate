@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "../../app/store";
 import { submitKyc } from "../../actions/trainerAction";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const TrainerKyc: React.FC = () => {
   const [documents1, setDocuments1] = useState<File | null>(null);
@@ -18,12 +19,14 @@ const TrainerKyc: React.FC = () => {
   const [error, setError] = useState("");
   const [submissionError, setSubmissionError] = useState("");
 
-  const { trainerToken , trainerInfo} = useSelector((state: RootState) => state.trainer);
+  const { trainerToken , trainerInfo, kycStatus} = useSelector((state: RootState) => state.trainer);
   const token = trainerToken;
   const trainer_id = trainerInfo.id
+console.log('dfsd',kycStatus);
+
 
   const dispatch = useDispatch<AppDispatch>();
-
+  const navigate = useNavigate()
   
 
   const handleChange1 = (e: ChangeEvent<HTMLInputElement>) => {
@@ -97,6 +100,7 @@ const TrainerKyc: React.FC = () => {
     
   })
     dispatch(submitKyc({ formData, token }));
+    navigate('/trainer/dashboard')
   };
   
 

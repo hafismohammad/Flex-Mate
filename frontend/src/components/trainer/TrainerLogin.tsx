@@ -70,7 +70,7 @@ function TrainerLogin() {
       .then(() => {
         toast.success("Login successful!");
         setTimeout(() => {
-          navigate("/trainer");
+          navigate("/trainer/dashboard");
         }, 1000);
       })
       .catch(() => {

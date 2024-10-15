@@ -6,7 +6,9 @@ import SpecializationModel from "../models/specializationModel";
 import TrainerModel from "../models/trainerModel";
 import OtpModel from "../models/otpModel";
 import KYCModel from "../models/KYC_Model";
-import mongoose from "mongoose";
+import {ISpecialization} from '../interface/trainer_interface'
+import mongoose, { Types } from 'mongoose';
+
 
 class TrainerRepository {
   private specializationModel = SpecializationModel;
@@ -57,6 +59,18 @@ class TrainerRepository {
     }
   }
 
+  
+
+  async findTrainerSpecialization(specialization: Types.ObjectId): Promise<ISpecialization | null> {
+    try {
+         return await this.specializationModel.findOne({ name: specialization });
+    } catch (error) {
+        console.log('Error in finding trainer specialization:', error);
+        return null; 
+    }
+}
+
+
   async createNewTrainer(trainerData: ITrainer): Promise<void> {
     try {
       await this.trainerModel.create(trainerData);
@@ -97,6 +111,7 @@ class TrainerRepository {
 
   async saveKyc(formData: any, documents: any) {
     try {
+      
       const kycData = {
         trainerId: formData.trainer_id,
         address: formData.address,
@@ -130,6 +145,30 @@ class TrainerRepository {
       throw new Error("Failed to fetch trainer KYC status");
     }
   }
+
+  async changeKycStatus(trainerId: string) {
+    try {
+    console.log('traiern---', trainerId);
+    
+      const trainer = await this.trainerModel.findByIdAndUpdate(
+        trainerId,
+        { kycStatus: 'submitted' },
+        { new: true, runValidators: true }
+      );
+  
+      await this.kycModel.findByIdAndUpdate(
+        trainerId,
+        { kycStatus: 'submitted' },
+        { new: true, runValidators: true }
+      );
+  
+      return trainer?.kycStatus;
+    } catch (error) {
+      console.error("Error changing trainer KYC status:", error);
+      throw new Error("Failed to change trainer KYC status");
+    }
+  }
+  
 }
 
 export default TrainerRepository;
