@@ -19,6 +19,10 @@ router.patch('/updateKycStatus/:trainer_id', adminController.changeKycStatus.bin
 router.get('/allSpecializations', adminController.getAllSpecializations.bind(adminController))
 router.patch('/toggle-status/:spec_id', adminController.updateStatus.bind(adminController))
 router.get('/allUsers', adminController.getAllUsers.bind(adminController))
+router.get('/allTrainer', adminController.getAllTrainer.bind(adminController))
+router.patch('/user-block-unblock/:user_id', adminController.blockUnblockUser.bind(adminController))
+
+
 
 
 

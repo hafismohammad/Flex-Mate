@@ -32,6 +32,36 @@ function UserListing() {
     user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+
+  const handleBlockUnblock = async (userId: string, currentStatus: boolean) => {
+    try {
+      const response = await axios.patch(
+        `${API_URL}/api/admin/user-block-unblock/${userId}`,
+        { status: !currentStatus }
+      );
+  
+      console.log('Server response:', response);
+  
+      if (response.status === 200 && response.data && response.data.data) {
+        const updatedUserStatus = response.data.data.isBlocked;
+  
+        setUsers((prevUsers) =>
+          prevUsers.map((user) =>
+            user._id === userId ? { ...user, isBlocked: updatedUserStatus } : user
+          )
+        );
+      } else {
+        console.error('Failed to update user status on the server.');
+      }
+    } catch (error) {
+      console.error('Error occurred while updating user status:', error);
+    }
+  };
+  
+
+  
+
+
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
       <div className="mb-8 flex flex-col md:flex-row items-center justify-between gap-4">
@@ -47,32 +77,35 @@ function UserListing() {
         </div>
       </div>
       <div className="bg-white shadow-lg rounded-lg p-6">
-        <div className="grid grid-cols-6 gap-4 text-lg font-semibold text-gray-600 mb-4 border-b border-gray-200 pb-2">
+        <div className="grid grid-cols-7 gap-1 text-lg font-semibold text-gray-600 mb-4 border-b border-gray-200 pb-2">
           <div>ID</div>
           <div>Name</div>
-          {/* Uncomment the email div if needed */}
           <div>Email</div>
           <div>Phone</div>
           <div>Status</div>
-          <div>Action</div>
+          <div className="col-span-2 text-center">Actions</div>
         </div>
 
         {filteredUsers.length > 0 ? (
           filteredUsers.map((user) => (
             <div 
               key={user._id} 
-              className="grid grid-cols-6 items-center p-4 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none mb-2"
+              className="grid grid-cols-7 items-center p-4 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none mb-2"
             >
               <div className="text-gray-800 font-medium">{user._id.toUpperCase().substring(0, 8)}</div>
               <div className="text-gray-800 font-medium">{user.name}</div>
-              {/* Uncomment the email div if needed */}
-              <div className="text-gray-800 font-medium truncate  ">{user.email}</div>
+              <div className="text-gray-800 font-medium truncate">{user.email}</div>
               <div className="text-gray-800 font-medium">{user.phone}</div>
-              <div className="text-gray-800 font-medium">
+              <div className={`${user.isBlocked ? 'font-medium text-red-500': 'font-medium text-green-500' }`}> 
                 {user.isBlocked ? "Blocked" : "Active"}
               </div>
-              <div className="text-gray-800 font-medium">
-                <button className="text-blue-500 hover:underline">View</button>
+              <div className="col-span-2 flex justify-center space-x-4">
+                <button
+                onClick={() => handleBlockUnblock(user._id, user.isBlocked)} 
+                className={`text-white py-2 px-5 rounded-md ${user.isBlocked ? 'bg-green-500 hover:bg-green-600' : 'bg-orange-500 hover:bg-orange-600' }`}  style={{ minWidth: "100px" }} >
+                {user.isBlocked? 'Unblock' :'Block'}  
+                </button>
+                <button className="text-white py-2 px-5 rounded-md bg-blue-500 hover:bg-blue-600"  style={{ minWidth: "100px" }}>View</button>
               </div>
             </div>
           ))

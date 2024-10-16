@@ -91,7 +91,7 @@ const navigate = useNavigate()
             <span className={`ml-2 ${!isSidebarOpen && "hidden"}`}>Users</span>
           </Link>
           <Link
-            to="#"
+            to="/admin/trainerListing"
             className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
           >
             <FaUserCircle size={20} />

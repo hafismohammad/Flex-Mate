@@ -103,7 +103,19 @@ class AdminRepository {
   async fetchAllUsers() {
     return await this.userModel.find()
   }
-
+  async fetchAllTrainer() {
+    return await this.trainerModel.find()
+  }
+  async updateUserStatus(user_id: string, userStatus: boolean) {
+    // console.log(user_id, userStatus);
+    
+   return  await this.userModel.findByIdAndUpdate(
+      {_id: user_id},
+      {isBlocked: userStatus},
+      { new: true } 
+    )
+    
+  }
 }
 
 export default AdminRepository;

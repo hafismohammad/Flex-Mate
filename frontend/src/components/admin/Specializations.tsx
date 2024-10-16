@@ -31,7 +31,7 @@ const Specializations = () => {
 
   const getAllSpecializations = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/admin/allSpecializations`);
+      const response = await axios.get(`${API_URL}/api/admin/allSpecializations`);      
       setSpecializations(response.data);
     } catch (error) {
       console.error("Error fetching specializations:", error);
@@ -81,16 +81,16 @@ const Specializations = () => {
     return isValid;
   };
 
-  const handleStatus = async (specId: string, currentStatus: boolean) => {
+  const  handleStatus = async (specId: string, currentStatus: boolean) => {
     try {
       const updatedStatus = !currentStatus;
-      console.log('Current status:', currentStatus, '-- Updated status:', updatedStatus);
+      // console.log('Current status:', currentStatus, '-- Updated status:', updatedStatus);
   
       const response = await axios.patch(`${API_URL}/api/admin/toggle-status/${specId}`, {
         isListed: updatedStatus,
       });
   
-      console.log('API Response:', response.data);
+      // console.log('API Response:', response.data);
   
       if (response.status === 200 && response.data && response.data.data) {
         const updatedSpec = response.data.data; 
@@ -204,7 +204,7 @@ const Specializations = () => {
                       ? "bg-orange-500 hover:bg-orange-600"
                       : "bg-green-500 hover:bg-green-600"
                   }`}
-                  style={{ minWidth: "120px" }} // Set a minimum width here
+                  style={{ minWidth: "120px" }} 
                 >
                   <span>{spec.isListed ? "Unlist" : "List"}</span>
                 </button>

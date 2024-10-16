@@ -144,13 +144,35 @@ async updateStatus(req: Request, res: Response) {
 async getAllUsers(req: Request, res: Response) {
   try {
    const  allUsers =  await this.adminService.fetchAllUsers()
-    console.log(allUsers);
     res.status(200).json({message: 'Fetch all users successfully', users: allUsers})
   } catch (error) {
     
   }
 }
+async getAllTrainer(req: Request, res: Response) {
+  try {
+   const  allTrainer =  await this.adminService.fetchAllTrainer()
+    res.status(200).json({message: 'Fetch all trainer successfully', trainer: allTrainer})
+  } catch (error) {
+    
+  }
+}
 
+async blockUnblockUser(req: Request, res: Response) {
+  try {
+    const user_id = req.params.user_id
+    const userStatus = req.body.status
+    // console.log('sta--', userStatus);
+    
+    const status = await this.adminService.updateUserStatus(user_id, userStatus)
+     res.status(200).json({
+      message: 'user status updated sucessfully',
+      data: status, 
+    });   
+  } catch (error) {
+    
+  }
+}
 }
 
 export default AdminController;

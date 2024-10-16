@@ -72,6 +72,13 @@ class AdminService {
   async fetchAllUsers() {
     return await this.adminRepository.fetchAllUsers()
   }
+  async fetchAllTrainer() {
+    return await this.adminRepository.fetchAllTrainer()
+  }
+
+  async updateUserStatus(user_id: string, userStatus: boolean) {
+    return await this.adminRepository.updateUserStatus(user_id, userStatus)
+  }
 
 }
 
