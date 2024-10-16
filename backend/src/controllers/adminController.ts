@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import AdminService from "../services/adminService";
 import { ILoginAdmin } from "../interface/admin_interface";
+import { json } from "stream/consumers";
 
 class AdminController {
   private adminService: AdminService;
@@ -107,6 +108,27 @@ async changeKycStatus(req: Request, res: Response) {
   }
 }
 
+async getAllSpecializations(req: Request, res: Response) {
+  try {
+    const allSpecializations = await this.adminService.getAllSpecializations(); 
+    res.status(200).json(allSpecializations); 
+  } catch (error) {
+    console.error('Error fetching specializations:', error);
+    res.status(500).json({ message: 'An error occurred while fetching specializations.' });
+  }
+}
+
+async updateStatus(req: Request, res: Response) {
+  try {
+    const spec_id = req.params.spec_id
+    const status= req.body.isListed
+    
+    await this.adminService.updateSpecStatus(spec_id, status)
+  } catch (error) {
+    console.error('Error updating  specializations status:', error);
+    res.status(500).json({ message: 'An error occurred while updating  specializations status.' });
+  }
+}
   
   
 }

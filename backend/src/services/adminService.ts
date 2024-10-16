@@ -58,6 +58,15 @@ class AdminService {
       console.error('Error updating KYC status:', error);
     }
   }
+
+  async getAllSpecializations() {
+    const specializations = await this.adminRepository.getAllSpecializations()    
+    return specializations
+  }
+
+  async updateSpecStatus(spec_id: string, status: boolean) {
+    await this.adminRepository.updateSpecStatus(spec_id, status)
+  }
   
 
 }

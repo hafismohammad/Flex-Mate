@@ -1,12 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../app/store";
-import { addSpecialization } from '../../actions/adminAction';
+import { addSpecialization } from "../../actions/adminAction";
+import axios from "axios";
+import API_URL from "../../../axios/API_URL";
+import { v4 as uuidv4 } from "uuid";
 
 interface Errors {
   name?: string;
   description?: string;
+}
+
+interface Specialization {
+  _id: string;
+  name: string;
+  description: string;
+  isListed: boolean;
 }
 
 const Specializations = () => {
@@ -15,16 +25,25 @@ const Specializations = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
+  const [specializations, setSpecializations] = useState<Specialization[]>([]);
 
   const dispatch = useDispatch<AppDispatch>();
 
-  // Mock data for Specializations
-  const specializations = [
-    { id: 1, name: "Yoga", status: "Active" },
-    { id: 2, name: "Pilates", status: "Inactive" },
-    { id: 3, name: "Strength Training", status: "Active" },
-    { id: 4, name: "Cardio", status: "Active" },
-  ];
+  useEffect(() => {
+    const getAllSpecializations = async () => {
+      try {
+        const response = await axios.get(
+          `${API_URL}/api/admin/allSpecializations`
+        );
+        setSpecializations(response.data);
+
+        console.log("Specializations fetched:", response.data);
+      } catch (error) {
+        console.error("Error fetching specializations:", error);
+      }
+    };
+    getAllSpecializations();
+  }, [specializations]);
 
   const filteredSpecializations = specializations.filter((spec) =>
     spec.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -36,9 +55,9 @@ const Specializations = () => {
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setErrors({}); 
-    setName(""); 
-    setDescription(""); 
+    setErrors({});
+    setName("");
+    setDescription("");
   };
 
   const validate = (): boolean => {
@@ -58,18 +77,30 @@ const Specializations = () => {
     if (!isValid) {
       setErrors(newErrors);
       setTimeout(() => {
-        setErrors({}); 
+        setErrors({});
       }, 3000);
     }
 
     return isValid;
   };
 
+  const handleStatus = async (specId: string, currentStatus: boolean) => {
+    try {
+      const updatedStatus = !currentStatus;
+
+      await axios.patch(`${API_URL}/api/admin/toggle-status/${specId}`, {
+        isListed: updatedStatus,
+      });
+    } catch (error) {
+      console.error("Error updating specialization status:", error);
+    }
+  };
+
   const handleAddSpecialization = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!validate()) {
-      return; 
+      return;
     }
 
     const specializationData = {
@@ -77,7 +108,7 @@ const Specializations = () => {
       description,
     };
     dispatch(addSpecialization(specializationData));
-    closeModal(); 
+    closeModal();
   };
 
   return (
@@ -105,7 +136,8 @@ const Specializations = () => {
       {/* Specializations List Container */}
       <div className="bg-white shadow-lg rounded-lg p-6">
         {/* Table Headers */}
-        <div className="grid grid-cols-3 text-lg font-semibold text-gray-600 mb-4 border-b border-gray-200 pb-2">
+        <div className="grid grid-cols-4 text-lg font-semibold text-gray-600 mb-4 border-b border-gray-200 pb-2">
+          <div>ID</div>
           <div>Specialization</div>
           <div>Status</div>
           <div className="text-center">Action</div>
@@ -115,25 +147,31 @@ const Specializations = () => {
         {filteredSpecializations.length > 0 ? (
           filteredSpecializations.map((spec) => (
             <div
-              key={spec.id}
-              className="grid grid-cols-3 items-center p-4 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none"
+              key={spec._id}
+              className="grid grid-cols-4 items-center p-4 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none"
             >
+              <div className="text-gray-800 font-medium">
+                {spec._id.substring(0, 8)}
+              </div>
               <div className="text-gray-800 font-medium">{spec.name}</div>
               <div
                 className={`font-semibold ${
-                  spec.status === "Active" ? "text-green-600" : "text-red-500"
+                  spec.isListed ? "text-green-600" : "text-red-500"
                 }`}
               >
-                {spec.status}
+                {spec.isListed ? "Active" : "Inactive"}
               </div>
               <div className="flex justify-center space-x-4">
-                <button className="flex items-center space-x-1 text-white bg-blue-600 hover:bg-blue-700 py-1 px-3 rounded-md font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  <FaEdit />
-                  <span>Edit</span>
-                </button>
-                <button className="flex items-center space-x-1 text-white bg-red-600 hover:bg-red-700 py-1 px-3 rounded-md font-semibold focus:outline-none focus:ring-2 focus:ring-red-500">
-                  <FaTrash />
-                  <span>Delete</span>
+                <button
+                  onClick={() => handleStatus(spec._id, spec.isListed)}
+                  className={`flex items-center justify-center text-white py-2 px-5 rounded-md font-semibold focus:outline-none ${
+                    spec.isListed
+                      ? "bg-orange-500 hover:bg-orange-600"
+                      : "bg-green-500 hover:bg-green-600"
+                  }`}
+                  style={{ minWidth: "120px" }} // Set a minimum width here
+                >
+                  <span>{spec.isListed ? "Unlist" : "List"}</span>
                 </button>
               </div>
             </div>
@@ -153,33 +191,40 @@ const Specializations = () => {
             <form onSubmit={handleAddSpecialization}>
               <input
                 type="text"
-                value={name} // Ensure input reflects state
+                value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Enter specialization name"
-                className={`w-full p-2 border ${errors.name ? "border-red-500" : "border-gray-300"} rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                className={`w-full p-2 border ${
+                  errors.name ? "border-red-500" : "border-gray-300"
+                } rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500`}
               />
-              {errors.name && <div className="text-red-500 mb-2">{errors.name}</div>}
-
+              {errors.name && (
+                <div className="text-red-500 mb-2">{errors.name}</div>
+              )}
               <textarea
-                value={description} // Ensure textarea reflects state
+                value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Enter specialization description"
-                className={`w-full h-32 p-2 border ${errors.description ? "border-red-500" : "border-gray-300"} rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500`}
-              ></textarea>
-              {errors.description && <div className="text-red-500 mb-2">{errors.description}</div>}
-
-              <div className="flex justify-end space-x-4">
+                className={`w-full p-2 border ${
+                  errors.description ? "border-red-500" : "border-gray-300"
+                } rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+              />
+              {errors.description && (
+                <div className="text-red-500 mb-2">{errors.description}</div>
+              )}
+              <div className="flex justify-end">
                 <button
+                  type="button"
                   onClick={closeModal}
-                  className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+                  className="text-gray-500 hover:text-gray-700 mr-4"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="bg-blue-600 text-white hover:bg-blue-700 py-2 px-4 rounded-lg font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  Add
+                  Add Specialization
                 </button>
               </div>
             </form>

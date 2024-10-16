@@ -86,8 +86,17 @@ class AdminRepository {
   }
   
   
+  async getAllSpecializations() {
+    return await this.specializationModel.find()
+  }
   
-  
+  async updateSpecStatus(spec_id: string, status: boolean) {
+    return await this.specializationModel.findByIdAndUpdate(
+     { _id: spec_id},
+     { isListed: status},
+     { new: true } 
+    )
+  }
 
 }
 

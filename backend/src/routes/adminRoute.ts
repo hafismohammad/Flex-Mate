@@ -16,7 +16,8 @@ router.post('/addSpecialization', adminController.addSpecialization.bind(adminCo
 router.get('/allTrainerKyc', adminController.getAllTrainersKycDatas.bind(adminController))
 router.get('/trainerKycDetails/:trainer_id', adminController.allTrainersKycData.bind(adminController));
 router.patch('/updateKycStatus/:trainer_id', adminController.changeKycStatus.bind(adminController));
-
+router.get('/allSpecializations', adminController.getAllSpecializations.bind(adminController))
+router.patch('/toggle-status/:spec_id', adminController.updateStatus.bind(adminController))
 
 
 
