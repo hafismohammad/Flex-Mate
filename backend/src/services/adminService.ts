@@ -37,6 +37,7 @@ class AdminService {
 
   async addSpecialization({name, description}: {name: string, description: string}) {
     const specializationData = await this.adminRepository.addSpecialization({name, description})
+    return specializationData
   }
 
   async TraienrsKycData() {
@@ -65,7 +66,7 @@ class AdminService {
   }
 
   async updateSpecStatus(spec_id: string, status: boolean) {
-    await this.adminRepository.updateSpecStatus(spec_id, status)
+    return await this.adminRepository.updateSpecStatus(spec_id, status)
   }
   
 

@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import AdminService from "../services/AdminService";
+import adminService from "../services/AdminService";
 
 interface LoginAdmin {
   email: string;
@@ -42,3 +43,17 @@ export const addSpecialization = createAsyncThunk(
     }
   }
 );
+
+export const fetchAllSpecializations = createAsyncThunk(
+  'admin/getAllSpecialization',
+  async (_, thunkAPI) => {
+    try {      
+      const response = await AdminService.getAllSpecializaton()
+      // console.log(response.data,'dfdf');
+      
+      return response.data
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.response?.data)
+    }
+  }
+)

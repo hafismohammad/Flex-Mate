@@ -13,11 +13,16 @@ const addSpecialization = ({ name, description }: { name: string; description: s
   return axios.post(`${API_URL}/api/admin/addSpecialization`, { name, description });
 };
 
+const getAllSpecializaton= () => {
+  return  axios.get(`${API_URL}/api/admin/allSpecializations`);
+}
+
 // Make sure to include addSpecialization in the exported object
 const adminService = {
   adminLogin,
   adminLogout,
   addSpecialization,
+  getAllSpecializaton
 };
 
 export default adminService;

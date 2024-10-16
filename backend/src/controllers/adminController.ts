@@ -61,6 +61,8 @@ class AdminController {
     try {
       const specializationData = req.body;
       const specialization = await this.adminService.addSpecialization(specializationData);
+      console.log(specialization,'dfd');
+      
       res.status(201).json({ message: "Specialization added successfully", specialization });
     } catch (error) {
       console.error('Adding specialization error', error);
@@ -72,6 +74,8 @@ class AdminController {
     try {
       
       const allTrainersKycData = await this.adminService.TraienrsKycData();
+      console.log(allTrainersKycData);
+      
       res.status(200).json({ message: "Trainers KYC data fetched successfully", data: allTrainersKycData });
     } catch (error) {
       console.error("Error fetching KYC data:", error);
@@ -111,6 +115,7 @@ async changeKycStatus(req: Request, res: Response) {
 async getAllSpecializations(req: Request, res: Response) {
   try {
     const allSpecializations = await this.adminService.getAllSpecializations(); 
+    
     res.status(200).json(allSpecializations); 
   } catch (error) {
     console.error('Error fetching specializations:', error);
@@ -120,17 +125,23 @@ async getAllSpecializations(req: Request, res: Response) {
 
 async updateStatus(req: Request, res: Response) {
   try {
-    const spec_id = req.params.spec_id
-    const status= req.body.isListed
-    
-    await this.adminService.updateSpecStatus(spec_id, status)
+    const spec_id = req.params.spec_id;
+    const status = req.body.isListed;
+
+    const updateResult = await this.adminService.updateSpecStatus(spec_id, status);
+console.log(updateResult);
+
+    res.status(200).json({
+      message: 'Specialization status updated successfully.',
+      data: updateResult, 
+    });
   } catch (error) {
-    console.error('Error updating  specializations status:', error);
-    res.status(500).json({ message: 'An error occurred while updating  specializations status.' });
+    console.error('Error updating specializations status:', error);
+
+    res.status(500).json({ message: 'An error occurred while updating specializations status.' });
   }
 }
-  
-  
+
 }
 
 export default AdminController;

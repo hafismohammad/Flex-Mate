@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../app/store";
 import { addSpecialization } from "../../actions/adminAction";
 import axios from "axios";
 import API_URL from "../../../axios/API_URL";
-import { v4 as uuidv4 } from "uuid";
 
 interface Errors {
   name?: string;
@@ -26,24 +25,22 @@ const Specializations = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
   const [specializations, setSpecializations] = useState<Specialization[]>([]);
+console.log('spec state', specializations);
 
   const dispatch = useDispatch<AppDispatch>();
 
-  useEffect(() => {
-    const getAllSpecializations = async () => {
-      try {
-        const response = await axios.get(
-          `${API_URL}/api/admin/allSpecializations`
-        );
-        setSpecializations(response.data);
+  const getAllSpecializations = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/admin/allSpecializations`);
+      setSpecializations(response.data);
+    } catch (error) {
+      console.error("Error fetching specializations:", error);
+    }
+  };
 
-        console.log("Specializations fetched:", response.data);
-      } catch (error) {
-        console.error("Error fetching specializations:", error);
-      }
-    };
+  useEffect(() => {
     getAllSpecializations();
-  }, [specializations]);
+  }, [setSpecializations]);
 
   const filteredSpecializations = specializations.filter((spec) =>
     spec.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -87,29 +84,67 @@ const Specializations = () => {
   const handleStatus = async (specId: string, currentStatus: boolean) => {
     try {
       const updatedStatus = !currentStatus;
-
-      await axios.patch(`${API_URL}/api/admin/toggle-status/${specId}`, {
+      console.log('Current status:', currentStatus, '-- Updated status:', updatedStatus);
+  
+      const response = await axios.patch(`${API_URL}/api/admin/toggle-status/${specId}`, {
         isListed: updatedStatus,
       });
+  
+      console.log('API Response:', response.data);
+  
+      if (response.status === 200 && response.data && response.data.data) {
+        const updatedSpec = response.data.data; 
+        setSpecializations((prevSpecializations) =>
+          prevSpecializations.map((spec) =>
+            spec._id === specId ? { ...spec, isListed: updatedSpec.isListed } : spec
+          )
+        );
+      } else {
+        console.error('Unexpected response format:', response);
+      }
     } catch (error) {
       console.error("Error updating specialization status:", error);
     }
   };
+  
 
-  const handleAddSpecialization = (e: React.FormEvent<HTMLFormElement>) => {
+
+  const handleAddSpecialization = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+  
     if (!validate()) {
       return;
     }
-
+  
     const specializationData = {
       name,
       description,
+      isListed: true, 
     };
-    dispatch(addSpecialization(specializationData));
-    closeModal();
+  
+    try {
+      const response = await dispatch(addSpecialization(specializationData));
+  
+      if (response.meta.requestStatus === 'fulfilled' && response.payload.specialization) {
+        const newSpecialization = response.payload.specialization;
+  
+        setSpecializations((prevSpecializations) => [
+          ...prevSpecializations,
+          newSpecialization,
+        ]);
+      }
+  
+      closeModal();
+    } catch (error) {
+      console.error("Error adding specialization:", error);
+    }
   };
+  
+
+  useEffect(() => {
+    console.log("wdw",specializations);
+    
+  },[specializations])
 
   return (
     <div className="p-8 bg-gray-100 min-h-screen">

@@ -84,7 +84,7 @@ const navigate = useNavigate()
             </span>
           </Link>
           <Link
-            to="#"
+            to="/admin/userListing"
             className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
           >
             <FaUser size={20} />

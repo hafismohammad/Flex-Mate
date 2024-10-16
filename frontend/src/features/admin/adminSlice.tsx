@@ -1,9 +1,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { adminLogin, adminLogout } from '../../actions/adminAction';
+import { adminLogin, adminLogout, addSpecialization, fetchAllSpecializations } from '../../actions/adminAction';
 
 interface AdminState {
   adminData: any;
   adminToken: string | null;
+  specializations: any[]; // Adding specializations to state
   loading: boolean;
   error: string | null;
 }
@@ -14,6 +15,7 @@ const adminData = admin ? JSON.parse(admin) : null;
 const initialState: AdminState = {
   adminData: adminData || null,
   adminToken: localStorage.getItem('admin_access_token') || null,
+  specializations: [], // Initialize specializations array
   loading: false,
   error: null,
 };
@@ -47,6 +49,38 @@ const adminSlice = createSlice({
         state.error = null;
         localStorage.removeItem('admin');
         localStorage.removeItem('admin_access_token');
+      })
+
+        // get all specialization cases
+        .addCase(fetchAllSpecializations.pending, (state) => {
+          state.loading = true;
+          state.error = null;
+        })
+        .addCase(fetchAllSpecializations.fulfilled, (state, action: PayloadAction<any>) => {
+          state.loading = false;
+          state.specializations.push(action.payload); 
+          console.log('action payload', action.payload);
+          
+        })
+        .addCase(fetchAllSpecializations.rejected, (state, action) => {
+          state.loading = false;
+          state.error = action.error.message || 'Failed to add specialization';
+        })
+
+      // Add specialization cases
+      .addCase(addSpecialization.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(addSpecialization.fulfilled, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.specializations.push(action.payload.specialization); 
+        // console.log('action payload', action.payload.specialization);
+        
+      })
+      .addCase(addSpecialization.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to add specialization';
       });
   },
 });

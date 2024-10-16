@@ -5,6 +5,7 @@ import AdminLayout from "../components/admin/AdminLayout ";
 import Verification from "../components/admin/Verification";
 import SpecializationsPage from "../pages/admin/SpecializationsPage";
 import TrianerVerificationViewPage from "../pages/admin/TrianerVerificationViewPage";
+import UserListingPage from "../pages/admin/UserListingPage";
 
 function AdminRoutes() {
   return (
@@ -16,7 +17,7 @@ function AdminRoutes() {
           <Route path="/verification" element={<Verification />} />
           <Route path="/specializations" element={<SpecializationsPage />} />
           <Route path="/trainerView/:trainerId" element={<TrianerVerificationViewPage />} />
-
+          <Route path="/userListing" element={<UserListingPage />}/>
         </Route>
       </Routes>
     </div>
