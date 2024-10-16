@@ -129,7 +129,6 @@ async updateStatus(req: Request, res: Response) {
     const status = req.body.isListed;
 
     const updateResult = await this.adminService.updateSpecStatus(spec_id, status);
-console.log(updateResult);
 
     res.status(200).json({
       message: 'Specialization status updated successfully.',
@@ -139,6 +138,16 @@ console.log(updateResult);
     console.error('Error updating specializations status:', error);
 
     res.status(500).json({ message: 'An error occurred while updating specializations status.' });
+  }
+}
+
+async getAllUsers(req: Request, res: Response) {
+  try {
+   const  allUsers =  await this.adminService.fetchAllUsers()
+    console.log(allUsers);
+    res.status(200).json({message: 'Fetch all users successfully', users: allUsers})
+  } catch (error) {
+    
   }
 }
 

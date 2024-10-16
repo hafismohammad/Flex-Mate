@@ -25,7 +25,7 @@ const Specializations = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
   const [specializations, setSpecializations] = useState<Specialization[]>([]);
-console.log('spec state', specializations);
+// console.log('spec state', specializations);
 
   const dispatch = useDispatch<AppDispatch>();
 

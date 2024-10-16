@@ -18,6 +18,7 @@ router.get('/trainerKycDetails/:trainer_id', adminController.allTrainersKycData.
 router.patch('/updateKycStatus/:trainer_id', adminController.changeKycStatus.bind(adminController));
 router.get('/allSpecializations', adminController.getAllSpecializations.bind(adminController))
 router.patch('/toggle-status/:spec_id', adminController.updateStatus.bind(adminController))
+router.get('/allUsers', adminController.getAllUsers.bind(adminController))
 
 
 

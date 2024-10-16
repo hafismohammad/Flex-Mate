@@ -2,12 +2,14 @@ import AdminModel from "../models/adminModel";
 import SpecializationModel from "../models/specializationModel";
 import KYCModel from "../models/KYC_Model";
 import TrainerModel from "../models/trainerModel";
+import UserModel from "../models/userModel";
 
 class AdminRepository {
   private adminModel = AdminModel;
   private specializationModel = SpecializationModel
   private kycModel = KYCModel
   private trainerModel = TrainerModel
+  private userModel = UserModel
   async findAdmin(email: string) {
     try {
       return await this.adminModel.findOne({ email });
@@ -96,6 +98,10 @@ class AdminRepository {
      { isListed: status},
      { new: true } 
     )
+  }
+
+  async fetchAllUsers() {
+    return await this.userModel.find()
   }
 
 }

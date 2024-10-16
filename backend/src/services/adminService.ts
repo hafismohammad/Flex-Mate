@@ -69,6 +69,9 @@ class AdminService {
     return await this.adminRepository.updateSpecStatus(spec_id, status)
   }
   
+  async fetchAllUsers() {
+    return await this.adminRepository.fetchAllUsers()
+  }
 
 }
 
