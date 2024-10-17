@@ -15,7 +15,7 @@ function TrainerRoutes() {
       <Route path="/otp" element={<TrainerOtpPage />} />
 
       <Route path="/" element={<TrainerLayout />}>
-        <Route path="dashboard" element={<ProtectRoute><TrainerDashboard /></ProtectRoute>} />
+        <Route path="/" element={<ProtectRoute><TrainerDashboard /></ProtectRoute>} />
       </Route>
     </Routes>
   );

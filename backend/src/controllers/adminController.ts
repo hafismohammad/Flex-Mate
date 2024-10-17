@@ -173,6 +173,25 @@ async blockUnblockUser(req: Request, res: Response) {
     
   }
 }
+
+async blockUnblockTrainer(req: Request, res: Response) {
+  try {
+    
+    const trainer_id = req.params.trainer_id
+    const trainerStatus = req.body.status
+    console.log(trainer_id,trainerStatus);
+    
+    const status = await this.adminService.updateTrainerStatus(trainer_id, trainerStatus)
+    
+     res.status(200).json({
+      message: 'trainer status updated sucessfully',
+      data: status, 
+    });   
+  } catch (error) {
+    
+  }
+}
+
 }
 
 export default AdminController;

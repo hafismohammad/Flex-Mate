@@ -46,7 +46,7 @@ function TrainerSidebar() {
 
       <nav className="flex flex-col space-y-4">
         <Link
-          to="/admin/"
+          to="/trainer"
           className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
         >
           <FaChartPie size={20} />
@@ -55,7 +55,7 @@ function TrainerSidebar() {
           </span>
         </Link>
         <Link
-          to="/admin/specializations"
+          to="#"
           className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
         >
           <FaListAlt size={20} />

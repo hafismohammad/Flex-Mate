@@ -100,7 +100,7 @@ console.log('dfsd',kycStatus);
     
   })
     dispatch(submitKyc({ formData, token }));
-    navigate('/trainer/dashboard')
+    navigate('/trainer')
   };
   
 

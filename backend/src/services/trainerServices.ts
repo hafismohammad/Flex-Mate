@@ -117,7 +117,30 @@ class TrainerService {
     }
 }
 
-  
+async resendOTP(email: string): Promise<void> {
+  try {
+    const generatedOTP: string = Math.floor(
+      1000 + Math.random() * 9000
+    ).toString();
+    this.OTP = generatedOTP;
+
+    const OTP_createdTime = new Date();
+    this.expiryOTP_time = new Date(OTP_createdTime.getTime() + 1 * 60 * 1000);
+
+    await this.trainerRepository.saveOTP(email, this.OTP, this.expiryOTP_time);
+
+    // const isMailSent = await sendOTPmail(email, this.OTP);
+    // if (!isMailSent) {
+    //   throw new Error("Failed to resend OTP email.");
+    // }
+
+    console.log(`Resent OTP ${this.OTP} to ${email}`);
+  } catch (error) {
+    console.error("Error in resendOTP:", (error as Error).message);
+    throw error;
+  }
+}
+
 
   // login trainer
   async trainerLogin({ email, password }: { email: string; password: string }) {

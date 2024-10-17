@@ -21,6 +21,7 @@ router.patch('/toggle-status/:spec_id', adminController.updateStatus.bind(adminC
 router.get('/allUsers', adminController.getAllUsers.bind(adminController))
 router.get('/allTrainer', adminController.getAllTrainer.bind(adminController))
 router.patch('/user-block-unblock/:user_id', adminController.blockUnblockUser.bind(adminController))
+router.patch('/trainer-block-unblock/:trainer_id', adminController.blockUnblockTrainer.bind(adminController))
 
 
 

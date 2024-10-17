@@ -68,6 +68,27 @@ class TrainerController {
       }
     }
   }
+    // Resend OTP
+    async resendOtp( req: Request<{ email: string }>,res: Response
+    ): Promise<void> {
+      try {
+        const { email } = req.body;
+console.log(email,'trainer cont');
+
+        await this.trainerService.resendOTP(email);
+        res.status(200).json({ message: "OTP resent successfully" });
+      } catch (error) {
+        console.error("Resend OTP Controller error:", error);
+        if ((error as Error).message === "User not found") {
+          res.status(404).json({ message: "User not found" });
+        } else {
+          res
+            .status(500)
+            .json({ message: "Failed to resend OTP. Please try again later." });
+        }
+      }
+    }
+  
   async trainerLogin(req: Request, res: Response): Promise<void> {
     try {
       const { email, password }: ITrainer = req.body;

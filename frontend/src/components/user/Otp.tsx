@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../app/store";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { verifyOtp } from "../../actions/userAction";
 import axios from "axios";
 import API_URL from "../../../axios/API_URL";
@@ -18,7 +18,6 @@ const Otp = () => {
   const [isDisabled, setIsDisabled] = useState<boolean>(true);
   const [otpVerified, setOtpVerified] = useState(false);
 
-  // Get the email from the URL
   const location = useLocation();
   const userData = location.state;
 
@@ -26,7 +25,9 @@ const Otp = () => {
   const navigate = useNavigate();
   const { userInfo, error } = useSelector((state: RootState) => state.user);
 
-  useEffect(() => {
+  const startCountdown = () => {
+    setSeconds(60);
+    setIsDisabled(true);
     const timer = setInterval(() => {
       setSeconds((prev) => {
         if (prev <= 1) {
@@ -37,7 +38,10 @@ const Otp = () => {
         return prev - 1;
       });
     }, 1000);
-    return () => clearInterval(timer);
+  };
+
+  useEffect(() => {
+    startCountdown();
   }, []);
 
   const validate = () => {
@@ -67,15 +71,13 @@ const Otp = () => {
       return;
     }
 
-    setErrors({});
-    // console.log("userData", userData, otp);
-
     if (userData) {
-      
       dispatch(verifyOtp({ userData, otp })).then((res) => {
         if (res.meta.requestStatus === "fulfilled") {
           setOtpVerified(true);
           toast.success("Registration successful");
+        } else {
+          toast.error("Invalid OTP");
         }
       });
     }
@@ -83,25 +85,21 @@ const Otp = () => {
 
   const resendOtp = async () => {
     try {
-      console.log(userData, userData.email);
-
-      const response = await axios.post(`${API_URL}/resend-otp`, {
-        email: userData.email,
+      const response = await axios.post(`${API_URL}/api/user/resend-otp`, {
+        email: userData?.email,
       });
-      console.log(response.data.message);
 
-      setSeconds(60);
-      setIsDisabled(true);
+      if (response.status === 200) {
+        toast.success("OTP resented");
+        startCountdown();
+      } else {
+        toast.error("Failed to resend OTP. Please try again.");
+      }
     } catch (error) {
       console.error("Error resending OTP:", error);
+      toast.error("Failed to resend OTP. Please try again.");
     }
   };
-
-  useEffect(() => {
-    if (error) {
-      if (error) toast.error("Invalid OTP");
-    }
-  }, [error, navigate]);
 
   useEffect(() => {
     if (otpVerified) {
@@ -117,7 +115,6 @@ const Otp = () => {
           Enter OTP
         </h2>
         <p className="text-center text-gray-500 mb-8">
-          {" "}
           Please enter the 4-digit OTP sent to your mobile number.
         </p>
         <div className="mt-4">

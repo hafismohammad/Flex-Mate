@@ -79,7 +79,9 @@ class AdminService {
   async updateUserStatus(user_id: string, userStatus: boolean) {
     return await this.adminRepository.updateUserStatus(user_id, userStatus)
   }
-
+  async updateTrainerStatus(trainer_id: string, trainerStatus: boolean) {
+    return await this.adminRepository.updateTrainerStatus(trainer_id, trainerStatus)
+  }
 }
 
 export default AdminService;

@@ -116,6 +116,16 @@ class AdminRepository {
     )
     
   }
+
+  async updateTrainerStatus(trainer_id: string, trainerStatus: boolean) {
+    
+   return  await this.trainerModel.findByIdAndUpdate(
+      {_id: trainer_id},
+      {isBlocked: trainerStatus},
+      { new: true } 
+    )
+    
+  }
 }
 
 export default AdminRepository;
