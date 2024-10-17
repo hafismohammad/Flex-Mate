@@ -51,6 +51,16 @@ class AdminService {
       throw error; 
     }
   }
+
+  async fetchKycData(trainerId: string) {
+    try {
+      return await this.adminRepository.fetchKycData(trainerId);
+    } catch (error) {
+      console.error('Error fetching KYC data:', error);
+      throw new Error('Failed to fetch KYC data');
+    }
+  }
+  
   
   async updateKycStatus(status: string, trainer_id: string): Promise<void> {
     try {

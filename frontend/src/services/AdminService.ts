@@ -10,6 +10,7 @@ const adminLogout = () => {
 };
 
 const addSpecialization = ({ name, description }: { name: string; description: string }) => {
+  
   return axios.post(`${API_URL}/api/admin/addSpecialization`, { name, description });
 };
 

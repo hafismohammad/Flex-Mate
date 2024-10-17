@@ -114,6 +114,7 @@ class TrainerRepository {
       
       const kycData = {
         trainerId: formData.trainer_id,
+        specialization_id: formData.specialization_id,
         address: formData.address,
         pinCode: formData.pinCode,
         kycDocuments: documents, 

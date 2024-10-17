@@ -55,6 +55,25 @@ class AdminRepository {
     ]);
   }
 
+  async fetchKycData(trainerId: string) {
+    try {
+      return await KYCModel.findOne({ trainerId })
+        .populate({
+          path: 'trainerId',
+          populate: {
+            path: 'specialization', 
+          },
+        });
+  
+    } catch (error) {
+      console.error('Error fetching KYC data:', error);
+      throw new Error('Failed to fetch KYC data');
+    }
+  }
+  
+  
+  
+
   async updateKycStatus(status: string, trainer_id: string): Promise<void> {
     try {
      

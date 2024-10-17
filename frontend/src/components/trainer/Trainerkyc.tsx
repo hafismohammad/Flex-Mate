@@ -22,7 +22,7 @@ const TrainerKyc: React.FC = () => {
   const { trainerToken , trainerInfo, kycStatus} = useSelector((state: RootState) => state.trainer);
   const token = trainerToken;
   const trainer_id = trainerInfo.id
-console.log('dfsd',kycStatus);
+console.log('dfsd',trainerInfo);
 
 
   const dispatch = useDispatch<AppDispatch>();
@@ -76,6 +76,7 @@ console.log('dfsd',kycStatus);
     event.preventDefault();
     const formData = new FormData();
     formData.append('trainer_id', trainer_id)
+    formData.append('specialization_id', trainerInfo.specialization)
     formData.append("pinCode", pinCode);
     formData.append("address[street]", address.street);
     formData.append("address[city]", address.city);

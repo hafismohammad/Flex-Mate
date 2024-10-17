@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaUser, FaPlus } from "react-icons/fa";
+import { FaFileAlt , FaPlus } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../app/store";
 import { addSpecialization } from '../../actions/adminAction';
@@ -99,13 +99,13 @@ function Verification() {
               <div className="text-gray-800">{trainer.name}</div>
               <div className="text-gray-800">{trainer.email}</div>
               <div className="text-gray-800">{new Date(trainer.kycSubmissionDate).toDateString()}</div>
-              <div className="text-gray-800">{trainer.status}</div>
+              <div className="text-orange-500 font-medium">{trainer.status}</div>
               <div className="flex justify-center space-x-4">
                 <button 
                   onClick={() => handleView(trainer.id)}
                   className="flex items-center space-x-1 text-white bg-blue-600 hover:bg-blue-700 py-1 px-3 rounded-md font-semibold focus:outline-none focus:ring-2 focus:ring-red-500"
                 >
-                  <FaUser />
+                  <FaFileAlt />
                   <span>View</span>
                 </button>
               </div>

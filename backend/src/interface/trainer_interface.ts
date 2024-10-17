@@ -33,7 +33,8 @@ export interface ISpecialization {
   import { Document } from 'mongoose';
 
   export interface IKYC extends Document {
-    trainerId: string;
+    trainerId: Types.ObjectId;
+    specialization: Types.ObjectId;
     address: {
       street: string;
       city: string;

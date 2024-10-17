@@ -43,8 +43,9 @@ const Specializations = () => {
   }, [setSpecializations]);
 
   const filteredSpecializations = specializations.filter((spec) =>
-    spec.name.toLowerCase().includes(searchTerm.toLowerCase())
+    spec.name.toLowerCase().includes(searchTerm.trim().toLowerCase())
   );
+  
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -186,7 +187,7 @@ const Specializations = () => {
               className="grid grid-cols-4 items-center p-4 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none"
             >
               <div className="text-gray-800 font-medium">
-                {spec._id.substring(0, 8)}
+                {spec._id.substring(0, 8).toUpperCase()}
               </div>
               <div className="text-gray-800 font-medium">{spec.name}</div>
               <div

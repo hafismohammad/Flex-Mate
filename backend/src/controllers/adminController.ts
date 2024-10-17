@@ -61,7 +61,6 @@ class AdminController {
     try {
       const specializationData = req.body;
       const specialization = await this.adminService.addSpecialization(specializationData);
-      console.log(specialization,'dfd');
       
       res.status(201).json({ message: "Specialization added successfully", specialization });
     } catch (error) {
@@ -83,18 +82,19 @@ class AdminController {
     }
   }
   
-  async allTrainersKycData(req: Request, res: Response) {
-    try {
-      
-      const trainerId = req.params.trainer_id; 
-      console.log('hit');
-      console.log('trainerId', trainerId);
-      
-    } catch (error) {
-      console.error("Error fetching KYC data:", error);
-      res.status(500).json({ message: "Failed to fetch KYC data", error });
-    }
+async allTrainersKycData(req: Request, res: Response): Promise<void> {
+  try {
+    const trainerId = req.params.trainer_id; 
+    const trainerKycDetails = await this.adminService.fetchKycData(trainerId);
+    console.log('Trainer KYC Details:', trainerKycDetails);
+
+    res.status(200).json({ message: 'Trainer KYC data fetched successfully', kycData: trainerKycDetails });
+  } catch (error) {
+    console.error("Error fetching KYC data:", error);
+    res.status(500).json({ message: "Failed to fetch KYC data", error });
   }
+}
+
 async changeKycStatus(req: Request, res: Response) {
   try {
     const status = String(req.body.status); 

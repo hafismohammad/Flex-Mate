@@ -6,7 +6,7 @@ const trainerSchema = new Schema<ITrainer>({
   email: { type: String, required: true, unique: true },
   phone: { type: Number, required: true },
   password: { type: String, required: true },
-  specialization: { type: Schema.Types.ObjectId, ref: 'Specialization', required: true },  
+ specialization: { type: Schema.Types.ObjectId, ref: 'Specialization' },
   dob: { type: String, required: false },
   image: { type: String, required: false },
   gender: { type: String, required: false },
