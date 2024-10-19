@@ -2,7 +2,7 @@
 
 import TrainerRepository from "../repositories/trainerRepository";
 import { ITrainer, ILoginTrainer } from "../interface/trainer_interface";
-import { generateAccessToken, generateRefreshToken } from "../utils/jwtHelper";
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../utils/jwtHelper";
 import sendOTPmail from "../config/email_config";
 import bcrypt from "bcryptjs";
 
@@ -190,6 +190,33 @@ async resendOTP(email: string): Promise<void> {
       throw error;
     }
   }
+
+
+  async generateTokn(trainer_refresh_token: string) {
+      try {
+          const payload = verifyRefreshToken(trainer_refresh_token);
+          // console.log('payload', payload);
+  
+          let id: string | undefined;
+          let email: string | undefined;
+  
+          if (payload && typeof payload === 'object') {
+              id = payload?.id;
+              email = payload?.email;
+          }
+  
+          if (id && email) {
+              const TrainerNewAccessToken = generateAccessToken({ id, email });
+              return TrainerNewAccessToken;
+          } else {
+              throw new Error('Invalid token payload structure');
+          }
+      } catch (error) {
+          console.error('Error generating token:', error);
+          throw error; 
+      }
+  }
+  
 
   async kycSubmit(formData: any, documents: any) {
     try {

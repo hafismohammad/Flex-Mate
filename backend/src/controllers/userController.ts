@@ -47,7 +47,8 @@ class UserController {
           secure: true,
           maxAge: 7 * 24 * 60 * 60 * 1000,
         });
-        // console.log(user);
+
+
 
         res.status(200).json({
           message: "Login successful",

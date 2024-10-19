@@ -96,10 +96,7 @@ console.log('dfsd',trainerInfo);
       setSubmissionError("Authorization token is required.");
       return; 
     }
-  formData.forEach((item) => {
-    console.log('formsubmission', item);
-    
-  })
+
     dispatch(submitKyc({ formData, token }));
     navigate('/trainer')
   };
