@@ -149,8 +149,6 @@ class TrainerRepository {
 
   async changeKycStatus(trainerId: string) {
     try {
-    console.log('traiern---', trainerId);
-    
       const trainer = await this.trainerModel.findByIdAndUpdate(
         trainerId,
         { kycStatus: 'submitted' },
@@ -169,6 +167,25 @@ class TrainerRepository {
       throw new Error("Failed to change trainer KYC status");
     }
   }
+
+  async updateKycStatus(trainerId: string) {
+    try {
+      const updatedTrainer = await this.trainerModel.findByIdAndUpdate(
+        trainerId,
+        { $unset: { kycStatus: "" } }, 
+        { new: true } 
+      );
+  
+      if (updatedTrainer) {
+        console.log('KYC status field removed successfully:', updatedTrainer);
+      } else {
+        console.log('Trainer not found with the given ID:', trainerId);
+      }
+    } catch (error) {
+      console.error('Error removing KYC status field:', error);
+    }
+  }
+  
   
 }
 

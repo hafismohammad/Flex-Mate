@@ -74,9 +74,8 @@ class AdminRepository {
   
   
 
-  async updateKycStatus(status: string, trainer_id: string): Promise<void> {
+  async updateKycStatus(status: string, trainer_id: string): Promise<any> { 
     try {
-     
       const updatedTrainer = await this.trainerModel.findByIdAndUpdate(
         trainer_id,
         { kycStatus: status },
@@ -86,7 +85,6 @@ class AdminRepository {
       if (updatedTrainer) {
         console.log('Trainer KYC status updated successfully:', updatedTrainer);
   
-        // Update the KYC status in the KYC model using the trainer_id
         const updatedKyc = await this.kycModel.findOneAndUpdate(
           { trainerId: trainer_id },
           { kycStatus: status },
@@ -95,17 +93,36 @@ class AdminRepository {
   
         if (updatedKyc) {
           console.log('KYC model status updated successfully:', updatedKyc);
+          return updatedKyc;
         } else {
           console.log('KYC record not found for the given trainer ID:', trainer_id);
+          return null; 
         }
       } else {
         console.log('Trainer not found with the given ID:', trainer_id);
+        return null; 
       }
     } catch (error) {
       console.error('Error updating KYC status:', error);
+      throw error; 
     }
   }
   
+
+  async deleteKyc(trainer_id: string) {
+    try {
+      console.log('-------------------------->',trainer_id);
+      
+      const result = await this.kycModel.findOneAndDelete({ trainerId: trainer_id });
+      if (result) {
+        console.log('KYC record deleted successfully:', result);
+      } else {
+        console.log('No KYC record found for deletion with trainer ID:', trainer_id);
+      }
+    } catch (error) {
+      console.error('Error deleting KYC record:', error);
+    }
+  }
   
   async getAllSpecializations() {
     return await this.specializationModel.find()

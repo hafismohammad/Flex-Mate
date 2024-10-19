@@ -243,6 +243,10 @@ async resendOTP(email: string): Promise<void> {
       throw new Error("Failed to retrieve KYC status");
     }
   }
+
+  async updateKycStatus(trainerId: string) {
+    return await this.trainerRepository.updateKycStatus(trainerId)
+  }
 }
 
 export default TrainerService;

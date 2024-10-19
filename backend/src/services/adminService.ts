@@ -64,11 +64,19 @@ class AdminService {
   
   async updateKycStatus(status: string, trainer_id: string): Promise<void> {
     try {
-      await this.adminRepository.updateKycStatus(status, trainer_id);
+      const updatedKyc = await this.adminRepository.updateKycStatus(status, trainer_id);
+      console.log('KYC status updated:', updatedKyc);
+      console.log('================',status);
+      
+      if (status === 'approved' || status === 'rejected') {
+        await this.adminRepository.deleteKyc(trainer_id);
+        console.log(`KYC data deleted for trainer ID: ${trainer_id}`);
+      }
     } catch (error) {
       console.error('Error updating KYC status:', error);
     }
   }
+  
 
   async getAllSpecializations() {
     const specializations = await this.adminRepository.getAllSpecializations()    

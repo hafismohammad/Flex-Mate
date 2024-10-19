@@ -14,7 +14,7 @@ const trainerSchema = new Schema<ITrainer>({
     street: { type: String, required: false },
     city: { type: String, required: false },
   },
-  kycStatus: { type: String, enum: ['pending', 'approved', 'submitted', 'reject'], default: 'pending' },
+  kycStatus: { type: String, enum: ['pending', 'approved', 'submitted', 'rejected'], default: 'pending' },
   isBlocked: { type: Boolean, default: false },
 }, { timestamps: true });
 

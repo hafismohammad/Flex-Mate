@@ -93,7 +93,7 @@ console.log('dfd',trainer);
                 trainer.kycDocuments.map((doc, index) => (
                   <a
                   key={index}
-                  href={`${API_URL}/uploads/${doc}`} // Remove 'public' from the URL
+                  href={`${API_URL}/uploads/${doc}`} 
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-600 hover:underline flex items-center"

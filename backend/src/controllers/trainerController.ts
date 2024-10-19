@@ -250,7 +250,6 @@ class TrainerController {
   }
 
   async getAllKycStatus(req: Request, res: Response) {
-    console.log("hit kyc statsu");
   }
 
   async trainerKycStatus(req: Request, res: Response) {
@@ -262,6 +261,16 @@ class TrainerController {
     } catch (error) {
       console.error("Error fetching trainer KYC status:", error);
       res.status(500).json({ message: "Failed to fetch trainer KYC status" });
+    }
+  }
+
+  async resubmitkyc(req: Request, res: Response) {
+    try {
+      const trainer_id = req.params.trainerId
+      await this.trainerService.updateKycStatus(trainer_id)
+      res.status(200).json({message: 'kyc updated'})
+    } catch (error) {
+      
     }
   }
 }

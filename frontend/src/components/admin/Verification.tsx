@@ -70,13 +70,6 @@ function Verification() {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="p-2 border rounded-md"
         />
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="flex items-center space-x-1 text-white bg-blue-600 hover:bg-blue-700 py-1 px-3 rounded-md font-semibold focus:outline-none focus:ring-2 focus:ring-red-500"
-        >
-          <FaPlus />
-          <span>Add Specialization</span>
-        </button>
       </div>
 
       <div className="bg-white shadow-lg rounded-lg p-6">

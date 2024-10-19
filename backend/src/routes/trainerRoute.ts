@@ -21,11 +21,10 @@ router.post('/resend-otp', trainerController.resendOtp.bind(trainerController))
 router.post('/login', trainerController.trainerLogin.bind(trainerController))
 router.post('/refresh-token', trainerController.refreshToken.bind(trainerController))
 router.post('/kyc', authMiddlewares, uploads.fields([{ name: 'document1', maxCount: 1 }, { name: 'document2', maxCount: 1 }]),trainerController.kycSubmission.bind(trainerController));
-router.post('/logout', trainerController.logoutTrainer.bind(trainerController))
+router.post('/logout' , authMiddlewares, trainerController.logoutTrainer.bind(trainerController))
 router.get('/getKycStatus', trainerController.getAllKycStatus.bind(trainerController))
-router.get('/kycStatus/:trainerId', trainerController.trainerKycStatus.bind(trainerController));
-
-
+router.get('/kycStatus/:trainerId', authMiddlewares,trainerController.trainerKycStatus.bind(trainerController));
+router.put('/resubmitKyc/:trainerId', authMiddlewares, trainerController.resubmitkyc.bind(trainerController))
 
 
 export default router;
