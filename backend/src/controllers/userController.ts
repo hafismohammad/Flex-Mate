@@ -130,6 +130,18 @@ class UserController {
       res.status(500).json({ message: "Logout failed", error });
     }
   };
+
+  async getAllTrainers(req: Request, res: Response) {
+    try {
+      const allTrainers = await this.userService.fetchAllTrainers();
+      
+      res.status(200).json(allTrainers);
+    } catch (error) {
+      console.error('Error fetching trainers:', error);
+      res.status(500).json({ message: 'Error fetching trainers' });
+    }
+  }
+
 }
 
 export default UserController;

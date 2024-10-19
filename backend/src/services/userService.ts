@@ -168,6 +168,20 @@ async login({ email, password }: ILoginUser): Promise<any> {
   }
 }
 
+async fetchAllTrainers() {
+  try {
+    const trainers = await this.userRepository.fetchAllTrainers();
+
+    const approvedTrainers = trainers?.filter(trainer => trainer.kycStatus === 'approved' &&  trainer.isBlocked === false) || [];
+
+    return approvedTrainers;
+  } catch (error) {
+    console.error('Error fetching trainers:', error);
+    throw error; 
+  }
+}
+
+
 }
 
 export default UserService;

@@ -2,10 +2,12 @@ import { IUser, IOtp } from "../interface/common";
 import UserModel from "../models/userModel";
 import OtpModel from "../models/otpModel";
 import mongoose from "mongoose";
+import TrainerModel from "../models/trainerModel";
 
 class UserRepository {
   private userModel = UserModel;
   private otpModel = OtpModel;
+  private trainerModel = TrainerModel
 
   // Check if user already exists by email
   async existsUser(email: string): Promise<IUser | null> {
@@ -78,6 +80,16 @@ class UserRepository {
     } catch (error) {
       console.log("Error finding user:", error);
       return null;
+    }
+  }
+
+  async fetchAllTrainers() {
+    try {
+      const trainers = await this.trainerModel.find({}).populate('specialization');
+      return trainers; 
+    } catch (error) {
+      console.error('Error fetching trainers from the database:', error);
+      throw error; 
     }
   }
 }
