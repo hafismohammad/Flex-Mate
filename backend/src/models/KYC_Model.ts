@@ -14,7 +14,6 @@ const kycSchema = new Schema<IKYC>({
     },
     kycDocuments: { type: [String], required: true },
     kycStatus: { type: String, enum: ['pending', 'approved', 'submitted', 'rejected'], default: 'pending' },
-    rejectionReason: { type: String, required: false },
     kycSubmissionDate: { type: Date, default: Date.now },
     kycComments: { type: String, required: false },
 }, { timestamps: true });

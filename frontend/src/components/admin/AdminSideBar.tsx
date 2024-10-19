@@ -100,15 +100,6 @@ const navigate = useNavigate()
             </span>
           </Link>
           <Link
-            to="#"
-            className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
-          >
-            <FaCog size={20} />
-            <span className={`ml-2 ${!isSidebarOpen && "hidden"}`}>
-              Settings
-            </span>
-          </Link>
-          <Link
             to="/logout"
             className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
           >

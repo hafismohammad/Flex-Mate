@@ -30,19 +30,21 @@ function KycRejectionStatus() {
       {isResubmitted ? (
         <TrainerKyc />
       ) : (
-        <div className="max-w-4xl mx-auto p-10 bg-white rounded-lg shadow-md text-center">
-          <h1 className="text-3xl font-semibold text-red-500 mb-4">
-            Your KYC information has been rejected.
-          </h1>
-          <p className="text-lg text-gray-800 mb-4">
-            We regret to inform you that your application has been rejected.
-          </p>
-          <button
-            onClick={handleResubmit}
-            className="bg-blue-500 text-white text-lg py-2 px-4 rounded-md hover:bg-blue-600"
-          >
-            Resubmit Your KYC
-          </button>
+        <div className="flex items-center justify-center  bg-gray-100">
+          <div className="max-w-4xl mx-auto p-10 bg-white rounded-lg shadow-md text-center">
+            <h1 className="text-3xl font-semibold text-red-500 mb-4">
+              Your KYC information has been rejected.
+            </h1>
+            <p className="text-lg text-gray-800 mb-4">
+              We regret to inform you that your application has been rejected.
+            </p>
+            <button
+              onClick={handleResubmit}
+              className="bg-blue-500 text-white text-lg py-2 px-4 rounded-md hover:bg-blue-600"
+            >
+              Resubmit Your KYC
+            </button>
+          </div>
         </div>
       )}
     </div>

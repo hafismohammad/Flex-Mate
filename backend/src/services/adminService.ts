@@ -62,15 +62,20 @@ class AdminService {
   }
   
   
-  async updateKycStatus(status: string, trainer_id: string): Promise<void> {
+  async updateKycStatus(status: string, trainer_id: string, rejectionReason: string | null): Promise<void> {
     try {
-      const updatedKyc = await this.adminRepository.updateKycStatus(status, trainer_id);
+      const updatedKyc = await this.adminRepository.updateKycStatus(status, trainer_id, rejectionReason);
       console.log('KYC status updated:', updatedKyc);
-      console.log('================',status);
-      
+  
       if (status === 'approved' || status === 'rejected') {
         await this.adminRepository.deleteKyc(trainer_id);
         console.log(`KYC data deleted for trainer ID: ${trainer_id}`);
+      }
+  
+      // If the status is 'rejected', save the rejection reason
+      if (status === 'rejected' && rejectionReason) {
+        await this.adminRepository.saveRejectionReason(trainer_id, rejectionReason);
+        console.log(`Rejection reason saved for trainer ID: ${trainer_id}`);
       }
     } catch (error) {
       console.error('Error updating KYC status:', error);
@@ -100,6 +105,8 @@ class AdminService {
   async updateTrainerStatus(trainer_id: string, trainerStatus: boolean) {
     return await this.adminRepository.updateTrainerStatus(trainer_id, trainerStatus)
   }
+
+
 }
 
 export default AdminService;

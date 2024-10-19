@@ -5,6 +5,7 @@ import authMiddlewares from '../middlewares/authMiddlewares'
 import TrainerController from '../controllers/trainerController';
 import TrainerService from '../services/trainerServices';
 import TrainerRepository from '../repositories/trainerRepository';
+import AdminController from '../controllers/adminController';
 
 const router = express.Router();
 
@@ -25,6 +26,8 @@ router.post('/logout' , authMiddlewares, trainerController.logoutTrainer.bind(tr
 router.get('/getKycStatus', trainerController.getAllKycStatus.bind(trainerController))
 router.get('/kycStatus/:trainerId', authMiddlewares,trainerController.trainerKycStatus.bind(trainerController));
 router.put('/resubmitKyc/:trainerId', authMiddlewares, trainerController.resubmitkyc.bind(trainerController))
+
+
 
 
 export default router;

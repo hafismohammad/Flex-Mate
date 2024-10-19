@@ -3,6 +3,7 @@ import SpecializationModel from "../models/specializationModel";
 import KYCModel from "../models/KYC_Model";
 import TrainerModel from "../models/trainerModel";
 import UserModel from "../models/userModel";
+import KycRejectionReasonModel from "../models/kycRejectionReason";
 
 class AdminRepository {
   private adminModel = AdminModel;
@@ -10,6 +11,8 @@ class AdminRepository {
   private kycModel = KYCModel
   private trainerModel = TrainerModel
   private userModel = UserModel
+  private kycRejectionReasonModel = KycRejectionReasonModel
+
   async findAdmin(email: string) {
     try {
       return await this.adminModel.findOne({ email });
@@ -74,7 +77,7 @@ class AdminRepository {
   
   
 
-  async updateKycStatus(status: string, trainer_id: string): Promise<any> { 
+  async updateKycStatus(status: string, trainer_id: string, rejectionReason: string | null): Promise<any> {
     try {
       const updatedTrainer = await this.trainerModel.findByIdAndUpdate(
         trainer_id,
@@ -93,18 +96,28 @@ class AdminRepository {
   
         if (updatedKyc) {
           console.log('KYC model status updated successfully:', updatedKyc);
+  
+          // Save the rejection reason if the status is 'rejected'
+          if (status === 'rejected' && rejectionReason) {
+            await this.kycRejectionReasonModel.create({
+              trainerId: trainer_id,
+              reason: rejectionReason,
+            });
+            console.log('Rejection reason saved successfully.');
+          }
+  
           return updatedKyc;
         } else {
           console.log('KYC record not found for the given trainer ID:', trainer_id);
-          return null; 
+          return null;
         }
       } else {
         console.log('Trainer not found with the given ID:', trainer_id);
-        return null; 
+        return null;
       }
     } catch (error) {
       console.error('Error updating KYC status:', error);
-      throw error; 
+      throw error;
     }
   }
   
@@ -162,6 +175,21 @@ class AdminRepository {
     )
     
   }
+
+  async saveRejectionReason(trainerId: string, reason: string): Promise<void> {
+    try {
+      await KycRejectionReasonModel.create({
+        trainerId: trainerId,
+        reason: reason,
+        date: new Date(),
+      });
+      console.log('Rejection reason saved successfully for trainer ID:', trainerId);
+    } catch (error) {
+      console.error('Error saving rejection reason:', error);
+      throw error;
+    }
+  }
 }
+
 
 export default AdminRepository;

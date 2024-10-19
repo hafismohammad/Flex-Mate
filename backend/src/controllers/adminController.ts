@@ -86,7 +86,7 @@ async allTrainersKycData(req: Request, res: Response): Promise<void> {
   try {
     const trainerId = req.params.trainer_id; 
     const trainerKycDetails = await this.adminService.fetchKycData(trainerId);
-    console.log('Trainer KYC Details:', trainerKycDetails);
+    // console.log('Trainer KYC Details:', trainerKycDetails);
 
     res.status(200).json({ message: 'Trainer KYC data fetched successfully', kycData: trainerKycDetails });
   } catch (error) {
@@ -97,13 +97,15 @@ async allTrainersKycData(req: Request, res: Response): Promise<void> {
 
 async changeKycStatus(req: Request, res: Response) {
   try {
-    const status = String(req.body.status); 
-    const trainer_id = req.params.trainer_id; 
-    
-    console.log('Status:', status); 
-    console.log('Trainer ID:', trainer_id); 
+    const status = String(req.body.status);
+    const trainer_id = req.params.trainer_id;
+    const rejectionReason = req.body.rejectionReason || null;
 
-    await this.adminService.updateKycStatus(status, trainer_id);
+    console.log('Status:', status);
+    console.log('Trainer ID:', trainer_id);
+    console.log('Rejection Reason:', rejectionReason);
+
+    await this.adminService.updateKycStatus(status, trainer_id, rejectionReason);
 
     res.status(200).json({ message: 'Trainer status updated successfully', status });
   } catch (error) {
@@ -191,6 +193,8 @@ async blockUnblockTrainer(req: Request, res: Response) {
     
   }
 }
+
+
 
 }
 

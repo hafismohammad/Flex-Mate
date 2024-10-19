@@ -78,31 +78,6 @@ function TrainerLogin() {
       });
 
 
-  //   dispatch(loginTrainer(trainerData))
-  // .unwrap()
-  // .then(() => {
-  //   axios
-  //     .get(`${API_URL}/api/trainer/getKycStatus`)
-  //     .then((response) => {
-  //       if (response.data.isApproved) {
-  //         toast.success("Login successful!");
-  //         setTimeout(() => {
-  //           navigate("/trainer");
-  //         }, 1000);
-  //       } else {
-  //         // toast.warning("Please complete your KYC.");
-  //         navigate("/trainer/kyc");
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       console.error('Error fetching trainer status:', error);
-  //       toast.error("Error checking KYC status.");
-  //     });
-  // })
-  // .catch(() => {
-  //   toast.error("Login failed");
-  // });
-
   };
 
   return (
