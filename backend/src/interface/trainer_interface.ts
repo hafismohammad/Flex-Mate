@@ -11,16 +11,13 @@ export interface ITrainer {
   password: string;
   dob?: string;
   image?: string;
-  gender?: string;
-  address?: {
-      street: string; 
-      city: string;
-  };
+  gender?: 'male' | 'female' | 'other' | ''; // Updated gender field with specific options
+  yearsOfExperience?: number; // Added yearsOfExperience field
+  language?: string; // Added language field
   specialization: Types.ObjectId;  
   kycStatus: 'pending' | 'approved' | 'submitted' | 'rejected';
   isBlocked?: boolean;
 }
-
 export interface ISpecialization {
     _id: Types.ObjectId;
     name: string;

@@ -186,6 +186,30 @@ class TrainerRepository {
     }
   }
   
+  async fetchTrainer(trainer_id: string) {
+    try {
+      return this.trainerModel.findOne({_id: trainer_id}).populate('specialization')
+    } catch (error: any) {
+      throw Error(error)
+    }
+  }
+
+// Repository Method
+async updateTrainerData(trainer_id: string) {
+  try {
+      const existingTrainer = await this.trainerModel.findById(trainer_id);
+      if (!existingTrainer) {
+          throw new Error("Trainer not found");
+      }
+      return existingTrainer;
+  } catch (error) {
+      console.error("Error in repository layer:", error);
+      throw new Error("Failed to update trainer data");
+  }
+}
+
+
+  
   
 }
 

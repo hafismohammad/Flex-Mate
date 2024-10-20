@@ -96,6 +96,7 @@ function TrainerSignup() {
       password,
       specialization,
      }
+   console.log('signup data',trainerData);
    
      dispatch(registerTrainer(trainerData))
     navigate("/trainer/otp", { state: trainerData });

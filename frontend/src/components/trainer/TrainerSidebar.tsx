@@ -10,7 +10,7 @@ import {
   FaChartPie,
   FaUser,
   FaCog,
-  FaUserCircle,
+  FaSignOutAlt
 } from "react-icons/fa";
 import { AppDispatch } from "../../app/store";
 
@@ -23,10 +23,10 @@ function TrainerSidebar() {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  const handleLogout = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleLogout = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault(); 
     dispatch(adminLogout());
-    navigate('/admin/login'); 
+    navigate('/trainer/login'); 
   };
 
   return (
@@ -55,7 +55,7 @@ function TrainerSidebar() {
           </span>
         </Link>
         <Link
-          to="#"
+          to="/trainer/bookings"
           className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
         >
           <FaListAlt size={20} />
@@ -65,11 +65,11 @@ function TrainerSidebar() {
         </Link>
         
         <Link
-          to="#"
+          to="/trainer/profile"
           className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
         >
           <FaUser size={20} />
-          <span className={`ml-2 ${!isSidebarOpen && "hidden"}`}>Users</span>
+          <span className={`ml-2 ${!isSidebarOpen && "hidden"}`}>Profile</span>
         </Link>
         
         <Link
@@ -81,6 +81,17 @@ function TrainerSidebar() {
             Settings
           </span>
         </Link>
+        
+        <a
+          href="#" // Using <a> to trigger the logout action
+          onClick={handleLogout}
+          className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition cursor-pointer"
+        >
+          <FaSignOutAlt size={20} />
+          <span className={`ml-2 ${!isSidebarOpen && "hidden"}`}>
+            Logout
+          </span>
+        </a>
       </nav>
     </div>
   );

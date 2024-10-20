@@ -74,6 +74,8 @@ const trainerSlice = createSlice({
       .addCase(registerTrainer.fulfilled, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.trainerInfo = action.payload;
+        console.log('trainer register', action.payload);
+        
         state.error = null;
       })
       .addCase(registerTrainer.rejected, (state, action: PayloadAction<any>) => {

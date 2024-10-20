@@ -247,6 +247,45 @@ async resendOTP(email: string): Promise<void> {
   async updateKycStatus(trainerId: string) {
     return await this.trainerRepository.updateKycStatus(trainerId)
   }
+  async findTrainer(trainer_id: string) {
+    try {
+      return await this.trainerRepository.fetchTrainer(trainer_id)
+    } catch (error: any) {
+      throw Error(error)
+    }
+  }
+
+  // Service Method
+async updateTrainer(trainer_id: string, trainerData: Partial<ITrainer>) {
+  try {
+      const { name, email, phone, yearsOfExperience, gender, language } = trainerData;
+
+      const existingTrainer = await this.trainerRepository.updateTrainerData(trainer_id);
+
+      if (!existingTrainer) {
+          throw new Error("Trainer not found");
+      }
+
+      // Update fields if they are present in the trainerData
+      if (name) existingTrainer.name = name;
+      if (email) existingTrainer.email = email;
+      if (phone) existingTrainer.phone = phone;
+      if (yearsOfExperience) existingTrainer.yearsOfExperience = yearsOfExperience;
+      if (gender) existingTrainer.gender = gender;
+      if (language) existingTrainer.language = language;
+
+      // Save the updated trainer data
+      await existingTrainer.save();
+
+      return existingTrainer;
+  } catch (error) {
+      console.error("Error in service layer:", error);
+      throw new Error("Failed to update trainer");
+  }
+}
+
+
+  
 }
 
 export default TrainerService;

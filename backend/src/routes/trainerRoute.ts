@@ -26,6 +26,8 @@ router.post('/logout' , authMiddlewares, trainerController.logoutTrainer.bind(tr
 router.get('/getKycStatus', trainerController.getAllKycStatus.bind(trainerController))
 router.get('/kycStatus/:trainerId', authMiddlewares,trainerController.trainerKycStatus.bind(trainerController));
 router.put('/resubmitKyc/:trainerId', authMiddlewares, trainerController.resubmitkyc.bind(trainerController))
+router.get('/getTrainer/:trainerId', authMiddlewares, trainerController.getTrainer.bind(trainerController))
+router.patch(`/updateTrainerData/:trainerId`, authMiddlewares, trainerController.updateTrainer.bind(trainerController))
 
 
 

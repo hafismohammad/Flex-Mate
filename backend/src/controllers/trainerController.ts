@@ -274,6 +274,30 @@ class TrainerController {
     }
   }
 
+  async getTrainer(req: Request, res: Response) {
+    try {      
+      const trainer_id = req.params.trainerId
+      const trainerData = await this.trainerService.findTrainer(trainer_id)
+      res.status(200).json({message: 'Trainer data fetch succeffully', trainerData: trainerData})
+    } catch (error: any) {
+      throw Error(error)
+    }
+  }
+
+  async updateTrainer(req: Request, res: Response) {
+    try {
+      const trainer_id = req.params.trainerId;
+      const trainerData = req.body; // This will include only the fields you want to update
+  
+      const updatedTrainer = await this.trainerService.updateTrainer(trainer_id, trainerData);
+  
+      res.status(200).json({ message: "Trainer updated successfully", updatedTrainer });
+    } catch (error) {
+      console.error("Error updating trainer:", error);
+      res.status(500).json({ message: "Failed to update trainer" });
+    }
+  }
+  
 
 }
 

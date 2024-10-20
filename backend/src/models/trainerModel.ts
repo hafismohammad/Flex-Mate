@@ -6,14 +6,13 @@ const trainerSchema = new Schema<ITrainer>({
   email: { type: String, required: true, unique: true },
   phone: { type: Number, required: true },
   password: { type: String, required: true },
- specialization: { type: Schema.Types.ObjectId, ref: 'Specialization' },
+  specialization: { type: Schema.Types.ObjectId, ref: 'Specialization' },
   dob: { type: String, required: false },
   image: { type: String, required: false },
-  gender: { type: String, required: false },
-  address: {
-    street: { type: String, required: false },
-    city: { type: String, required: false },
-  },
+  gender: { type: String, enum: ['male', 'female', 'other', ''], required: false }, // Added gender field
+  yearsOfExperience: { type: Number, required: false }, // Added yearsOfExperience field
+  language: { type: String, required: false }, // Added language field
+
   kycStatus: { type: String, enum: ['pending', 'approved', 'submitted', 'rejected'], default: 'pending' },
   isBlocked: { type: Boolean, default: false },
 }, { timestamps: true });
