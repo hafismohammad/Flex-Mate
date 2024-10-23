@@ -2,10 +2,12 @@
 module.exports = {
   content: [
     './index.html',
-    './src/**/*.{js,ts,jsx,tsx}',  // Add this line
+    './src/**/*.{js,ts,jsx,tsx}',  
   ],
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [
+    require('tailwindcss-animated') 
+  ],
 };

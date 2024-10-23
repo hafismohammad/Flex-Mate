@@ -1,9 +1,13 @@
+import { useEffect } from "react";
 import cardImg_1 from "../../assets/card-1.jpg";
 import cardImg_2 from "../../assets/card-2.jpg";
 import cardImg_3 from "../../assets/card-3.jpg";
 import cardImg_4 from "../../assets/card-4.jpg";
 import cardImg_5 from "../../assets/card-5.jpg";
 import cardImg_6 from "../../assets/card-6.jpg";
+
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 
 const featuresData = [
   {
@@ -45,6 +49,16 @@ const featuresData = [
 ];
 
 function Features() {
+  useEffect(() => {
+    AOS.init({
+      duration: 1500, 
+      delay: 100, 
+      easing: 'ease-out-quart', 
+      once: true, 
+    });
+  }, []);
+  
+
   return (
     <div className="bg-slate-100 rounded-md p-4 flex flex-col place-items-center">
       <h1 className="text-4xl font-bold mb-14 mt-20 text-center">Services</h1>
@@ -54,6 +68,7 @@ function Features() {
           <div
             key={feature.id}
             className="mb-5 bg-white w-80 rounded-md shadow-md transform transition duration-300 hover:-translate-y-7"
+            data-aos="fade-up" // Adding fade-up animation to each feature card
           >
             <div className="overflow-hidden rounded-t-md">
               <img className="w-full" src={feature.image} alt={feature.title} />
