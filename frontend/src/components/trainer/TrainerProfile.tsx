@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../app/store';
 import axiosInstance from '../../../axios/axiosInstance';
-import {FaImages} from "react-icons/fa";
 
 interface Specialization {
     name: string;
@@ -14,10 +13,11 @@ interface TrainerProfileData {
     name: string;
     email: string;
     phone: string;
+    profileImage: string
     specialization: Specialization;
-    gender: string; // Add this if it's part of the response
-    yearsOfExperience: string; // Add this if it's part of the response
-    language: string; // Add this if it's part of the response
+    gender: string; 
+    yearsOfExperience: string;
+    language: string;
 }
 
 function TrainerProfile() {
@@ -57,6 +57,7 @@ function TrainerProfile() {
     if (!trainer) {
         return <div>No trainer data available</div>;
     }
+console.log('traianer',trainer);
 
     return (
         <div className="bg-gray-100 min-h-screen flex flex-col items-center py-8">
@@ -69,7 +70,7 @@ function TrainerProfile() {
 
                 <div className="absolute top-36 md:top-44 left-8 md:left-12 flex items-center justify-center">
                     <img
-                        src=""
+                        src={trainer.profileImage}
                         alt="Profile"
                         className="w-40 h-40 rounded-full bg-slate-500 object-cover border-4 border-white shadow-lg"
                     />

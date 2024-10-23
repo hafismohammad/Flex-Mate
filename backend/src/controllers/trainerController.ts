@@ -181,7 +181,6 @@ class TrainerController {
       const documents: { [key: string]: string | undefined } = {};
   
 
-      console.log('files',files);
       
       // Upload the files to Cloudinary and store the URLs
       if (files.profileImage && files.profileImage[0]) {
@@ -206,9 +205,7 @@ class TrainerController {
         documents.certificateUrl = certificateUrl.secure_url;
       }
       
-      console.log('document1', documents.profileImageUrl);
-      console.log('document2', documents.aadhaarFrontSideUrl);
-      console.log('document3', documents.certificateUrl);
+
 
       // Now you have the URLs in the `documents` object
       const formData = {

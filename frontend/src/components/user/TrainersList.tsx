@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import API_URL from "../../../axios/API_URL";
+import { useNavigate } from "react-router-dom";
 
 interface Specialization {
   name: string;
@@ -12,6 +13,7 @@ interface Trainer {
   name: string;
   email: string;
   phone: number;
+  profileImage: string
   specialization: Specialization;
   imageUrl?: string;
   isBlocked: boolean;
@@ -21,6 +23,8 @@ interface Trainer {
 function TrainersList() {
   const [trainersData, setTrainersData] = useState<Trainer[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchAllTrainers = async () => {
@@ -33,12 +37,17 @@ function TrainersList() {
     };
     fetchAllTrainers();
   }, []);
+console.log('treinerdata',trainersData);
 
   // Filter trainers based on the search term
   const filteredTrainers = trainersData.filter((trainer) =>
     trainer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     trainer.specialization.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleTrainerProfileView = (trainerId: string)  => {
+    navigate(`/treinerProfileView`)
+  }
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
@@ -57,14 +66,16 @@ function TrainersList() {
             key={trainer._id}
             className="bg-white shadow-lg rounded-lg overflow-hidden mb-5  transform transition duration-300 hover:-translate-y-7"
           >
-            <img alt={trainer.name} className="w-full h-48 object-cover" />
+            <img src={trainer.profileImage}
+              alt="Profile"
+               className="w-full h-48 object-cover" />
             <div className="p-4">
               <h3 className="text-xl font-semibold text-gray-800">
                 {trainer.name}
               </h3>
               <p className="text-gray-600">{trainer.specialization.name}</p>
               <p className="text-gray-600">{trainer.specialization.description}</p>
-              <button className="mt-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">
+              <button onClick={() => handleTrainerProfileView(trainer._id)} className="mt-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">
                 View Profile
               </button>
             </div>

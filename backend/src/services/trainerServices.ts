@@ -217,7 +217,7 @@ async resendOTP(email: string): Promise<void> {
         await this.trainerRepository.saveKyc(formData, documents);
 
         // After successful saving, change the KYC status to 'submitted' or any relevant status
-        return await this.trainerRepository.changeKycStatus(formData.trainer_id);
+        return await this.trainerRepository.changeKycStatus(formData.trainer_id, documents.profileImageUrl);
     } catch (error) {
         console.error("Error in kycSubmit service:", error);
         throw new Error("Failed to submit KYC data");

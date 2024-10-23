@@ -8,7 +8,7 @@ const trainerSchema = new Schema<ITrainer>({
   password: { type: String, required: true },
   specialization: { type: Schema.Types.ObjectId, ref: 'Specialization' },
   dob: { type: String, required: false },
-  image: { type: String, required: false },
+  profileImage: { type: String, required: false },
   gender: { type: String, enum: ['male', 'female', 'other', ''], required: false }, // Added gender field
   yearsOfExperience: { type: Number, required: false }, // Added yearsOfExperience field
   language: { type: String, required: false }, // Added language field

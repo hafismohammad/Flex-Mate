@@ -4,6 +4,7 @@ import Otp from '../pages/user/OtpPage'
 import Login from '../pages/user/LoginPage';
 import Home from '../pages/user/HomePage';
 import Trainers from '../pages/user/TrainersPage'
+import TrainerProfileViewPage from '../pages/user/TrainerProfileViewPage';
 
 function UserRoutes() {
   return (
@@ -14,6 +15,7 @@ function UserRoutes() {
         <Route path='/otp' element={<Otp />} />
         <Route path='/login' element={<Login />} />
         <Route path='/trainers' element={<Trainers />} />
+        <Route path='/treinerProfileView' element={<TrainerProfileViewPage />} />
       </Routes>
     </div>
   );

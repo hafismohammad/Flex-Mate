@@ -153,11 +153,14 @@ class TrainerRepository {
     }
   }
 
-  async changeKycStatus(trainerId: string) {
+  async changeKycStatus(trainerId: string, profileImage: string) {
     try {
       const trainer = await this.trainerModel.findByIdAndUpdate(
         trainerId,
-        { kycStatus: 'submitted' },
+        { 
+          kycStatus: 'submitted', 
+          profileImage: profileImage, 
+        },
         { new: true, runValidators: true }
       );
   

@@ -10,7 +10,7 @@ export interface ITrainer {
   email: string;
   password: string;
   dob?: string;
-  image?: string;
+  profileImage?: string;
   gender?: 'male' | 'female' | 'other' | ''; // Updated gender field with specific options
   yearsOfExperience?: number; // Added yearsOfExperience field
   language?: string; // Added language field
