@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import AdminService from "../services/adminService";
 import { ILoginAdmin } from "../interface/admin_interface";
-import { json } from "stream/consumers";
+import {getFileFromS3, extractKeyFromS3Url} from '../config/s3Service'
 
 class AdminController {
   private adminService: AdminService;
@@ -82,18 +82,39 @@ class AdminController {
     }
   }
   
-async allTrainersKycData(req: Request, res: Response): Promise<void> {
-  try {
-    const trainerId = req.params.trainer_id; 
-    const trainerKycDetails = await this.adminService.fetchKycData(trainerId);
-    // console.log('Trainer KYC Details:', trainerKycDetails);
+  async trainersKycData(req: Request, res: Response): Promise<void> {
+    try {
+        const trainerId = req.params.trainer_id;
+        const trainerKycDetails = await this.adminService.fetchKycData(trainerId);
 
-    res.status(200).json({ message: 'Trainer KYC data fetched successfully', kycData: trainerKycDetails });
-  } catch (error) {
-    console.error("Error fetching KYC data:", error);
-    res.status(500).json({ message: "Failed to fetch KYC data", error });
-  }
+        // Check if trainerKycDetails is null
+        if (!trainerKycDetails) {
+            res.status(404).json({ message: 'Trainer KYC details not found' });
+            return;
+        }
+
+  
+        // const profileImageUrl = trainerKycDetails.profileImage
+        // const aadhaarFrontImageUrl = trainerKycDetails.aadhaarFrontImage
+        // const aadhaarBackImageUrl = trainerKycDetails.aadhaarBackImage
+        // const certificateUrl = trainerKycDetails.certificate
+        
+
+        res.status(200).json({
+            message: 'Trainer KYC data fetched successfully',
+            kycData: {
+                ...trainerKycDetails,
+            },
+        });
+    } catch (error) {
+        console.error("Error fetching KYC data:", error);
+        res.status(500).json({ message: "Failed to fetch KYC data", error });
+    }
 }
+
+
+
+
 
 async changeKycStatus(req: Request, res: Response) {
   try {

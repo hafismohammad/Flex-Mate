@@ -26,46 +26,39 @@ class TrainerService {
 
   async registerTrainer(trainerData: ITrainer) {
     try {
-      const existingTrainer = await this.trainerRepository.existsTrainer(
-        trainerData.email
-      );
-
+      const existingTrainer = await this.trainerRepository.existsTrainer(trainerData.email);
+  
       if (existingTrainer) {
-        console.log("Trainer already exists");
-        throw new Error("Email already exists");
+        return null; // Return null if the email already exists
       }
-
+  
       // Generate random OTP
-      const generatedOTP: string = Math.floor(
-        1000 + Math.random() * 9000
-      ).toString();
+      const generatedOTP: string = Math.floor(1000 + Math.random() * 9000).toString();
       this.OTP = generatedOTP;
-
+  
       console.log("Generated OTP is", this.OTP);
-      // console.log('trainerData.email',trainerData.email);
-
-      // Send OTP to trainer's email
-      //   const isMailSent = await sendOTPmail(trainerData.email, this.OTP);
-      //   if (!isMailSent) {
-      //     throw new Error("Email not sent");
-      //   }
-
+  
       const OTP_createdTime = new Date();
       this.expiryOTP_time = new Date(OTP_createdTime.getTime() + 1 * 60 * 1000);
-
+  
       // Save OTP in the database
-      await this.trainerRepository.saveOTP(
-        trainerData.email,
-        this.OTP,
-        this.expiryOTP_time
-      );
-
+      await this.trainerRepository.saveOTP(trainerData.email, this.OTP, this.expiryOTP_time);
+  
       console.log(`OTP will expire at: ${this.expiryOTP_time}`);
+  
+      // You may also want to send the OTP email here if it's commented out in the previous code
+      // const isMailSent = await sendOTPmail(trainerData.email, this.OTP);
+      // if (!isMailSent) {
+      //   throw new Error("Email not sent");
+      // }
+  
+      return { email: trainerData.email }; // Return a success response with the trainer's email
     } catch (error) {
       console.error("Error in service:", (error as Error).message);
       throw new Error("Error in Trainer service");
     }
   }
+  
 
   async verifyOTP(trainerData: ITrainer, otp: string): Promise<void> {
     try {
@@ -218,19 +211,20 @@ async resendOTP(email: string): Promise<void> {
   }
   
 
-  async kycSubmit(formData: any, documents: any) {
+  async kycSubmit(formData: any, documents: any): Promise<any> {
     try {
-      
-      await this.trainerRepository.saveKyc(formData, documents);
+        // First, save the KYC data with documents in the database
+        await this.trainerRepository.saveKyc(formData, documents);
 
-      return await this.trainerRepository.changeKycStatus(formData.trainer_id)
-
-
+        // After successful saving, change the KYC status to 'submitted' or any relevant status
+        return await this.trainerRepository.changeKycStatus(formData.trainer_id);
     } catch (error) {
-      console.error("Error in kycSubmit service:", error);
-      throw new Error("Failed to submit KYC data");
+        console.error("Error in kycSubmit service:", error);
+        throw new Error("Failed to submit KYC data");
     }
-  }
+}
+
+  
 
   async kycStatus(trainerId: string) {
     try {
@@ -284,6 +278,13 @@ async updateTrainer(trainer_id: string, trainerData: Partial<ITrainer>) {
   }
 }
 
+async fetchRejectionData(trainer_id: string) {
+  try {
+    return await this.trainerRepository.fetchRejectionData(trainer_id)
+  } catch (error) {
+    
+  }
+}
 
   
 }

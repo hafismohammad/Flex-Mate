@@ -6,6 +6,7 @@ import SpecializationModel from "../models/specializationModel";
 import TrainerModel from "../models/trainerModel";
 import OtpModel from "../models/otpModel";
 import KYCModel from "../models/KYC_Model";
+import KycRejectionReasonModel from "../models/kycRejectionReason";
 import {ISpecialization} from '../interface/trainer_interface'
 import mongoose, { Types } from 'mongoose';
 
@@ -15,6 +16,7 @@ class TrainerRepository {
   private trainerModel = TrainerModel;
   private otpModel = OtpModel;
   private kycModel = KYCModel;
+  private kycRejectionModel = KycRejectionReasonModel
 
   // Method to find all specializations
   async findAllSpecializations() {
@@ -109,27 +111,31 @@ class TrainerRepository {
     }
   }
 
-  async saveKyc(formData: any, documents: any) {
+  async saveKyc(formData: any, documents: any): Promise<any> {
     try {
-      
-      const kycData = {
-        trainerId: formData.trainer_id,
-        specialization_id: formData.specialization_id,
-        address: formData.address,
-        pinCode: formData.pinCode,
-        kycDocuments: documents, 
-        kycComments: formData.comment,
-        kycStatus: "pending",
-        kycSubmissionDate: new Date(),
-      };
+        console.log('KYC Data to save:', { ...formData, ...documents });
 
-      const savedKyc = await KYCModel.create(kycData);
-      return savedKyc;
+        const kycData = {
+            trainerId: formData.trainer_id,
+            specializationId: formData.specialization,
+            profileImage: documents.profileImageUrl,
+            aadhaarFrontImage: documents.aadhaarFrontSideUrl,
+            aadhaarBackImage: documents.aadhaarBackSideUrl,
+            certificate: documents.certificateUrl,
+            kycStatus: "pending",
+            kycSubmissionDate: new Date(),
+        };
+
+        const savedKyc = await this.kycModel.create(kycData);
+        console.log('KYC Data saved successfully:', savedKyc);
+        return savedKyc;
     } catch (error) {
-      console.error("Error in saveKyc repository:", error);
-      throw new Error("Failed to save KYC data");
+        console.error("Error in saveKyc repository:", error);
+        throw new Error("Failed to save KYC data");
     }
-  }
+}
+
+  
 
   async getTrainerStatus(trainerId: string) {
     try {
@@ -207,6 +213,20 @@ async updateTrainerData(trainer_id: string) {
       throw new Error("Failed to update trainer data");
   }
 }
+
+async fetchRejectionData(trainerId: string) {
+  try {
+    // Use findOne() to search by the trainerId field
+    const rejectionData = await this.kycRejectionModel.findOne({ trainerId: trainerId });
+    console.log('rejectionData:', rejectionData);
+    
+    return rejectionData; 
+  } catch (error) {
+    console.error('Error fetching rejection data:', error);
+    throw error; // Rethrow the error for proper error handling
+  }
+}
+
 
 
   

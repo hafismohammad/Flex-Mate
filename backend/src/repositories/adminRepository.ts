@@ -32,7 +32,7 @@ class AdminRepository {
   }
 
   async getAllTrainersKycDatas() {
-    return this.trainerModel.aggregate([
+    return await this.trainerModel.aggregate([
       {
         $lookup: {
           from: this.kycModel.collection.name, 
@@ -60,19 +60,14 @@ class AdminRepository {
 
   async fetchKycData(trainerId: string) {
     try {
-      return await KYCModel.findOne({ trainerId })
-        .populate({
-          path: 'trainerId',
-          populate: {
-            path: 'specialization', 
-          },
-        });
-  
+      return await KYCModel.findOne({ trainerId }).populate('specializationId').populate('trainerId')
+       
     } catch (error) {
       console.error('Error fetching KYC data:', error);
       throw new Error('Failed to fetch KYC data');
     }
   }
+  
   
   
   

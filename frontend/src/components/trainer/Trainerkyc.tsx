@@ -5,152 +5,87 @@ import { submitKyc } from "../../actions/trainerAction";
 import { useNavigate } from "react-router-dom";
 
 const TrainerKyc: React.FC = () => {
-  const [documents1, setDocuments1] = useState<File | null>(null);
-  const [documents2, setDocuments2] = useState<File | null>(null);
-  const [pinCode, setPinCode] = useState("");
-  const [address, setAddress] = useState({
-    street: "",
-    city: "",
-    state: "",
-    country: "",
-  });
-  const [comment, setComment] = useState("");
-  const [error, setError] = useState("");
-  const [submissionError, setSubmissionError] = useState("");
-  const [formErrors, setFormErrors] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    documents: "",
-  });
+  const [name, setName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [phone, setPhone] = useState<string>("");
+  const [profileImage, setProfileImage] = useState<File | null>(null);
+  const [aadhaarFrontSide, setAadhaarFrontSide] = useState<File | null>(null);
+  const [aadhaarBackSide, setAadhaarBackSide] = useState<File | null>(null);
+  const [certificate, setCertificate] = useState<File | null>(null);
+  
+  const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
+  const [submissionError, setSubmissionError] = useState<string>("");
 
-  const { trainerToken, trainerInfo } = useSelector((state: RootState) => state.trainer);
+  const { trainerToken, trainerInfo } = useSelector(
+    (state: RootState) => state.trainer
+  );
   const token = trainerToken;
-  const trainer_id = trainerInfo.id;
+  const trainer_id = trainerInfo?.id;
+  const specialization = trainerInfo?.specialization;
 
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  const handleFileChange1 = (e: ChangeEvent<HTMLInputElement>) => {
-    setDocuments1(e.target.files?.[0] || null);
-  };
-
-  const handleFileChange2 = (e: ChangeEvent<HTMLInputElement>) => {
-    setDocuments2(e.target.files?.[0] || null);
-  };
-
-  const handlePinCodeChange = async (event: ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    setPinCode(value);
-
-    if (value.length === 6) {
-      try {
-        const response = await fetch(`https://api.postalpincode.in/pincode/${value}`);
-        const data = await response.json();
-
-        if (data[0].Status === "Success") {
-          const addressData = data[0].PostOffice[0];
-          setAddress({
-            street: "",
-            city: addressData.District,
-            state: addressData.State,
-            country: "India",
-          });
-          setError("");
-        } else {
-          setError("Invalid PIN code. Please try again.");
-          setAddress({ street: "", city: "", state: "", country: "" });
-        }
-      } catch (error) {
-        setError("Error fetching address. Please try again.");
-        console.error(error);
-      }
-    } else {
-      setAddress({ street: "", city: "", state: "", country: "" });
-    }
-  };
-
-  const validate = () => {
-    const errors = {
-      name: "",
-      email: "",
-      phone: "",
-      documents: "",
-    };
-
-    // Validate name
-    const name = document.querySelector('input[name="name"]') as HTMLInputElement;
-    if (!name.value.trim()) {
-      errors.name = "Name is required.";
-    }
-
-    // Validate email
-    const email = document.querySelector('input[name="email"]') as HTMLInputElement;
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email.value.trim()) {
-      errors.email = "Email is required.";
-    } else if (!emailPattern.test(email.value)) {
-      errors.email = "Please enter a valid email address.";
-    }
-
-    // Validate phone
-    const phone = document.querySelector('input[name="phone"]') as HTMLInputElement;
-    if (!phone.value.trim()) {
-      errors.phone = "Phone number is required.";
-    } else if (!/^\d{10}$/.test(phone.value.trim())) {
-      errors.phone = "Phone number must be 10 digits.";
-    }
-
-    // Validate document uploads
-    if (!documents1) {
-      errors.documents = "Please upload your Aadhar/Driving License.";
-    }
-    if (!documents2) {
-      errors.documents = "Please upload your Certificate.";
-    }
+  // Validate form
+  const validateForm = (): boolean => {
+    const errors: { [key: string]: string } = {};
+    if (!name) errors.name = "Name is required";
+    if (!email) errors.email = "Email is required";
+    if (!phone) errors.phone = "Phone number is required";
+    if (!profileImage) errors.profileImage = "Profile image is required";
+    if (!aadhaarFrontSide) errors.aadhaarFrontSide = "Aadhaar front side is required";
+    if (!aadhaarBackSide) errors.aadhaarBackSide = "Aadhaar back side is required";
+    if (!certificate) errors.certificate = "Certificate is required";
 
     setFormErrors(errors);
-    return Object.values(errors).every((error) => error === "");
+    return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
-    // Reset submission error on new submission attempt
-    setSubmissionError("");
-
-    // Validate before proceeding
-    if (!validate()) {
-      return; // Stop submission if there are errors
+  
+    // Validate form inputs before proceeding
+    if (!validateForm()) {
+      return;
     }
-
+  
+    // Creating FormData object to handle files and other data
     const formData = new FormData();
-    formData.append("trainer_id", trainer_id);
-    formData.append("specialization_id", trainerInfo.specialization);
-    formData.append("pinCode", pinCode);
-    formData.append("address[street]", address.street);
-    formData.append("address[city]", address.city);
-    formData.append("address[state]", address.state);
-    formData.append("address[country]", address.country);
-    formData.append("comment", comment);
-
-    if (documents1) {
-      formData.append("document1", documents1);
-    }
-    if (documents2) {
-      formData.append("document2", documents2);
-    }
-
+    formData.append('trainer_id', trainer_id!); // Use non-null assertion
+    formData.append('specialization', specialization!); // Use non-null assertion
+    formData.append('name', name);
+    formData.append('email', email);
+    formData.append('phone', phone);
+    
+    // Append files only if they exist
+    if (profileImage) formData.append('profileImage', profileImage);
+    if (aadhaarFrontSide) formData.append('aadhaarFrontSide', aadhaarFrontSide);
+    if (aadhaarBackSide) formData.append('aadhaarBackSide', aadhaarBackSide);
+    if (certificate) formData.append('certificate', certificate);
+  
+    // Check for auth token
     if (!token) {
       setSubmissionError("Authorization token is required.");
       return;
     }
-
-    // Dispatch the action to submit KYC
-    await dispatch(submitKyc({ formData, token }));
-    navigate("/trainer");
+  
+    try {
+      // Dispatch submitKyc with the correct format
+      await dispatch(submitKyc({ formData })); // Ensure submitKyc handles FormData
+      // Optionally navigate or show success message
+    } catch (error) {
+      setSubmissionError("Failed to submit KYC. Please try again.");
+    }
   };
 
+  const handleFileChange = (
+    event: ChangeEvent<HTMLInputElement>,
+    setState: React.Dispatch<React.SetStateAction<File | null>>
+  ) => {
+    const file = event.target.files?.[0] || null;
+    setState(file);
+  };
+  
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
       <h1 className="text-3xl font-bold mb-6 text-center">KYC Submission</h1>
@@ -165,32 +100,53 @@ const TrainerKyc: React.FC = () => {
             <label className="block mb-2">
               Name:
               <input
+                onChange={(e) => setName(e.target.value)}
                 type="text"
                 name="name"
                 required
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2"
               />
-              {formErrors.name && <p className="text-red-500">{formErrors.name}</p>}
+              {formErrors.name && (
+                <p className="text-red-500">{formErrors.name}</p>
+              )}
             </label>
             <label className="block mb-2">
               Email:
               <input
-                type="text"
+                onChange={(e) => setEmail(e.target.value)}
+                type="email"
                 name="email"
                 required
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2"
               />
-              {formErrors.email && <p className="text-red-500">{formErrors.email}</p>}
+              {formErrors.email && (
+                <p className="text-red-500">{formErrors.email}</p>
+              )}
             </label>
             <label className="block mb-2">
               Phone Number:
               <input
+                onChange={(e) => setPhone(e.target.value)}
                 type="text"
                 name="phone"
                 required
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2"
               />
-              {formErrors.phone && <p className="text-red-500">{formErrors.phone}</p>}
+              {formErrors.phone && (
+                <p className="text-red-500">{formErrors.phone}</p>
+              )}
+            </label>
+            <label className="block mb-2">
+              Profile Image:
+              <input
+                onChange={(e) => handleFileChange(e, setProfileImage)}
+                type="file"
+                required
+                className="flex-1 border border-gray-300 rounded-md p-2"
+              />
+              {formErrors.profileImage && (
+                <p className="text-red-500">{formErrors.profileImage}</p>
+              )}
             </label>
           </div>
         </div>
@@ -199,91 +155,43 @@ const TrainerKyc: React.FC = () => {
           <h2 className="text-xl font-semibold mb-4">KYC Document Upload</h2>
 
           <div className="flex items-center mb-4 space-x-4">
-            <h2 className="w-1/4">Aadhar/Driving License</h2>
+            <h2 className="w-1/4"> Aadhaar Front Side</h2>
             <input
+              onChange={(e) => handleFileChange(e, setAadhaarFrontSide)}
               type="file"
-              onChange={handleFileChange1}
               required
               className="flex-1 border border-gray-300 rounded-md p-2"
             />
+            {formErrors.aadhaarFrontSide && (
+              <p className="text-red-500">{formErrors.aadhaarFrontSide}</p>
+            )}
+          </div>
+
+          <div className="flex items-center mb-4 space-x-4">
+            <h2 className="w-1/4"> Aadhaar Back Side</h2>
+            <input
+              onChange={(e) => handleFileChange(e, setAadhaarBackSide)}
+              type="file"
+              required
+              className="flex-1 border border-gray-300 rounded-md p-2"
+            />
+            {formErrors.aadhaarBackSide && (
+              <p className="text-red-500">{formErrors.aadhaarBackSide}</p>
+            )}
           </div>
 
           <div className="flex items-center mb-4 space-x-4">
             <h2 className="w-1/4">Certificate</h2>
             <input
+              onChange={(e) => handleFileChange(e, setCertificate)}
               type="file"
-              onChange={handleFileChange2}
               required
               className="flex-1 border border-gray-300 rounded-md p-2"
             />
+            {formErrors.certificate && (
+              <p className="text-red-500">{formErrors.certificate}</p>
+            )}
           </div>
-          {formErrors.documents && <p className="text-red-500">{formErrors.documents}</p>}
-        </div>
-
-        <div className="mb-8 p-4 bg-gray-50 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-4">Address (Optional)</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <label className="block mb-2">
-              Street Address:
-              <input
-                type="text"
-                name="streetAddress"
-                value={address.street}
-                onChange={(e) => setAddress({ ...address, street: e.target.value })}
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-              />
-            </label>
-            <label className="block mb-2">
-              City:
-              <input
-                type="text"
-                name="city"
-                value={address.city}
-                onChange={(e) => setAddress({ ...address, city: e.target.value })}
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-              />
-            </label>
-            <label className="block mb-2">
-              State:
-              <input
-                type="text"
-                name="state"
-                value={address.state}
-                onChange={(e) => setAddress({ ...address, state: e.target.value })}
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-              />
-            </label>
-            <label className="block mb-2">
-              Country:
-              <input
-                type="text"
-                name="country"
-                value={address.country}
-                onChange={(e) => setAddress({ ...address, country: e.target.value })}
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-              />
-            </label>
-          </div>
-
-          <label className="block mb-2">
-            PIN Code:
-            <input
-              type="text"
-              value={pinCode}
-              onChange={handlePinCodeChange}
-              className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-            />
-            {error && <p className="text-red-500">{error}</p>}
-          </label>
-
-          <label className="block mb-2">
-            Comment:
-            <textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-            />
-          </label>
         </div>
 
         <button

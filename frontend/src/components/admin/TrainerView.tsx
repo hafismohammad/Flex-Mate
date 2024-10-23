@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { ReactElement, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaUser, FaFileAlt, FaCheck, FaTimes } from "react-icons/fa";
 import API_URL from "../../../axios/API_URL";
 import { useParams } from "react-router-dom";
@@ -9,14 +9,16 @@ interface Errors {
 }
 
 interface Trainer {
-  id: string;
-  name: string;
-  email: string;
-  kycSubmissionDate: string;
-  kycStatus: string;
-  kycComments: string;
-  kycDocuments: string[];
+  trainerName: string;
+  trainerEmail: string;
+  trainerPhone: string;
   specialization: string;
+  profileImage: string;
+  aadhaarFrontImage: string;
+  aadhaarBackImage: string;
+  certificate: string;
+  kycStatus: string;
+  kycSubmissionDate: string;
 }
 
 function TrainerView() {
@@ -34,27 +36,24 @@ function TrainerView() {
           `${API_URL}/api/admin/trainerKycDetails/${trainerId}`
         );
         const trainerData = response.data.kycData;
+        const kycData = trainerData._doc;
 
         if (trainerData) {
-          // Extracting the relevant data from the response
-          const {
-            trainerId: trainerInfo,
-            kycSubmissionDate,
-            kycStatus,
-            kycComments,
-            kycDocuments,
-          } = trainerData;
+          // Extract the required data
+          const data: Trainer = {
+            trainerName: kycData.trainerId.name,
+            trainerEmail: kycData.trainerId.email,
+            trainerPhone: kycData.trainerId.phone,
+            specialization: kycData.specializationId.name,
+            profileImage: kycData.profileImage,
+            aadhaarFrontImage: kycData.aadhaarFrontImage,
+            aadhaarBackImage: kycData.aadhaarBackImage,
+            certificate: kycData.certificate,
+            kycStatus: kycData.kycStatus,
+            kycSubmissionDate: new Date(kycData.createdAt).toLocaleDateString(),
+          };
 
-          setTrainer({
-            id: trainerData._id,
-            name: trainerInfo.name,
-            email: trainerInfo.email,
-            kycSubmissionDate,
-            kycStatus,
-            kycComments,
-            kycDocuments,
-            specialization: trainerInfo.specialization?.name || "",
-          });
+          setTrainer(data);
         } else {
           console.warn("No trainer data found");
         }
@@ -69,7 +68,6 @@ function TrainerView() {
   const handleApproveStatusChange = async (newStatus: string) => {
     try {
       await axios.patch(`${API_URL}/api/admin/updateKycStatus/${trainerId}`, { status: newStatus });
-      console.log(`Trainer status updated to ${newStatus}`);
       setTrainer((prevTrainer) => prevTrainer ? { ...prevTrainer, kycStatus: newStatus } : null);
     } catch (error) {
       console.error("Error updating trainer status:", error);
@@ -109,7 +107,7 @@ function TrainerView() {
     e.preventDefault();
 
     if (!validate()) {
-      return; 
+      return;
     }
 
     try {
@@ -120,7 +118,7 @@ function TrainerView() {
       setTrainer((prevTrainer) =>
         prevTrainer ? { ...prevTrainer, kycStatus: "rejected" } : null
       );
-      closeModal(); 
+      closeModal();
     } catch (error) {
       console.error("Error updating trainer status with rejection reason:", error);
     }
@@ -133,39 +131,61 @@ function TrainerView() {
       {trainer ? (
         <>
           <div className="mb-6">
+          <div>
+                <img
+                  src={trainer.profileImage}
+                  alt="Profile"
+                  className="w-40 h-40 border r rounded-full "
+                />
+              </div>
             <div className="flex items-center mb-2">
-              <FaUser className="text-2xl text-gray-700 mr-2" />
-              <h3 className="text-xl font-semibold">{trainer.name}</h3>
+              <h3 className="text-xl font-semibold">{trainer.trainerName}</h3>
             </div>
-            <p className="text-gray-600">{trainer.email}</p>
+            <p className="text-gray-600">{trainer.trainerEmail}</p>
+            <p className="text-gray-600">Phone: {trainer.trainerPhone}</p>
           </div>
 
           <div className="mb-6 border-t border-gray-300 pt-4">
             <h4 className="font-medium text-lg mb-2">KYC Information</h4>
             <p className="text-sm text-gray-500">KYC Submission Date: {trainer.kycSubmissionDate}</p>
             <p className="text-sm text-gray-500">Status: {trainer.kycStatus}</p>
-            <p className="text-sm text-gray-500">Comments: {trainer.kycComments}</p>
             <p className="text-sm text-gray-500">Specialization: {trainer.specialization}</p>
           </div>
 
           <div className="mb-6 border-t border-gray-300 pt-4">
             <h4 className="font-medium text-lg mb-2">Documents</h4>
-            <div className="flex flex-col space-y-2">
-              {trainer.kycDocuments.length > 0 ? (
-                trainer.kycDocuments.map((doc, index) => (
-                  <a
-                    key={index}
-                    href={`/uploads/${doc}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline flex items-center"
-                  >
-                    <FaFileAlt className="mr-1" /> Document {index + 1}
-                  </a>
-                ))
-              ) : (
-                <p className="text-gray-500">No documents submitted.</p>
-              )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            
+              <div>
+                <h5 className="font-medium">Aadhaar Front Image</h5>
+                <a  href={trainer.aadhaarFrontImage} target="_blank" rel="noopener noreferrer">
+                <img
+                  src={trainer.aadhaarFrontImage}
+                  alt="Aadhaar Front"
+                  className="w-40 h-40 border"
+                />
+                </a>
+              </div>
+              <div>
+                <h5 className="font-medium">Aadhaar Back Image</h5>
+                <a  href={trainer.aadhaarBackImage} target="_blank" rel="noopener noreferrer">
+                <img
+                  src={trainer.aadhaarBackImage}
+                  alt="Aadhaar Back"
+                  className="w-40 h-40 border"
+                />
+                </a>
+              </div>
+              <div>
+                <h5 className="font-medium">Certificate</h5>
+               <a href={trainer.certificate} target="_blank" rel="noopener noreferrer">
+               <img
+                  src={trainer.certificate}
+                  alt="Certificate"
+                  className="w-40 h-40 border"
+                />
+               </a>
+              </div>
             </div>
           </div>
 
@@ -212,7 +232,7 @@ function TrainerView() {
                 </button>
                 <button
                   type="submit"
-                  className="bg-blue-600 text-white hover:bg-blue-700 py-2 px-4 rounded-lg font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="bg-blue-600 text-white hover:bg-blue-700 py-2 px-4 rounded-lg font-semibold"
                 >
                   Submit
                 </button>

@@ -35,7 +35,7 @@ function Verification() {
     const getAllTrainersKycData = async () => {
       try {
         const response = await axios.get(`${API_URL}/api/admin/allTrainerKyc`);
-        const trainersData: Trainer[] = response.data.data.map((trainer: any) => ({
+        const trainersData: Trainer[] = response.data.data.map((trainer: any) => ({          
           id: trainer._id, 
           name: trainer.name,
           email: trainer.email,
@@ -43,6 +43,8 @@ function Verification() {
           status: trainer.kycData?.status || "Pending", 
         }));
         setTrainersKycData(trainersData);
+        console.log('all pending trainers',trainersKycData);
+
       } catch (error) {
         console.error('Error fetching KYC data:', error);
       }

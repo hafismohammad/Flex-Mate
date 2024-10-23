@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import bgImage from "../../assets/trainers-tablet.jpg";
-import axiosInstance from "../../axiosInstance";
+import axiosInstance from "../../../axios/axiosInstance";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 

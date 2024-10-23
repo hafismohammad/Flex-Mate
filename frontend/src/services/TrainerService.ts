@@ -1,4 +1,5 @@
-import axiosInstance from "../axiosInstance";
+import axiosInstance from "../../axios/axiosInstance";
+import {ITrainerKycData} from '../types/trainer'
 
 const getAllSpecializations = async () => {
   try {
@@ -61,15 +62,22 @@ const trainerLogin = async (trainerData: { email: string; password: string }) =>
   }
 };
 
-const kycSubmission = async (kycData: FormData) => {
+const kycSubmission = async (formData: FormData) => {  // Accept FormData here
   try {
-    const response = await axiosInstance.post(`/api/trainer/kyc`, kycData ,{ withCredentials: true });
+    const response = await axiosInstance.post(`/api/trainer/kyc`, formData, {
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'multipart/form-data',  // Ensure correct headers
+      },
+    });
     return response.data;
   } catch (error: any) {
     console.error('Error kyc submission trainer:', error.response ? error.response.data : error.message);
-    throw error; 
+    throw error;
   }
 };
+
+
 
 const logoutTrainer = async () => {
   try {

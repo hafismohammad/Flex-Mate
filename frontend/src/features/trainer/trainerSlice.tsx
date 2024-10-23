@@ -64,6 +64,7 @@ const trainerSlice = createSlice({
       )
       .addCase(fetchSpecializations.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
+        // console.log('-------------------',action.payload);
         state.error = action.payload?.message || "Failed to fetch specializations";
       })
 
@@ -74,15 +75,15 @@ const trainerSlice = createSlice({
       .addCase(registerTrainer.fulfilled, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.trainerInfo = action.payload;
-        console.log('trainer register', action.payload);
         
-        state.error = null;
+        state.error = null; 
       })
       .addCase(registerTrainer.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
-        state.error = action.payload?.message || "Registration failed";
-      })
-
+        state.error =  action.payload || "Registration failed"
+        console.log('acion',action.payload);
+      })  
+      
       // Verify OTP actions
       .addCase(trainerVerifyOtp.pending, (state) => {
         state.loading = true;

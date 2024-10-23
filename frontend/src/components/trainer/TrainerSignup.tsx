@@ -7,6 +7,8 @@ import { AppDispatch, RootState } from "../../app/store";
 import { fetchSpecializations } from "../../actions/trainerAction";
 import { useSelector } from "react-redux";
 import {registerTrainer} from '../../actions/trainerAction'
+import toast, { Toaster } from "react-hot-toast";
+import { log } from "console";
 
 interface Errors {
   name?: string;
@@ -34,7 +36,7 @@ function TrainerSignup() {
   const specializationsData = useSelector(
     (state: RootState) => state.trainer.specializations
   );
-
+ const signupError = useSelector((state: RootState) => state.trainer.error)
   useEffect(() => {
     dispatch(fetchSpecializations());
   }, [dispatch]);
@@ -78,33 +80,48 @@ function TrainerSignup() {
     }, 3000);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formErrors = validate();
     setErrors(formErrors);
+  
     if (Object.keys(formErrors).length > 0) {
       clearErrors();
       return;
     }
+  
     setErrors({});
-    
-    
-     const trainerData = {
+  
+    const trainerData = {
       name,
       email,
       phone,
       password,
       specialization,
-     }
-   console.log('signup data',trainerData);
-   
-     dispatch(registerTrainer(trainerData))
-    navigate("/trainer/otp", { state: trainerData });
+    };
 
+    // Dispatch the registration action
+    await dispatch(registerTrainer(trainerData));
+
+    // Check if there's an error related to registration
+    if (!signupError) {  // Changed from checking if signupError
+      console.log('signup', signupError);
+      navigate("/trainer/otp", { state: trainerData }); 
+    } else {
+      toast.error(signupError);  // Show error using toast if it exists
+    }
   };
+  
+
+  // useEffect(() => {
+  //   console.log('signup',signupError);
+  //   toast.error(signupError); 
+    
+  // },[handleSubmit])
 
   return (
     <div className="min-h-screen bg-slate-100 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+      <Toaster />
       <div className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col md:flex-row w-full max-w-4xl">
         <div
           className="w-full md:w-1/2 flex flex-col items-center justify-center p-8 bg-cover bg-center"

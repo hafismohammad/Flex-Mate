@@ -3,8 +3,9 @@
 import { Request, Response } from "express";
 import TrainerService from "../services/trainerServices";
 import { ITrainer } from "../interface/trainer_interface";
-import { s3, bucketName, Upload } from "../../src/config/s3Service";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
+import {uploadToCloudinary} from '../config/cloudinary'
+import fs from 'fs'; 
+import sharp from "sharp";
 class TrainerController {
   private trainerService: TrainerService;
 
@@ -32,18 +33,33 @@ class TrainerController {
   async registerTrainer(req: Request, res: Response) {
     try {
       const trainerData: ITrainer = req.body;
-      await this.trainerService.registerTrainer(trainerData);
-      res.status(200).json({ message: "OTP sent to email" });
+  
+      // Call the service to register the trainer
+      const trainer = await this.trainerService.registerTrainer(trainerData);
+  
+      // Check if the trainer already exists
+      if (!trainer) {
+        // If trainer is null, it means the email already exists
+         res.status(409).json({ message: "Email already exists" });
+         return
+      }
+  
+      // If the registration is successful, send the OTP response
+       res.status(200).json({ message: "OTP sent to email" });
+       return
     } catch (error) {
+      console.error('Error in registerTrainer:', error);
       if ((error as Error).message === "Email already exists") {
-        res.status(409).json({ message: "Email already exists" });
+         res.status(409).json({ message: "Email already exists" });
+         return
       } else {
-        res
-          .status(500)
-          .json({ message: "Something went wrong, please try again later" });
+         res.status(500).json({ message: "Something went wrong, please try again later" });
+         return
       }
     }
   }
+  
+  
 
   async verifyOtp(req: Request, res: Response) {
     try {
@@ -151,87 +167,103 @@ class TrainerController {
   }
   
 
+  async kycSubmission(req: Request, res: Response): Promise<void> {
+    try {
+      // Access form text fields from req.body
+      const { trainer_id, specialization, name, email, phone } = req.body;
+  
+      // Access uploaded files via req.files
+      const files = req.files as {
+        [fieldname: string]: Express.Multer.File[];
+      };
+  
+      // Initialize an object to store URLs of uploaded documents
+      const documents: { [key: string]: string | undefined } = {};
+  
+
+      console.log('files',files);
+      
+      // Upload the files to Cloudinary and store the URLs
+      if (files.profileImage && files.profileImage[0]) {
+        const profileImageUrl = await uploadToCloudinary(files.profileImage[0].buffer, 'trainer_profileImage');
+        documents.profileImageUrl = profileImageUrl.secure_url;
+
+        
+      }
+  
+      if (files.aadhaarFrontSide && files.aadhaarFrontSide[0]) {
+        const aadhaarFrontSideUrl = await uploadToCloudinary(files.aadhaarFrontSide[0].buffer, 'trainer_aadhaarFrontSidec');
+        documents.aadhaarFrontSideUrl = aadhaarFrontSideUrl.secure_url;
+      }
+  
+      if (files.aadhaarBackSide && files.aadhaarBackSide[0]) {
+        const aadhaarBackSideUrl = await uploadToCloudinary(files.aadhaarBackSide[0].buffer, 'trainer_aadhaarBackSide');
+        documents.aadhaarBackSideUrl = aadhaarBackSideUrl.secure_url;
+      }
+      
+      if (files.certificate && files.certificate[0]) {
+        const certificateUrl = await uploadToCloudinary(files.certificate[0].buffer, 'trainer_certificate');
+        documents.certificateUrl = certificateUrl.secure_url;
+      }
+      
+      console.log('document1', documents.profileImageUrl);
+      console.log('document2', documents.aadhaarFrontSideUrl);
+      console.log('document3', documents.certificateUrl);
+
+      // Now you have the URLs in the `documents` object
+      const formData = {
+        trainer_id,
+        specialization,
+        name,
+        email,
+        phone,
+      };
+  
+      // Pass formData and document URLs to your service for KYC submission
+      const kycStatus = await this.trainerService.kycSubmit(formData, documents);
+  
+      // Return success response with KYC status
+      res.status(200).json({ message: 'KYC submitted successfully', kycStatus });
+    } catch (error) {
+      // Log and send error response
+      console.error('Error in KYC submission:', error);
+      res.status(500).json({
+        message: 'Error in KYC submission',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  }
+
+  
+
   // async kycSubmission(req: Request, res: Response) {
   //   try {
   //     const formData = req.body;
+  //     // console.log("Form data:", formData);
+
   //     const files = req.files as { [fieldname: string]: Express.Multer.File[] };
 
-  //     const documents: string[] = [];
-
-  //     // Function to upload a file to S3
-  //     const uploadFileToS3 = async (file: Express.Multer.File): Promise<string> => {
-  //       const upload = new Upload({
-  //         client: s3,
-  //         params: {
-  //           Bucket: bucketName,
-  //           Key: file.filename, // Use a unique filename
-  //           Body: file.buffer,
-  //           ContentType: file.mimetype,
-  //         },
-  //       });
-
-  //       try {
-  //         const uploadResult = await upload.done();
-  //         return `https://${bucketName}.s3.${bucketRegion}.amazonaws.com/${uploadResult.Key}`;
-  //       } catch (error) {
-  //         console.error('Error uploading file to S3:', error);
-  //         throw new Error('File upload failed');
-  //       }
-  //     };
-
-  //     // Upload files if they exist
+  //     const documents = [];
   //     if (files.document1) {
-  //       for (const file of files.document1) {
-  //         const fileUrl = await uploadFileToS3(file);
-  //         documents.push(fileUrl);
-  //       }
+  //       documents.push(files.document1[0].filename);
   //     }
-
   //     if (files.document2) {
-  //       for (const file of files.document2) {
-  //         const fileUrl = await uploadFileToS3(file);
-  //         documents.push(fileUrl);
-  //       }
+  //       documents.push(files.document2[0].filename);
   //     }
 
-  //     // Call your service with the formData and document URLs
-  //     const kycStatus = await this.trainerService.kycSubmit(formData, documents);
+  //     // console.log("Documents:", documents);
 
-  //     res.status(200).json({ message: 'KYC submission successful', kycStatus });
+      // const kycStatus = await this.trainerService.kycSubmit(
+      //   formData,
+      //   documents
+      // );
+
+  //     res.status(200).json({ message: "KYC submission successful", kycStatus });
   //   } catch (error) {
-  //     console.error('Error in KYC submission:', error);
-  //     res.status(500).json({ message: 'Error in KYC submission', error });
+  //     console.error("Error in KYC submission:", error);
+  //     res.status(500).json({ message: "Error in KYC submission", error });
   //   }
   // }
-
-  async kycSubmission(req: Request, res: Response) {
-    try {
-      const formData = req.body;
-      // console.log("Form data:", formData);
-
-      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-
-      const documents = [];
-      if (files.document1) {
-        documents.push(files.document1[0].filename);
-      }
-      if (files.document2) {
-        documents.push(files.document2[0].filename);
-      }
-
-      // console.log("Documents:", documents);
-
-      const kycStatus = await this.trainerService.kycSubmit(
-        formData,
-        documents
-      );
-
-      res.status(200).json({ message: "KYC submission successful", kycStatus });
-    } catch (error) {
-      console.error("Error in KYC submission:", error);
-      res.status(500).json({ message: "Error in KYC submission", error });
-    }
-  }
 
   async logoutTrainer(req: Request, res: Response) {
     try {
@@ -295,6 +327,24 @@ class TrainerController {
     } catch (error) {
       console.error("Error updating trainer:", error);
       res.status(500).json({ message: "Failed to update trainer" });
+    }
+  }
+  
+  async fetchRejectionReason(req: Request, res: Response) {
+    try {
+      const trainer_id = req.params.trainerId;
+      const rejectionData = await this.trainerService.fetchRejectionData(trainer_id);
+  
+      // Extracting only the "reason" field
+      const reason = rejectionData ? rejectionData.reason : null;
+  
+      res.status(200).json({
+        message: 'Rejection reason fetched successfully',
+        reason: reason, // Sending only the reason
+      });
+    } catch (error) {
+      console.error('Error fetching rejection reason:', error);
+      res.status(500).json({ message: 'Error fetching rejection reason' });
     }
   }
   

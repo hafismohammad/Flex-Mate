@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import trainerService from '../services/TrainerService';
-import {KycSubmission} from '../../src/types/trainer'
+import {ITrainerKycData} from '../../src/types/trainer'
 
 export const fetchSpecializations = createAsyncThunk<any[], void>(
   'trainer/fetchSpecializations',
@@ -72,18 +72,17 @@ export const loginTrainer = createAsyncThunk(
 
 export const submitKyc = createAsyncThunk(
   'trainer/kyc', 
-  async ({ formData, token }: { formData: FormData; token: string }, thunkAPI) => {  
-
+  async ({ formData }: { formData: FormData }, thunkAPI) => {  // Accept FormData here
     try {
-      const response = await trainerService.kycSubmission(formData, token); 
+      const response = await trainerService.kycSubmission(formData); // Pass FormData
       console.log('response in submit', response);
-      
-      return response; 
+      return response;
     } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.response?.data || error.message); 
+      return thunkAPI.rejectWithValue(error.response?.data || error.message);
     }
   }
 );
+
 
 export const logoutTrainer = createAsyncThunk(
   'trainer/logout',

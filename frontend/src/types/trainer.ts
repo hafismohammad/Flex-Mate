@@ -17,3 +17,15 @@ export interface KycDocument {
     documents: KycDocument[]; 
   }
   
+
+   export interface ITrainerKycData {
+    trainer_id: string;
+    specialization: string;
+    name: string;
+    email: string;
+    phone: string;
+    profileImage: File | null;
+    aadhaarFrontSide: File | null;
+    aadhaarBackSide: File | null;
+    certificate: File | null;
+  }

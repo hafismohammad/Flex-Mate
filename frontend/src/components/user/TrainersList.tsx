@@ -48,14 +48,14 @@ function TrainersList() {
           placeholder="Search Trainers"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="p-2 border w-[60%] border-gray-300 rounded-lg shadow-sm focus:outline-none "
+          className="p-2 border w-[60%] border-gray-300 rounded-lg shadow-sm focus:outline-none"
         />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {filteredTrainers.map((trainer: Trainer) => (
           <div
             key={trainer._id}
-            className="bg-white shadow-lg rounded-lg overflow-hidden"
+            className="bg-white shadow-lg rounded-lg overflow-hidden mb-5  transform transition duration-300 hover:-translate-y-7"
           >
             <img alt={trainer.name} className="w-full h-48 object-cover" />
             <div className="p-4">

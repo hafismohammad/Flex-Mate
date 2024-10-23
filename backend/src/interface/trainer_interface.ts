@@ -31,15 +31,11 @@ export interface ISpecialization {
 
   export interface IKYC extends Document {
     trainerId: Types.ObjectId;
-    specialization: Types.ObjectId;
-    address: {
-      street: string;
-      city: string;
-      state: string;
-      pinCode: string;
-      country: string;
-    };
-    kycDocuments: string[];
+    specializationId: Types.ObjectId;
+    profileImage: string,
+    certificate: string
+    aadhaarFrontImage: string,
+    aadhaarBackImage: string,
     kycStatus: 'pending' | 'approved' | 'rejected';
     rejectionReason: string
     kycSubmissionDate: Date;
