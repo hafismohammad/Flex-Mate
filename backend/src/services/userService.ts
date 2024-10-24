@@ -192,6 +192,13 @@ async specializations() {
   }
 }
 
+async getTrainer(trainerId: string) {
+  try {
+    return await this.userRepository.getTrainer(trainerId)
+  } catch (error) {
+    
+  }
+}
 
 }
 

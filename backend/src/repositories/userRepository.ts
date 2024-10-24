@@ -88,8 +88,6 @@ class UserRepository {
   async fetchAllTrainers() {
     try {
       const trainers = await this.trainerModel.find({}).populate('specialization')
-      // const trainers1 = await this.specializationModel({})
-      console.log('Trainers with specializations:', trainers); 
       return trainers; 
     } catch (error) {
       console.error('Error fetching trainers from the database:', error);
@@ -108,6 +106,17 @@ class UserRepository {
     } catch (error) {
       console.error('Error fetching specializations from the database:', error);
       throw error; 
+    }
+  }
+
+  async getTrainer(trainerId: string) {
+    try {
+      const trainer = await this.trainerModel.find({_id : trainerId}).populate('specialization')
+      console.log(trainer);
+      
+      return trainer
+    } catch (error) {
+      
     }
   }
 }

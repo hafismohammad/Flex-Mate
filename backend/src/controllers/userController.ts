@@ -134,7 +134,7 @@ class UserController {
   async getAllTrainers(req: Request, res: Response) {
     try {
       const allTrainers = await this.userService.fetchAllTrainers();
-      console.log(allTrainers);
+      // console.log(allTrainers);
       
       res.status(200).json(allTrainers);
     } catch (error) {
@@ -147,7 +147,7 @@ class UserController {
     try {
       
       const allSpecializations = await this.userService.specializations()
-      console.log(allSpecializations);
+      // console.log(allSpecializations);
       
       res.status(200).json(allSpecializations)
     } catch (error) {
@@ -155,6 +155,29 @@ class UserController {
       res.status(500).json({ message: 'Error fetching trainers' });
     }
   }
+
+  async getTrainer(req: Request, res: Response) {
+    try {
+      const trainerId = req.params.trainerId;
+      
+      if (!trainerId) {
+         res.status(400).json({ message: "Trainer ID is required" });
+      }
+  
+      const trainer = await this.userService.getTrainer(trainerId);
+      // console.log(trainer);
+      
+      if (!trainer) {
+         res.status(404).json({ message: "Trainer not found" });
+      }
+  
+      res.status(200).json(trainer);
+    } catch (error) {
+      console.error("Error in getTrainer controller:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  }
+  
 
 }
 

@@ -16,7 +16,7 @@ function UserRoutes() {
         <Route path='/login' element={<Login />} />
         <Route path='/trainers' element={<Trainers />} />
         <Route path='/trainers/:specId' element={<Trainers />} />
-        <Route path='/treinerProfileView/:trainerId' element={<TrainerProfileViewPage />} />
+        <Route path='/trainerProfileView/:trainerId' element={<TrainerProfileViewPage />} />
       </Routes>
     </div>
   );
