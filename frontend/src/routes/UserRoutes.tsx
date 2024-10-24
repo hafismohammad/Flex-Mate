@@ -15,7 +15,8 @@ function UserRoutes() {
         <Route path='/otp' element={<Otp />} />
         <Route path='/login' element={<Login />} />
         <Route path='/trainers' element={<Trainers />} />
-        <Route path='/treinerProfileView' element={<TrainerProfileViewPage />} />
+        <Route path='/trainers/:specId' element={<Trainers />} />
+        <Route path='/treinerProfileView/:trainerId' element={<TrainerProfileViewPage />} />
       </Routes>
     </div>
   );

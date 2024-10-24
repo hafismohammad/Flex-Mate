@@ -15,23 +15,28 @@ interface Specialization {
   _id: string;
   name: string;
   description: string;
+  image: string;
   isListed: boolean;
 }
 
 const Specializations = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [image, setImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
   const [specializations, setSpecializations] = useState<Specialization[]>([]);
-// console.log('spec state', specializations);
+  // console.log('spec state', specializations);
 
   const dispatch = useDispatch<AppDispatch>();
 
   const getAllSpecializations = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/admin/allSpecializations`);      
+      const response = await axios.get(
+        `${API_URL}/api/admin/allSpecializations`
+      );
       setSpecializations(response.data);
     } catch (error) {
       console.error("Error fetching specializations:", error);
@@ -45,7 +50,6 @@ const Specializations = () => {
   const filteredSpecializations = specializations.filter((spec) =>
     spec.name.toLowerCase().includes(searchTerm.trim().toLowerCase())
   );
-  
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -56,6 +60,8 @@ const Specializations = () => {
     setErrors({});
     setName("");
     setDescription("");
+    setImage(null);
+    setImagePreview(null)
   };
 
   const validate = (): boolean => {
@@ -82,70 +88,84 @@ const Specializations = () => {
     return isValid;
   };
 
-  const  handleStatus = async (specId: string, currentStatus: boolean) => {
+  const handleStatus = async (specId: string, currentStatus: boolean) => {
     try {
       const updatedStatus = !currentStatus;
       // console.log('Current status:', currentStatus, '-- Updated status:', updatedStatus);
-  
-      const response = await axios.patch(`${API_URL}/api/admin/toggle-status/${specId}`, {
-        isListed: updatedStatus,
-      });
-  
+
+      const response = await axios.patch(
+        `${API_URL}/api/admin/toggle-status/${specId}`,
+        {
+          isListed: updatedStatus,
+        }
+      );
+
       // console.log('API Response:', response.data);
-  
+
       if (response.status === 200 && response.data && response.data.data) {
-        const updatedSpec = response.data.data; 
+        const updatedSpec = response.data.data;
         setSpecializations((prevSpecializations) =>
           prevSpecializations.map((spec) =>
-            spec._id === specId ? { ...spec, isListed: updatedSpec.isListed } : spec
+            spec._id === specId
+              ? { ...spec, isListed: updatedSpec.isListed }
+              : spec
           )
         );
       } else {
-        console.error('Unexpected response format:', response);
+        console.error("Unexpected response format:", response);
       }
     } catch (error) {
       console.error("Error updating specialization status:", error);
     }
   };
-  
-
 
   const handleAddSpecialization = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  
+
     if (!validate()) {
-      return;
+        return;
     }
-  
-    const specializationData = {
-      name,
-      description,
-      isListed: true, 
-    };
-  
+
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("description", description); 
+    if (image) {
+        formData.append("image", image);
+    }
+
+
     try {
-      const response = await dispatch(addSpecialization(specializationData));
-  
-      if (response.meta.requestStatus === 'fulfilled' && response.payload.specialization) {
-        const newSpecialization = response.payload.specialization;
-  
-        setSpecializations((prevSpecializations) => [
-          ...prevSpecializations,
-          newSpecialization,
-        ]);
-      }
-  
-      closeModal();
+        const response = await dispatch(addSpecialization({formData}));
+        if (response.payload && response.payload.specialization) {
+            const newSpecialization = response.payload.specialization;
+            setSpecializations((prevSpecializations) => [
+                ...prevSpecializations,
+                newSpecialization,
+            ]);
+        }
+
+        closeModal();
     } catch (error) {
-      console.error("Error adding specialization:", error);
+        console.error("Error adding specialization:", error);
     }
-  };
-  
+};
+
 
   useEffect(() => {
-    console.log("wdw",specializations);
-    
-  },[specializations])
+    console.log("wdw", specializations);
+  }, [specializations]);
+
+  const handleChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setImage(file);
+
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+    } else {
+      setImagePreview(null);
+    }
+  };
 
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
@@ -205,7 +225,7 @@ const Specializations = () => {
                       ? "bg-orange-500 hover:bg-orange-600"
                       : "bg-green-500 hover:bg-green-600"
                   }`}
-                  style={{ minWidth: "120px" }} 
+                  style={{ minWidth: "120px" }}
                 >
                   <span>{spec.isListed ? "Unlist" : "List"}</span>
                 </button>
@@ -219,7 +239,6 @@ const Specializations = () => {
         )}
       </div>
 
-     
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-lg shadow-lg">
@@ -248,7 +267,34 @@ const Specializations = () => {
               {errors.description && (
                 <div className="text-red-500 mb-2">{errors.description}</div>
               )}
-              <div className="flex justify-end">
+              <label
+                htmlFor="uploadFile1"
+                className="bg-white text-gray-500 font-semibold text-base rounded max-w-md h-52 flex flex-col items-center justify-center cursor-pointer border-2 border-gray-300 border-dashed mx-auto font-sans relative"
+                style={{
+                  backgroundImage: imagePreview
+                    ? `url(${imagePreview})`
+                    : "none",
+                  backgroundSize: "cover",
+                  // backgroundPosition: "center",
+                }}
+              >
+                {!imagePreview && (
+                  <>
+                    Upload file
+                    <p className="text-xs font-medium text-gray-400 mt-2">
+                      PNG, JPG, SVG, WEBP, and GIF are Allowed.
+                    </p>
+                  </>
+                )}
+                <input
+                  onChange={handleChanges}
+                  type="file"
+                  id="uploadFile1"
+                  className="hidden"
+                />
+              </label>
+
+              <div className="flex justify-end mt-7">
                 <button
                   type="button"
                   onClick={closeModal}

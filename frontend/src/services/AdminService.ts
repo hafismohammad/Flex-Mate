@@ -9,9 +9,9 @@ const adminLogout = () => {
   return axios.post(`${API_URL}/api/admin/logout`);
 };
 
-const addSpecialization = ({ name, description }: { name: string; description: string }) => {
+const addSpecialization = (formData: FormData) => {
   
-  return axios.post(`${API_URL}/api/admin/addSpecialization`, { name, description });
+  return axios.post(`${API_URL}/api/admin/addSpecialization`, formData );
 };
 
 const getAllSpecializaton= () => {

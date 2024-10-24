@@ -70,9 +70,7 @@ const TrainerKyc: React.FC = () => {
     }
   
     try {
-      // Dispatch submitKyc with the correct format
-      await dispatch(submitKyc({ formData })); // Ensure submitKyc handles FormData
-      // Optionally navigate or show success message
+      await dispatch(submitKyc({ formData })); 
     } catch (error) {
       setSubmissionError("Failed to submit KYC. Please try again.");
     }

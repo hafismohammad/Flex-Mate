@@ -181,6 +181,17 @@ async fetchAllTrainers() {
   }
 }
 
+async specializations() {
+  try {
+  const data = await this.userRepository.fetchSpecializations()
+  return data
+  
+  } catch (error) {
+    console.error('Error fetching trainers:', error);
+    throw error; 
+  }
+}
+
 
 }
 

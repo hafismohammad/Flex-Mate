@@ -16,5 +16,6 @@ router.post("/resend-otp", userController.resendOtp.bind(userController));
 router.post("/login", userController.login.bind(userController));
 router.post("/logout", userController.logout.bind(userController));
 router.get("/allTrainers", userController.getAllTrainers.bind(userController))
+router.get("/allspecializations", userController.getAllspecializations.bind(userController))
 
 export default router;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { AppDispatch, RootState } from '../../app/store';
 import {adminLogin} from '../../actions/adminAction'
@@ -17,6 +17,14 @@ function AdminLogin() {
 
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate()
+
+  const {adminToken} = useSelector((state: RootState) => state.admin)
+
+  useEffect(() => {
+    if(adminToken) {
+      navigate('/admin')
+    }
+  }, [adminToken, navigate])
 
   const validate = (): Errors => {
     const newErrors: Errors = {};
@@ -58,7 +66,8 @@ function AdminLogin() {
 
 
       dispatch(adminLogin(adminData));
-      navigate('/admin/')
+      
+      // navigate('/admin')
 
     }
   };

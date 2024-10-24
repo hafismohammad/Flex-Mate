@@ -100,7 +100,7 @@ const navigate = useNavigate()
             </span>
           </Link>
           <Link
-            to="/logout"
+            to="/admin/login"
             className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
           >
             <FaSignOutAlt size={20} />

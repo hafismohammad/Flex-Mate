@@ -6,6 +6,7 @@ export interface ILoginAdmin {
   export interface ISpecialization extends Document {
     name: string;
     description: string;
+    image: string
     createdAt: Date;
     isListed: boolean;
   }

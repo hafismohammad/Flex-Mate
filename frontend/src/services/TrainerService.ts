@@ -62,12 +62,12 @@ const trainerLogin = async (trainerData: { email: string; password: string }) =>
   }
 };
 
-const kycSubmission = async (formData: FormData) => {  // Accept FormData here
+const kycSubmission = async (formData: FormData) => {  
   try {
     const response = await axiosInstance.post(`/api/trainer/kyc`, formData, {
       withCredentials: true,
       headers: {
-        'Content-Type': 'multipart/form-data',  // Ensure correct headers
+        'Content-Type': 'multipart/form-data',  
       },
     });
     return response.data;

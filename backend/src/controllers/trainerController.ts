@@ -169,20 +169,16 @@ class TrainerController {
 
   async kycSubmission(req: Request, res: Response): Promise<void> {
     try {
-      // Access form text fields from req.body
       const { trainer_id, specialization, name, email, phone } = req.body;
   
-      // Access uploaded files via req.files
       const files = req.files as {
         [fieldname: string]: Express.Multer.File[];
       };
   
-      // Initialize an object to store URLs of uploaded documents
       const documents: { [key: string]: string | undefined } = {};
   
 
       
-      // Upload the files to Cloudinary and store the URLs
       if (files.profileImage && files.profileImage[0]) {
         const profileImageUrl = await uploadToCloudinary(files.profileImage[0].buffer, 'trainer_profileImage');
         documents.profileImageUrl = profileImageUrl.secure_url;
@@ -231,36 +227,7 @@ class TrainerController {
     }
   }
 
-  
 
-  // async kycSubmission(req: Request, res: Response) {
-  //   try {
-  //     const formData = req.body;
-  //     // console.log("Form data:", formData);
-
-  //     const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-
-  //     const documents = [];
-  //     if (files.document1) {
-  //       documents.push(files.document1[0].filename);
-  //     }
-  //     if (files.document2) {
-  //       documents.push(files.document2[0].filename);
-  //     }
-
-  //     // console.log("Documents:", documents);
-
-      // const kycStatus = await this.trainerService.kycSubmit(
-      //   formData,
-      //   documents
-      // );
-
-  //     res.status(200).json({ message: "KYC submission successful", kycStatus });
-  //   } catch (error) {
-  //     console.error("Error in KYC submission:", error);
-  //     res.status(500).json({ message: "Error in KYC submission", error });
-  //   }
-  // }
 
   async logoutTrainer(req: Request, res: Response) {
     try {

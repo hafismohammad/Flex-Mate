@@ -10,7 +10,6 @@ export default cloudinary;
 
 interface CloudinaryUploadResult {
     secure_url: string;
-    // Add other fields if needed
   }
   
 

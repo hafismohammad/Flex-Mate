@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import AdminService from "../services/adminService";
 import { ILoginAdmin } from "../interface/admin_interface";
-import {getFileFromS3, extractKeyFromS3Url} from '../config/s3Service'
+import {uploadToCloudinary} from '../config/cloudinary'
 
 class AdminController {
   private adminService: AdminService;
@@ -59,15 +59,28 @@ class AdminController {
 
   async addSpecialization(req: Request, res: Response) {
     try {
-      const specializationData = req.body;
-      const specialization = await this.adminService.addSpecialization(specializationData);
-      
-      res.status(201).json({ message: "Specialization added successfully", specialization });
+        const specializationData = req.body;
+        const imageFile = req.file;
+
+        let imageUrl: string | null = null;
+
+        if (imageFile) {
+            const result = await uploadToCloudinary(imageFile.buffer, 'specializationImage');
+            imageUrl = result.secure_url; 
+        }
+
+        const specialization = await this.adminService.addSpecialization(specializationData, imageUrl);
+
+        res.status(201).json({ message: "Specialization added successfully", specialization });
     } catch (error) {
-      console.error('Adding specialization error', error);
-      res.status(500).json({ message: "Failed to add specialization", error });
+        console.error('Adding specialization error', error);
+        res.status(500).json({ message: "Failed to add specialization", error });
     }
-  }
+}
+
+
+
+
   
   async getAllTrainersKycDatas(req: Request, res: Response) {
     try {

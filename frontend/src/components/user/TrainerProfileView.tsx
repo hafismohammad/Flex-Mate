@@ -1,6 +1,10 @@
+import { useParams } from "react-router-dom";
 import profileBG from "../../assets/trainer-profile-view-img.jpg";
 
 function TrainerProfileView() {
+  const {trainerId} = useParams()
+
+  
   return (
     <>
       <div>
@@ -10,7 +14,7 @@ function TrainerProfileView() {
           alt="Profile Background"
         />
       </div>
-      <div className="absolute top-36 md:top-56 left-8 md:left-32 flex items-center justify-center">
+      <div className="absolute top-36 md:top-40 left-8 md:left-32 flex items-center justify-center">
         <img
              src={'https://res.cloudinary.com/da7kapsui/image/upload/v1729686017/trainer_profileImage/iturwlulth6vviz4dg3r.jpg'}
           alt="Profile"

@@ -3,11 +3,13 @@ import UserModel from "../models/userModel";
 import OtpModel from "../models/otpModel";
 import mongoose from "mongoose";
 import TrainerModel from "../models/trainerModel";
+import SpecializationModel from "../models/specializationModel";
 
 class UserRepository {
   private userModel = UserModel;
   private otpModel = OtpModel;
   private trainerModel = TrainerModel
+  private specializationModel = SpecializationModel
 
   // Check if user already exists by email
   async existsUser(email: string): Promise<IUser | null> {
@@ -85,10 +87,26 @@ class UserRepository {
 
   async fetchAllTrainers() {
     try {
-      const trainers = await this.trainerModel.find({}).populate('specialization');
+      const trainers = await this.trainerModel.find({}).populate('specialization')
+      // const trainers1 = await this.specializationModel({})
+      console.log('Trainers with specializations:', trainers); 
       return trainers; 
     } catch (error) {
       console.error('Error fetching trainers from the database:', error);
+      throw error; 
+    }
+  }
+  
+
+  
+  
+
+  async fetchSpecializations() {
+    try {
+      const data =   await this.specializationModel.find({})
+      return data
+    } catch (error) {
+      console.error('Error fetching specializations from the database:', error);
       throw error; 
     }
   }

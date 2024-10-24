@@ -35,10 +35,11 @@ class AdminService {
     }
   }
 
-  async addSpecialization({name, description}: {name: string, description: string}) {
-    const specializationData = await this.adminRepository.addSpecialization({name, description})
-    return specializationData
-  }
+  async addSpecialization(specializationData: { name: string, description: string }, imageUrl: string | null) {
+    const specialization = await this.adminRepository.addSpecialization({ ...specializationData, image: imageUrl  });
+    return specialization;
+}
+
 
   async TraienrsKycData() {
     try {

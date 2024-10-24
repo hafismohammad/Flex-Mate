@@ -134,8 +134,22 @@ class UserController {
   async getAllTrainers(req: Request, res: Response) {
     try {
       const allTrainers = await this.userService.fetchAllTrainers();
+      console.log(allTrainers);
       
       res.status(200).json(allTrainers);
+    } catch (error) {
+      console.error('Error fetching trainers:', error);
+      res.status(500).json({ message: 'Error fetching trainers' });
+    }
+  }
+
+  async getAllspecializations(req: Request, res: Response) {
+    try {
+      
+      const allSpecializations = await this.userService.specializations()
+      console.log(allSpecializations);
+      
+      res.status(200).json(allSpecializations)
     } catch (error) {
       console.error('Error fetching trainers:', error);
       res.status(500).json({ message: 'Error fetching trainers' });

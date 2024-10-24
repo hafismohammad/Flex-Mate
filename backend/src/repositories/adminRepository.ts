@@ -22,14 +22,16 @@ class AdminRepository {
     }
   }
 
-  async addSpecialization({ name, description }: { name: string; description: string }) {
+  async addSpecialization({ name, description, image }: { name: string; description: string; image: string | null }) {
     try {
-      return await this.specializationModel.create({ name, description });
+        // Include the image in the data being inserted into the database
+        return await this.specializationModel.create({ name, description, image });
     } catch (error) {
-      console.log('Error adding specialization:', error);
-      throw error; 
+        console.log('Error adding specialization:', error);
+        throw error;
     }
-  }
+}
+
 
   async getAllTrainersKycDatas() {
     return await this.trainerModel.aggregate([

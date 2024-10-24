@@ -6,7 +6,7 @@ import TrainersListBanner from "../../components/user/TrainersListBanner"
 
 function TrainersPage() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col pt-16">
     <Header />
     <TrainersListBanner />
     <div className="flex flex-1 bg-gray-100">
