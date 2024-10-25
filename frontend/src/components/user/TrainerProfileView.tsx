@@ -3,32 +3,12 @@ import profileBG from "../../assets/trainer-profile-view-img.jpg";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import API_URL from "../../../axios/API_URL";
+import {TrainerProfile} from '../../types/trainer'
 
-
-interface Specialization {
-  _id: string;
-  name: string;
-  description: string;
-}
-
-interface Trainer {
-  _id: string;
-  name: string;
-  email: string;
-  phone: number;
-  profileImage: string;
-  specialization: Specialization;
-  imageUrl?: string;
-  yearsOfExperience: string | null
-  language: string | null
-  gender: string | null
-  isBlocked: boolean;
-  kycStatus: string;
-}
 
 
 function TrainerProfileView() {
-  const [trainer, setTrainer] = useState<Trainer | null>(null);
+  const [trainer, setTrainer] = useState<TrainerProfile | null>(null);
 
   const {trainerId} = useParams()
 

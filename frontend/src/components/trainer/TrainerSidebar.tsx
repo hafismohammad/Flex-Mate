@@ -54,6 +54,17 @@ function TrainerSidebar() {
             Dashboard
           </span>
         </Link>
+
+        <Link
+          to="/trainer/currentSchedules"
+          className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
+        >
+          <FaListAlt size={20} />
+          <span className={`ml-2 ${!isSidebarOpen && "hidden"}`}>
+          Current Schedules 
+          </span>
+        </Link>
+
         <Link
           to="/trainer/bookings"
           className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"

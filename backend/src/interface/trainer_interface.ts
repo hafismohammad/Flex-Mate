@@ -50,4 +50,13 @@ export interface ISpecialization {
     password: string;
   }
 
-
+export interface ISession {
+  trainerId: Types.ObjectId;
+  startDate: Date;
+  endDate: Date;
+  time: string;
+  isSingleSession: boolean;
+  numberOfSessions: number;
+  price: number;
+  status: 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled' | 'InProgress';
+}

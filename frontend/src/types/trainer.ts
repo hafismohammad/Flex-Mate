@@ -29,3 +29,38 @@ export interface KycDocument {
     aadhaarBackSide: File | null;
     certificate: File | null;
   }
+
+
+  export interface Specialization {
+    _id: string;
+    name: string;
+    description: string;
+  }
+  
+  export interface Trainer {
+    _id: string;
+    name: string;
+    email: string;
+    phone: number;
+    profileImage: string;
+    specialization: Specialization;
+    imageUrl?: string;
+    isBlocked: boolean;
+    kycStatus: string;
+  }
+
+  export interface TrainerProfile {
+    _id: string;
+    name: string;
+    email: string;
+    phone: number;
+    profileImage: string;
+    specialization: Specialization;
+    imageUrl?: string;
+    yearsOfExperience?: string | null
+    language?: string | null
+    gender?: string | null
+    isBlocked: boolean;
+    kycStatus: string;
+  }
+  

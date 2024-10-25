@@ -8,6 +8,7 @@ import ProtectRoute from "./protectRoutes/TrainerProtectRoute";
 import TrainerProfilePage from "../pages/trainer/TrainerProfilePage";
 import BookingsPage from "../pages/trainer/BookingsPage";
 import TrainerProfileEditPage from "../pages/trainer/TrainerProfileEditPage";
+import CurrentSchedulesPage from "../pages/trainer/CurrentSchedulesPage";
 
 function TrainerRoutes() {
   return (
@@ -21,6 +22,8 @@ function TrainerRoutes() {
         <Route path="/profile" element={<ProtectRoute><TrainerProfilePage /></ProtectRoute>} />
         <Route path="/editProfile" element={<ProtectRoute><TrainerProfileEditPage /></ProtectRoute>} />
         <Route path="/bookings" element={<ProtectRoute><BookingsPage /></ProtectRoute>} />
+        <Route path="/currentSchedules" element={<ProtectRoute><CurrentSchedulesPage /></ProtectRoute>} />
+
       </Route>
     </Routes>
   );

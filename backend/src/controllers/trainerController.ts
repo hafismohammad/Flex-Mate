@@ -311,6 +311,40 @@ class TrainerController {
       res.status(500).json({ message: 'Error fetching rejection reason' });
     }
   }
+
+  async storeSessionData(req: Request, res: Response) {
+    try {
+      console.log('hit session traine controller');
+      const { isSingleSession, selectedDate, startTime, startDate, endDate, endTime, price } = req.body;
+console.log(isSingleSession, selectedDate, startTime, endTime, price );
+
+      // try {
+      //   if (isSingleSession) {
+      //     // Handle single session
+      //     const session = new Session({
+      //       startDate: selectedDate,
+      //       time: startTime,
+      //       price,
+      //       isSingleSession: true,
+      //       // add other necessary fields
+      //     });
+      //     await session.save();
+      //   } else {
+      //     // Handle package session
+      //     const session = new Session({
+      //       startDate,
+      //       endDate,
+      //       time: endTime,
+      //       price,
+      //       isSingleSession: false,
+      //       // add other necessary fields
+      //     });
+      //     await session.save();
+      
+    } catch (error) {
+      
+    }
+  }
   
 
 }

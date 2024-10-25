@@ -2,24 +2,9 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import API_URL from "../../../axios/API_URL";
 import { useNavigate, useParams } from "react-router-dom";
+import {Trainer} from '../../types/trainer'
 
-interface Specialization {
-  _id: string;
-  name: string;
-  description: string;
-}
 
-interface Trainer {
-  _id: string;
-  name: string;
-  email: string;
-  phone: number;
-  profileImage: string;
-  specialization: Specialization;
-  imageUrl?: string;
-  isBlocked: boolean;
-  kycStatus: string;
-}
 
 function TrainersList() {
   const [trainersData, setTrainersData] = useState<Trainer[]>([]);

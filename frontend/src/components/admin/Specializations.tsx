@@ -91,8 +91,6 @@ const Specializations = () => {
   const handleStatus = async (specId: string, currentStatus: boolean) => {
     try {
       const updatedStatus = !currentStatus;
-      // console.log('Current status:', currentStatus, '-- Updated status:', updatedStatus);
-
       const response = await axios.patch(
         `${API_URL}/api/admin/toggle-status/${specId}`,
         {
@@ -100,7 +98,6 @@ const Specializations = () => {
         }
       );
 
-      // console.log('API Response:', response.data);
 
       if (response.status === 200 && response.data && response.data.data) {
         const updatedSpec = response.data.data;
@@ -183,15 +180,13 @@ const Specializations = () => {
             onClick={openModal}
             className="flex items-center space-x-2 text-white bg-blue-600 hover:bg-blue-700 py-2 px-4 rounded-lg font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <FaPlus />
+             <FaPlus />
             <span>Add Specialization</span>
           </button>
         </div>
       </div>
 
-      {/* Specializations List Container */}
       <div className="bg-white shadow-lg rounded-lg p-6">
-        {/* Table Headers */}
         <div className="grid grid-cols-4 text-lg font-semibold text-gray-600 mb-4 border-b border-gray-200 pb-2">
           <div>ID</div>
           <div>Specialization</div>
@@ -199,7 +194,6 @@ const Specializations = () => {
           <div className="text-center">Action</div>
         </div>
 
-        {/* Specializations List Items */}
         {filteredSpecializations.length > 0 ? (
           filteredSpecializations.map((spec) => (
             <div

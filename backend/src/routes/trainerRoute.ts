@@ -36,6 +36,7 @@ router.put('/resubmitKyc/:trainerId', authMiddlewares, trainerController.resubmi
 router.get('/getTrainer/:trainerId', authMiddlewares, trainerController.getTrainer.bind(trainerController))
 router.patch(`/updateTrainerData/:trainerId`, authMiddlewares, trainerController.updateTrainer.bind(trainerController))
 router.get('/rejectionReason/:trainerId', authMiddlewares, trainerController.fetchRejectionReason.bind(trainerController))
+router.post('/session', authMiddlewares, trainerController.storeSessionData.bind(trainerController))
 
 
 
