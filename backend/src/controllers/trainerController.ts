@@ -3,9 +3,7 @@
 import { Request, Response } from "express";
 import TrainerService from "../services/trainerServices";
 import { ITrainer } from "../interface/trainer_interface";
-import {uploadToCloudinary} from '../config/cloudinary'
-import fs from 'fs'; 
-import sharp from "sharp";
+import { uploadToCloudinary } from "../config/cloudinary";
 class TrainerController {
   private trainerService: TrainerService;
 
@@ -33,33 +31,29 @@ class TrainerController {
   async registerTrainer(req: Request, res: Response) {
     try {
       const trainerData: ITrainer = req.body;
-  
-      // Call the service to register the trainer
+
       const trainer = await this.trainerService.registerTrainer(trainerData);
-  
-      // Check if the trainer already exists
+
       if (!trainer) {
-        // If trainer is null, it means the email already exists
-         res.status(409).json({ message: "Email already exists" });
-         return
+        res.status(409).json({ message: "Email already exists" });
+        return;
       }
-  
-      // If the registration is successful, send the OTP response
-       res.status(200).json({ message: "OTP sent to email" });
-       return
+
+      res.status(200).json({ message: "OTP sent to email" });
+      return;
     } catch (error) {
-      console.error('Error in registerTrainer:', error);
+      console.error("Error in registerTrainer:", error);
       if ((error as Error).message === "Email already exists") {
-         res.status(409).json({ message: "Email already exists" });
-         return
+        res.status(409).json({ message: "Email already exists" });
+        return;
       } else {
-         res.status(500).json({ message: "Something went wrong, please try again later" });
-         return
+        res
+          .status(500)
+          .json({ message: "Something went wrong, please try again later" });
+        return;
       }
     }
   }
-  
-  
 
   async verifyOtp(req: Request, res: Response) {
     try {
@@ -122,9 +116,9 @@ class TrainerController {
 
         res.cookie("trainer_refresh_token", refreshToken, {
           httpOnly: true,
-          secure: true, 
+          secure: true,
           sameSite: "none",
-          maxAge: 7 * 24 * 60 * 60 * 1000, 
+          maxAge: 7 * 24 * 60 * 60 * 1000,
         });
 
         res.status(200).json({
@@ -143,65 +137,75 @@ class TrainerController {
 
   async refreshToken(req: Request, res: Response) {
     const trainer_refresh_token = req.cookies?.trainer_refresh_token;
-  
+
     if (!trainer_refresh_token) {
       res.status(403).json({ message: "Refresh token not found" });
       return;
     }
-  
+
     try {
       // Wait for the new access token to be generated
-      const newAccessToken = await this.trainerService.generateTokn(trainer_refresh_token);
-  
+      const newAccessToken = await this.trainerService.generateTokn(
+        trainer_refresh_token
+      );
+
       // Ensure the new access token is a plain object (although usually it's just a string)
-      const TrainerNewAccessToken = Object.assign({}, { accessToken: newAccessToken });
-  
+      const TrainerNewAccessToken = Object.assign(
+        {},
+        { accessToken: newAccessToken }
+      );
+
       // console.log('new token', TrainerNewAccessToken);
-  
+
       // Send the new access token as a response
       res.status(200).json({ accessToken: newAccessToken });
     } catch (error) {
-      console.error('Error generating new access token:', error);
+      console.error("Error generating new access token:", error);
       res.status(500).json({ message: "Failed to refresh token" });
     }
   }
-  
 
   async kycSubmission(req: Request, res: Response): Promise<void> {
     try {
       const { trainer_id, specialization, name, email, phone } = req.body;
-  
+
       const files = req.files as {
         [fieldname: string]: Express.Multer.File[];
       };
-  
+
       const documents: { [key: string]: string | undefined } = {};
-  
 
-      
       if (files.profileImage && files.profileImage[0]) {
-        const profileImageUrl = await uploadToCloudinary(files.profileImage[0].buffer, 'trainer_profileImage');
+        const profileImageUrl = await uploadToCloudinary(
+          files.profileImage[0].buffer,
+          "trainer_profileImage"
+        );
         documents.profileImageUrl = profileImageUrl.secure_url;
-
-        
       }
-  
+
       if (files.aadhaarFrontSide && files.aadhaarFrontSide[0]) {
-        const aadhaarFrontSideUrl = await uploadToCloudinary(files.aadhaarFrontSide[0].buffer, 'trainer_aadhaarFrontSidec');
+        const aadhaarFrontSideUrl = await uploadToCloudinary(
+          files.aadhaarFrontSide[0].buffer,
+          "trainer_aadhaarFrontSidec"
+        );
         documents.aadhaarFrontSideUrl = aadhaarFrontSideUrl.secure_url;
       }
-  
+
       if (files.aadhaarBackSide && files.aadhaarBackSide[0]) {
-        const aadhaarBackSideUrl = await uploadToCloudinary(files.aadhaarBackSide[0].buffer, 'trainer_aadhaarBackSide');
+        const aadhaarBackSideUrl = await uploadToCloudinary(
+          files.aadhaarBackSide[0].buffer,
+          "trainer_aadhaarBackSide"
+        );
         documents.aadhaarBackSideUrl = aadhaarBackSideUrl.secure_url;
       }
-      
+
       if (files.certificate && files.certificate[0]) {
-        const certificateUrl = await uploadToCloudinary(files.certificate[0].buffer, 'trainer_certificate');
+        const certificateUrl = await uploadToCloudinary(
+          files.certificate[0].buffer,
+          "trainer_certificate"
+        );
         documents.certificateUrl = certificateUrl.secure_url;
       }
-      
-
 
       // Now you have the URLs in the `documents` object
       const formData = {
@@ -211,23 +215,26 @@ class TrainerController {
         email,
         phone,
       };
-  
+
       // Pass formData and document URLs to your service for KYC submission
-      const kycStatus = await this.trainerService.kycSubmit(formData, documents);
-  
+      const kycStatus = await this.trainerService.kycSubmit(
+        formData,
+        documents
+      );
+
       // Return success response with KYC status
-      res.status(200).json({ message: 'KYC submitted successfully', kycStatus });
+      res
+        .status(200)
+        .json({ message: "KYC submitted successfully", kycStatus });
     } catch (error) {
       // Log and send error response
-      console.error('Error in KYC submission:', error);
+      console.error("Error in KYC submission:", error);
       res.status(500).json({
-        message: 'Error in KYC submission',
-        error: error instanceof Error ? error.message : 'Unknown error',
+        message: "Error in KYC submission",
+        error: error instanceof Error ? error.message : "Unknown error",
       });
     }
   }
-
-
 
   async logoutTrainer(req: Request, res: Response) {
     try {
@@ -245,8 +252,7 @@ class TrainerController {
     }
   }
 
-  async getAllKycStatus(req: Request, res: Response) {
-  }
+  async getAllKycStatus(req: Request, res: Response) {}
 
   async trainerKycStatus(req: Request, res: Response) {
     try {
@@ -262,21 +268,24 @@ class TrainerController {
 
   async resubmitkyc(req: Request, res: Response) {
     try {
-      const trainer_id = req.params.trainerId
-      await this.trainerService.updateKycStatus(trainer_id)
-      res.status(200).json({message: 'kyc updated'})
-    } catch (error) {
-      
-    }
+      const trainer_id = req.params.trainerId;
+      await this.trainerService.updateKycStatus(trainer_id);
+      res.status(200).json({ message: "kyc updated" });
+    } catch (error) {}
   }
 
   async getTrainer(req: Request, res: Response) {
-    try {      
-      const trainer_id = req.params.trainerId
-      const trainerData = await this.trainerService.findTrainer(trainer_id)
-      res.status(200).json({message: 'Trainer data fetch succeffully', trainerData: trainerData})
+    try {
+      const trainer_id = req.params.trainerId;
+      const trainerData = await this.trainerService.findTrainer(trainer_id);
+      res
+        .status(200)
+        .json({
+          message: "Trainer data fetch succeffully",
+          trainerData: trainerData,
+        });
     } catch (error: any) {
-      throw Error(error)
+      throw Error(error);
     }
   }
 
@@ -284,69 +293,80 @@ class TrainerController {
     try {
       const trainer_id = req.params.trainerId;
       const trainerData = req.body; // This will include only the fields you want to update
-  
-      const updatedTrainer = await this.trainerService.updateTrainer(trainer_id, trainerData);
-  
-      res.status(200).json({ message: "Trainer updated successfully", updatedTrainer });
+
+      const updatedTrainer = await this.trainerService.updateTrainer(
+        trainer_id,
+        trainerData
+      );
+
+      res
+        .status(200)
+        .json({ message: "Trainer updated successfully", updatedTrainer });
     } catch (error) {
       console.error("Error updating trainer:", error);
       res.status(500).json({ message: "Failed to update trainer" });
     }
   }
-  
+
   async fetchRejectionReason(req: Request, res: Response) {
     try {
       const trainer_id = req.params.trainerId;
-      const rejectionData = await this.trainerService.fetchRejectionData(trainer_id);
-  
-      // Extracting only the "reason" field
+      const rejectionData = await this.trainerService.fetchRejectionData(
+        trainer_id
+      );
+
       const reason = rejectionData ? rejectionData.reason : null;
-  
+
       res.status(200).json({
-        message: 'Rejection reason fetched successfully',
-        reason: reason, // Sending only the reason
+        message: "Rejection reason fetched successfully",
+        reason: reason, 
       });
     } catch (error) {
-      console.error('Error fetching rejection reason:', error);
-      res.status(500).json({ message: 'Error fetching rejection reason' });
+      console.error("Error fetching rejection reason:", error);
+      res.status(500).json({ message: "Error fetching rejection reason" });
     }
   }
 
-  async storeSessionData(req: Request, res: Response) {
+  async storeSessionData(req: Request, res: Response): Promise<void> {
     try {
-      console.log('hit session traine controller');
-      const { isSingleSession, selectedDate, startTime, startDate, endDate, endTime, price } = req.body;
-console.log(isSingleSession, selectedDate, startTime, endTime, price );
+      const {
+        isSingleSession,
+        selectedDate,
+        startTime,
+        startDate,
+        endDate,
+        endTime,
+        price,
+      } = req.body;
+      const trainerId = req.params.tranerId;
+      // console.log('trainerId',trainerId);
 
-      // try {
-      //   if (isSingleSession) {
-      //     // Handle single session
-      //     const session = new Session({
-      //       startDate: selectedDate,
-      //       time: startTime,
-      //       price,
-      //       isSingleSession: true,
-      //       // add other necessary fields
-      //     });
-      //     await session.save();
-      //   } else {
-      //     // Handle package session
-      //     const session = new Session({
-      //       startDate,
-      //       endDate,
-      //       time: endTime,
-      //       price,
-      //       isSingleSession: false,
-      //       // add other necessary fields
-      //     });
-      //     await session.save();
-      
+      const sessionData: any = {};
+
+      if (isSingleSession) {
+        sessionData.isSingleSession = isSingleSession
+        sessionData.trainerId = trainerId
+        sessionData.startDate = selectedDate;
+        sessionData.startTime = startTime;
+        sessionData.endTime = endTime;
+        sessionData.price = price;
+      } else {
+        sessionData.isSingleSession = isSingleSession
+        sessionData.trainerId = trainerId
+        sessionData.startDate = startDate;
+        sessionData.endDate = endDate;
+        sessionData.startTime = startTime;
+        sessionData.endTime = endTime;
+        sessionData.price = price;
+      }
+
+      await this.trainerService.AddNewSession(sessionData)
+      res.status(201).json({ message: "Session created successfully." });
     } catch (error) {
-      
+      console.error("Error saving session data:", error);
+      res.status(500).json({ message: "An error occurred" });
     }
   }
-  
-
 }
 
 export default TrainerController;

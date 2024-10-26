@@ -1,6 +1,6 @@
 // trainerRepository.js
 
-import { ITrainer } from "../interface/trainer_interface";
+import { ISession, ITrainer } from "../interface/trainer_interface";
 import { IOtp } from "../interface/common";
 import SpecializationModel from "../models/specializationModel";
 import TrainerModel from "../models/trainerModel";
@@ -8,6 +8,7 @@ import OtpModel from "../models/otpModel";
 import KYCModel from "../models/KYC_Model";
 import KycRejectionReasonModel from "../models/kycRejectionReason";
 import {ISpecialization} from '../interface/trainer_interface'
+import SessionModel from '../models/sessionModel'
 import mongoose, { Types } from 'mongoose';
 
 
@@ -17,6 +18,7 @@ class TrainerRepository {
   private otpModel = OtpModel;
   private kycModel = KYCModel;
   private kycRejectionModel = KycRejectionReasonModel
+  private sessionModel = SessionModel
 
   // Method to find all specializations
   async findAllSpecializations() {
@@ -219,17 +221,34 @@ async updateTrainerData(trainer_id: string) {
 
 async fetchRejectionData(trainerId: string) {
   try {
-    // Use findOne() to search by the trainerId field
     const rejectionData = await this.kycRejectionModel.findOne({ trainerId: trainerId });
     console.log('rejectionData:', rejectionData);
     
     return rejectionData; 
   } catch (error) {
     console.error('Error fetching rejection data:', error);
-    throw error; // Rethrow the error for proper error handling
+    throw error; 
   }
 }
 
+async createNewSession(sessionData: ISession) {
+  try {
+    console.log('sessionData before saving:', sessionData);
+
+    // Convert price to a number if needed
+    sessionData.price = Number(sessionData.price);
+
+    // Create the session data in the database
+    const createdSessionData = await this.sessionModel.create(sessionData);
+    
+    console.log('Created session data:', createdSessionData);
+
+    return createdSessionData;  // Return the created session if needed
+  } catch (error) {
+    console.error('Error creating new session:', error);
+    throw new Error('Session creation failed');
+  }
+}
 
 
   

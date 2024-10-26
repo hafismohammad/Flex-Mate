@@ -6,6 +6,7 @@ import API_URL from "../../../axios/API_URL";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 import axiosInstance from "../../../axios/axiosInstance";
+import { toast, Toaster } from "react-hot-toast";
 
 type Status =
   | "Pending"
@@ -27,7 +28,7 @@ function CurrentSchedules() {
   const [price, setPrice] = useState<string>("");
 
   const { trainerInfo } = useSelector((state: RootState) => state.trainer);
-  const tranerId = trainerInfo.id;
+  const trainerId = trainerInfo.id;
   const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setStatus(e.target.value as Status);
     console.log("Selected status:", e.target.value);
@@ -54,35 +55,51 @@ function CurrentSchedules() {
     setPrice("");
   };
 
-  const handleAdd = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleAdd = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    const today = new Date();
+    const maxDate = new Date(today);
+    maxDate.setDate(today.getDate() + 20);
+
+    // Validation for Single Session
     if (isSingleSession) {
       if (!selectedDate || !startTime || !price) {
-        alert("Please fill in all fields for the single session.");
+        toast.error("Please fill in all fields for the single session.");
         return;
       }
-      console.log("Single Session Added", { selectedDate, startTime, price });
+
+      if (new Date(selectedDate) > maxDate) {
+        toast.error("The session date must be within the next 20 days.");
+        return;
+      }
     } else {
-      if (!startDate || !endDate || !endTime || !price) {
-        alert("Please fill in all fields for the package session.");
+      if (!startDate || !endDate || !startTime || !endTime || !price) {
+        toast.error("Please fill in all fields for the package session.");
         return;
       }
-      console.log("Package Session Added", {
-        startDate,
-        endDate,
-        endTime,
-        price,
-      });
+
+      if (new Date(startDate) > maxDate) {
+        toast.error("The package start date must be within the next 20 days.");
+        return;
+      }
+
+      if (new Date(startDate) >= new Date(endDate)) {
+        alert("Start date must be before end date.");
+        return;
+      }
     }
 
     try {
-      console.log("startTime, endTime", startTime, endTime);
-
       const sessionData = isSingleSession
-        ? { tranerId, isSingleSession, selectedDate: selectedDate?.toISOString(), startTime, endTime, price }
+        ? {
+            isSingleSession,
+            selectedDate: selectedDate?.toISOString(),
+            startTime,
+            endTime,
+            price,
+          }
         : {
-            tranerId,
             isSingleSession,
             startDate: startDate?.toISOString(),
             endDate: endDate?.toISOString(),
@@ -91,8 +108,30 @@ function CurrentSchedules() {
             price,
           };
 
-      axiosInstance.post(`${API_URL}/api/trainer/session`, sessionData);
-    } catch (error) {}
+      const response = await axiosInstance.post(
+        `${API_URL}/api/trainer/session/${trainerId}`,
+        sessionData
+      );
+      console.log(response.data);
+      
+      if(response.status === 201) {
+        toast.success('Session created successfully')
+      }
+    } catch (error: any) {
+      if (error.response?.status === 400) {
+        const errorMessage = error.response.data.message || "Bad request";
+        return toast.error(errorMessage);
+      } else if (error.response) {
+        return toast.error(error.response.data.message || "An error occurred");
+      } else {
+        toast.error("No response received from server");
+      }
+
+      if (error.response?.status === 401) {
+        console.error("Unauthorized request. You may need to log in again.");
+        window.location.href = "/trainer/login";
+      }
+    }
 
     handleClose();
   };
@@ -104,6 +143,7 @@ function CurrentSchedules() {
 
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
+      <Toaster />
       <div className="mb-8 flex flex-col md:flex-row items-center justify-between gap-4">
         <h2 className="text-4xl font-bold text-gray-800">Current Schedules</h2>
       </div>

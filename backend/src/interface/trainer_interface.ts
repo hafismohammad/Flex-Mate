@@ -54,9 +54,13 @@ export interface ISession {
   trainerId: Types.ObjectId;
   startDate: Date;
   endDate: Date;
-  time: string;
+  selectedDate: Date;
+  startTime: string;
+  endTime: string;
   isSingleSession: boolean;
   numberOfSessions: number;
   price: number;
   status: 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled' | 'InProgress';
 }
+
+

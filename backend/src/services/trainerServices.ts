@@ -5,6 +5,7 @@ import { ITrainer, ILoginTrainer } from "../interface/trainer_interface";
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../utils/jwtHelper";
 import sendOTPmail from "../config/email_config";
 import bcrypt from "bcryptjs";
+import {ISession} from '../interface/trainer_interface'
 
 class TrainerService {
   private trainerRepository: TrainerRepository;
@@ -282,7 +283,15 @@ async fetchRejectionData(trainer_id: string) {
   try {
     return await this.trainerRepository.fetchRejectionData(trainer_id)
   } catch (error) {
-    
+    throw new Error("Error in fetching rejectin reason");
+  }
+}
+
+async AddNewSession(sessionData: ISession) {
+  try {
+    return await this.trainerRepository.createNewSession(sessionData)
+  } catch (error) {
+    throw new Error("Error creating new session");
   }
 }
 
