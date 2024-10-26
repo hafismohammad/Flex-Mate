@@ -37,6 +37,7 @@ router.get('/getTrainer/:trainerId', authMiddlewares, trainerController.getTrain
 router.patch(`/updateTrainerData/:trainerId`, authMiddlewares, trainerController.updateTrainer.bind(trainerController))
 router.get('/rejectionReason/:trainerId', authMiddlewares, trainerController.fetchRejectionReason.bind(trainerController))
 router.post('/session/:tranerId', authMiddlewares, trainerController.storeSessionData.bind(trainerController))
+router.get('/sessiosShedules/:trainerId', authMiddlewares, trainerController.getSessionSchedules.bind(trainerController))
 
 
 

@@ -7,18 +7,18 @@ import TrainerModel from "../models/trainerModel";
 import OtpModel from "../models/otpModel";
 import KYCModel from "../models/KYC_Model";
 import KycRejectionReasonModel from "../models/kycRejectionReason";
-import {ISpecialization} from '../interface/trainer_interface'
-import SessionModel from '../models/sessionModel'
-import mongoose, { Types } from 'mongoose';
-
+import { ISpecialization } from "../interface/trainer_interface";
+import SessionModel from "../models/sessionModel";
+import mongoose, { Types } from "mongoose";
+import moment from "moment";
 
 class TrainerRepository {
   private specializationModel = SpecializationModel;
   private trainerModel = TrainerModel;
   private otpModel = OtpModel;
   private kycModel = KYCModel;
-  private kycRejectionModel = KycRejectionReasonModel
-  private sessionModel = SessionModel
+  private kycRejectionModel = KycRejectionReasonModel;
+  private sessionModel = SessionModel;
 
   // Method to find all specializations
   async findAllSpecializations() {
@@ -63,17 +63,16 @@ class TrainerRepository {
     }
   }
 
-  
-
-  async findTrainerSpecialization(specialization: Types.ObjectId): Promise<ISpecialization | null> {
+  async findTrainerSpecialization(
+    specialization: Types.ObjectId
+  ): Promise<ISpecialization | null> {
     try {
-         return await this.specializationModel.findOne({ name: specialization });
+      return await this.specializationModel.findOne({ name: specialization });
     } catch (error) {
-        console.log('Error in finding trainer specialization:', error);
-        return null; 
+      console.log("Error in finding trainer specialization:", error);
+      return null;
     }
-}
-
+  }
 
   async createNewTrainer(trainerData: ITrainer): Promise<void> {
     try {
@@ -104,8 +103,8 @@ class TrainerRepository {
   // Find trainer for login
   async findTrainer(email: string): Promise<ITrainer | null> {
     try {
-      console.log('repository ', email);
-      
+      console.log("repository ", email);
+
       return await this.trainerModel.findOne({ email });
     } catch (error) {
       console.log("Error finding user:", error);
@@ -115,29 +114,27 @@ class TrainerRepository {
 
   async saveKyc(formData: any, documents: any): Promise<any> {
     try {
-        console.log('KYC Data to save:', { ...formData, ...documents });
+      console.log("KYC Data to save:", { ...formData, ...documents });
 
-        const kycData = {
-            trainerId: formData.trainer_id,
-            specializationId: formData.specialization,
-            profileImage: documents.profileImageUrl,
-            aadhaarFrontImage: documents.aadhaarFrontSideUrl,
-            aadhaarBackImage: documents.aadhaarBackSideUrl,
-            certificate: documents.certificateUrl,
-            kycStatus: "pending",
-            kycSubmissionDate: new Date(),
-        };
+      const kycData = {
+        trainerId: formData.trainer_id,
+        specializationId: formData.specialization,
+        profileImage: documents.profileImageUrl,
+        aadhaarFrontImage: documents.aadhaarFrontSideUrl,
+        aadhaarBackImage: documents.aadhaarBackSideUrl,
+        certificate: documents.certificateUrl,
+        kycStatus: "pending",
+        kycSubmissionDate: new Date(),
+      };
 
-        const savedKyc = await this.kycModel.create(kycData);
-        console.log('KYC Data saved successfully:', savedKyc);
-        return savedKyc;
+      const savedKyc = await this.kycModel.create(kycData);
+      console.log("KYC Data saved successfully:", savedKyc);
+      return savedKyc;
     } catch (error) {
-        console.error("Error in saveKyc repository:", error);
-        throw new Error("Failed to save KYC data");
+      console.error("Error in saveKyc repository:", error);
+      throw new Error("Failed to save KYC data");
     }
-}
-
-  
+  }
 
   async getTrainerStatus(trainerId: string) {
     try {
@@ -159,19 +156,19 @@ class TrainerRepository {
     try {
       const trainer = await this.trainerModel.findByIdAndUpdate(
         trainerId,
-        { 
-          kycStatus: 'submitted', 
-          profileImage: profileImage, 
+        {
+          kycStatus: "submitted",
+          profileImage: profileImage,
         },
         { new: true, runValidators: true }
       );
-  
+
       await this.kycModel.findByIdAndUpdate(
         trainerId,
-        { kycStatus: 'submitted' },
+        { kycStatus: "submitted" },
         { new: true, runValidators: true }
       );
-  
+
       return trainer?.kycStatus;
     } catch (error) {
       console.error("Error changing trainer KYC status:", error);
@@ -183,76 +180,103 @@ class TrainerRepository {
     try {
       const updatedTrainer = await this.trainerModel.findByIdAndUpdate(
         trainerId,
-        { $unset: { kycStatus: "" } }, 
-        { new: true } 
+        { $unset: { kycStatus: "" } },
+        { new: true }
       );
-  
+
       if (updatedTrainer) {
-        console.log('KYC status field removed successfully:', updatedTrainer);
+        console.log("KYC status field removed successfully:", updatedTrainer);
       } else {
-        console.log('Trainer not found with the given ID:', trainerId);
+        console.log("Trainer not found with the given ID:", trainerId);
       }
     } catch (error) {
-      console.error('Error removing KYC status field:', error);
+      console.error("Error removing KYC status field:", error);
     }
   }
-  
+
   async fetchTrainer(trainer_id: string) {
     try {
-      return this.trainerModel.findOne({_id: trainer_id}).populate('specialization')
+      return this.trainerModel
+        .findOne({ _id: trainer_id })
+        .populate("specialization");
     } catch (error: any) {
-      throw Error(error)
+      throw Error(error);
     }
   }
 
-// Repository Method
-async updateTrainerData(trainer_id: string) {
-  try {
+  // Repository Method
+  async updateTrainerData(trainer_id: string) {
+    try {
       const existingTrainer = await this.trainerModel.findById(trainer_id);
       if (!existingTrainer) {
-          throw new Error("Trainer not found");
+        throw new Error("Trainer not found");
       }
       return existingTrainer;
-  } catch (error) {
+    } catch (error) {
       console.error("Error in repository layer:", error);
       throw new Error("Failed to update trainer data");
+    }
   }
-}
 
-async fetchRejectionData(trainerId: string) {
-  try {
-    const rejectionData = await this.kycRejectionModel.findOne({ trainerId: trainerId });
-    console.log('rejectionData:', rejectionData);
-    
-    return rejectionData; 
-  } catch (error) {
-    console.error('Error fetching rejection data:', error);
-    throw error; 
+  async fetchRejectionData(trainerId: string) {
+    try {
+      const rejectionData = await this.kycRejectionModel.findOne({
+        trainerId: trainerId,
+      });
+      console.log("rejectionData:", rejectionData);
+
+      return rejectionData;
+    } catch (error) {
+      console.error("Error fetching rejection data:", error);
+      throw error;
+    }
   }
-}
 
-async createNewSession(sessionData: ISession) {
-  try {
-    console.log('sessionData before saving:', sessionData);
-
-    // Convert price to a number if needed
-    sessionData.price = Number(sessionData.price);
-
-    // Create the session data in the database
-    const createdSessionData = await this.sessionModel.create(sessionData);
-    
-    console.log('Created session data:', createdSessionData);
-
-    return createdSessionData;  // Return the created session if needed
-  } catch (error) {
-    console.error('Error creating new session:', error);
-    throw new Error('Session creation failed');
-  }
-}
-
-
+  async createNewSession(sessionData: ISession) {
+    try {
+      const newStartTime = moment(sessionData.startTime, 'HH:mm');
+      const newEndTime = moment(sessionData.endTime, 'HH:mm');
   
+      const existingSession = await this.sessionModel.find({
+        trainerId: sessionData.trainerId,
+        startDate: sessionData.isSingleSession
+          ? sessionData.startDate
+          : { $gte: sessionData.startDate, $lte: sessionData.endDate },
+      });
   
+      const hasConflict = existingSession.some((existingSession) => {
+        const existingStartTime = moment(existingSession.startTime, 'HH:mm');
+        const existingEndTime = moment(existingSession.endTime, 'HH:mm');
+  
+        return (
+          newStartTime.isBefore(existingEndTime) && newEndTime.isAfter(existingStartTime)
+        );
+      });
+  
+      if (hasConflict) {
+        throw new Error("Time conflict with an existing session.");
+      }
+  
+      sessionData.price = Number(sessionData.price);
+  
+      const createdSessionData = await this.sessionModel.create(sessionData);
+  
+      return createdSessionData;
+    } catch (error: any) {
+      console.error("Detailed error:", error);
+    throw error;  
+    }
+  }
+  
+  async fetchSessionData(trainer_id: string) {
+    try {
+      const sesseionData = await this.sessionModel.find({
+        trainerId: trainer_id,
+      });
+      // console.log(sesseionData);
+      return sesseionData;
+    } catch (error) {}
+  }
 }
 
 export default TrainerRepository;

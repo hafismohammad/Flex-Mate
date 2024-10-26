@@ -1,24 +1,19 @@
+// CurrentSchedules.tsx
 import { FaPlus } from "react-icons/fa";
 import React, { useEffect, useState } from "react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import toast, { Toaster } from "react-hot-toast";
+import SessionModal from "../../components/trainer/SessionModal";
 import API_URL from "../../../axios/API_URL";
+import axiosInstance from "../../../axios/axiosInstance";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
-import axiosInstance from "../../../axios/axiosInstance";
-import { toast, Toaster } from "react-hot-toast";
-
-type Status =
-  | "Pending"
-  | "Confirmed"
-  | "Completed"
-  | "Cancelled"
-  | "InProgress"
-  | "";
+import {ISessionSchedule} from '../../types/trainer'
+import {formatTime} from '../../utils/timeUtils'
 
 function CurrentSchedules() {
-  const [status, setStatus] = useState<Status>("");
   const [modalOpen, setModalOpen] = useState(false);
+
+  // Add necessary state variables
   const [isSingleSession, setIsSingleSession] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -26,35 +21,12 @@ function CurrentSchedules() {
   const [startTime, setStartTime] = useState<string>("");
   const [endTime, setEndTime] = useState<string>("");
   const [price, setPrice] = useState<string>("");
+  const [sessionSchedules, setSessionSchedules] = useState<ISessionSchedule[]>([]);
 
   const { trainerInfo } = useSelector((state: RootState) => state.trainer);
   const trainerId = trainerInfo.id;
-  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setStatus(e.target.value as Status);
-    console.log("Selected status:", e.target.value);
-  };
 
-  const openModal = () => setModalOpen(true);
-
-  const singleSession = () => {
-    setIsSingleSession(true);
-    clearSessionData();
-  };
-
-  const packageSession = () => {
-    setIsSingleSession(false);
-    clearSessionData();
-  };
-
-  const clearSessionData = () => {
-    setSelectedDate(null);
-    setStartDate(null);
-    setEndDate(null);
-    setStartTime("");
-    setEndTime("");
-    setPrice("");
-  };
-
+  
   const handleAdd = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -62,7 +34,15 @@ function CurrentSchedules() {
     const maxDate = new Date(today);
     maxDate.setDate(today.getDate() + 20);
 
-    // Validation for Single Session
+    const clearSessionData = () => {
+      setSelectedDate(null);
+      setStartDate(null);
+      setEndDate(null);
+      setStartTime("");
+      setEndTime("");
+      setPrice("");
+    };
+
     if (isSingleSession) {
       if (!selectedDate || !startTime || !price) {
         toast.error("Please fill in all fields for the single session.");
@@ -112,229 +92,112 @@ function CurrentSchedules() {
         `${API_URL}/api/trainer/session/${trainerId}`,
         sessionData
       );
-      console.log(response.data);
-      
-      if(response.status === 201) {
-        toast.success('Session created successfully')
+      const newSchedule = response.data.createdSessionData
+      setSessionSchedules((schedule) => [
+        ...schedule,
+        newSchedule,
+    ]);    
+
+      if (response.status === 201) {
+        toast.success("Session created successfully");
       }
     } catch (error: any) {
       if (error.response?.status === 400) {
-        const errorMessage = error.response.data.message || "Bad request";
-        return toast.error(errorMessage);
-      } else if (error.response) {
-        return toast.error(error.response.data.message || "An error occurred");
-      } else {
-        toast.error("No response received from server");
-      }
-
-      if (error.response?.status === 401) {
-        console.error("Unauthorized request. You may need to log in again.");
+        const errorMessage = error.response.data.message || "Time conflict with an existing session.";
+        toast.error(errorMessage); // Shows specific conflict message
+      } else if (error.response?.status === 401) {
+        console.error("Unauthorized request. Redirecting to login.");
         window.location.href = "/trainer/login";
+      } else {
+        console.error("Unexpected error:", error);
+        const generalErrorMessage = error.response?.data.message || "An unexpected error occurred";
+        toast.error(generalErrorMessage); // For other non-conflict errors
       }
     }
+    
 
-    handleClose();
-  };
-
-  const handleClose = () => {
-    setModalOpen(false);
+    handleCloseModal();
     clearSessionData();
   };
+
+  const handleOpenModal = () => {
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+  };
+
+  useEffect(() => {
+    const fetchSessionData = async () => {
+      const response = await axiosInstance.get(
+        `${API_URL}/api/trainer/sessiosShedules/${trainerId}`
+      );
+      const schedules = response.data.sheduleData;
+      setSessionSchedules(schedules);
+    };
+    fetchSessionData();
+  }, [trainerId]);
 
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
       <Toaster />
       <div className="mb-8 flex flex-col md:flex-row items-center justify-between gap-4">
         <h2 className="text-4xl font-bold text-gray-800">Current Schedules</h2>
-      </div>
-
-      <div className="flex justify-end space-x-4">
         <button
-          onClick={openModal}
-          className="flex items-center space-x-2 text-white bg-blue-600 hover:bg-blue-700 py-2 px-4 rounded-lg font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
+          onClick={handleOpenModal}
+          className="flex items-center bg-blue-500 px-3 py-2 text-white rounded-md hover:bg-blue-700"
         >
-          <FaPlus /> Add
+          <FaPlus className="mr-1" />
+          <span>Add Schedule</span>
         </button>
-
-        <select
-          value={status}
-          onChange={handleFilterChange}
-          className="bg-gray-200 py-2 px-4 rounded-lg font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
-        >
-          <option value="">Filter by Status</option>
-          <option value="Pending">Pending</option>
-          <option value="Confirmed">Confirmed</option>
-          <option value="Completed">Completed</option>
-          <option value="Cancelled">Cancelled</option>
-          <option value="InProgress">In Progress</option>
-        </select>
       </div>
 
-      {modalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg p-6 h-[95vh] w-full max-w-lg shadow-lg">
-            <h3 className="text-lg font-semibold mb-2">Choose Session Type</h3>
-            <div className="mt-8 space-x-4">
-              <button
-                onClick={singleSession}
-                className={`p-2 ${
-                  isSingleSession
-                    ? "bg-blue-500 text-white"
-                    : "bg-slate-400 text-white"
-                } rounded-md`}
-              >
-                Single Session
-              </button>
-              <button
-                onClick={packageSession}
-                className={`p-2 ${
-                  !isSingleSession
-                    ? "bg-blue-500 text-white"
-                    : "bg-slate-400 text-white"
-                } rounded-md`}
-              >
-                Package Session
-              </button>
-            </div>
+      <SessionModal
+        isOpen={modalOpen}
+        onClose={handleCloseModal}
+        isSingleSession={isSingleSession}
+        setIsSingleSession={setIsSingleSession}
+        selectedDate={selectedDate}
+        setSelectedDate={setSelectedDate}
+        startDate={startDate}
+        setStartDate={setStartDate}
+        endDate={endDate}
+        setEndDate={setEndDate}
+        startTime={startTime}
+        setStartTime={setStartTime}
+        endTime={endTime}
+        setEndTime={setEndTime}
+        price={price}
+        setPrice={setPrice}
+        handleAdd={handleAdd}
+      />
 
-            {isSingleSession ? (
-              <form onSubmit={handleAdd}>
-                <div className="bg-slate-200 p-10 mt-7 rounded-lg">
-                  <label className="block text-gray-700 mb-2">
-                    Select Date
-                  </label>
-                  <DatePicker
-                    selected={selectedDate}
-                    onChange={(date) => setSelectedDate(date)}
-                    placeholderText="Select date"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5"
-                    required
-                  />
-                  <label className="block text-gray-700 mb-2 mt-4">
-                    Select Start Time
-                  </label>
-                  <input
-                    type="time"
-                    value={startTime}
-                    onChange={(e) => setStartTime(e.target.value)}
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                    required
-                  />
-                  <label className="block text-gray-700 mb-2 mt-4">
-                    Select End Time
-                  </label>
-                  <input
-                    type="time"
-                    value={endTime}
-                    onChange={(e) => setEndTime(e.target.value)}
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                    required
-                  />
-                  <label className="block text-gray-700 mt-4">
-                    Session Price
-                  </label>
-                  <input
-                    onChange={(e) => setPrice(e.target.value)}
-                    value={price}
-                    className="px-3 py-3 mt-3 rounded-lg w-full"
-                    type="text"
-                    placeholder="Enter Session Price"
-                    required
-                  />
-                  <div className="mt-7 flex justify-center">
-                    <button
-                      type="submit"
-                      className="text-white px-9 rounded-lg py-3 bg-blue-500 hover:bg-blue-700 mr-6"
-                    >
-                      Add
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleClose}
-                      className="text-white px-7 rounded-lg py-3 bg-red-500 hover:bg-red-700"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              </form>
-            ) : (
-              <form onSubmit={handleAdd}>
-                <div className="bg-slate-200 p-10 mt-7 rounded-lg">
-                  <label className="block text-gray-700 mb-2">Start Date</label>
-                  <DatePicker
-                    selected={startDate}
-                    onChange={(date) => setStartDate(date)}
-                    placeholderText="Select start date"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                    required
-                  />
-                  <label className="block text-gray-700 mb-2 mt-4">
-                    End Date
-                  </label>
-                  <DatePicker
-                    selected={endDate}
-                    onChange={(date) => setEndDate(date)}
-                    placeholderText="Select end date"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                    required
-                  />
-                  <div className="flex justify-around">
-                    <label className="block text-gray-700 mb-2 mt-4">
-                      Select Start Time
-                    </label>
-                    <label className="block text-gray-700 mb-2 mt-4">
-                      Select End Time
-                    </label>
-                  </div>
-                  <div className="flex justify-around gap-7">
-                    <input
-                      type="time"
-                      value={startTime}
-                      onChange={(e) => setStartTime(e.target.value)}
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                      required
-                    />
-                    <input
-                      type="time"
-                      value={endTime}
-                      onChange={(e) => setEndTime(e.target.value)}
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                      required
-                    />
-                  </div>
-                  <label className="block text-gray-700 mt-4">
-                    Package Price
-                  </label>
-                  <input
-                    onChange={(e) => setPrice(e.target.value)}
-                    value={price}
-                    className="px-3 py-3 mt-3 rounded-lg w-full"
-                    type="text"
-                    placeholder="Enter Package Price"
-                    required
-                  />
-                  <div className="mt-7 flex justify-center">
-                    <button
-                      type="submit"
-                      className="text-white px-9 rounded-lg py-3 bg-blue-500 hover:bg-blue-700 mr-6"
-                    >
-                      Add
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleClose}
-                      className="text-white px-7 rounded-lg py-3 bg-red-500 hover:bg-red-700"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              </form>
-            )}
-          </div>
+      <div className="bg-white shadow-lg rounded-lg p-6">
+        <div className="grid grid-cols-7 gap-1 text-lg font-semibold text-gray-600 mb-4 border-b border-gray-200 pb-2">
+          <div>Session Type</div>
+          <div>Date</div>
+          <div>Start Time</div>
+          <div>End Time</div>
+          <div>Price</div>
+          <div>Duration</div>
+          <div>Status</div>
         </div>
-      )}
+      {sessionSchedules.length > 0 ? (
+        sessionSchedules.map((schedule) => (
+          <div key={schedule._id} className="grid grid-cols-7 gap-1 items-center p-4 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none mb-2">
+            <div className="text-gray-800 font-medium">{schedule.isSingleSession ? 'Single Session' : 'Package'}</div>
+            <div className="text-gray-800 font-medium mt-3">{schedule.isSingleSession ? new Date(schedule.startDate).toLocaleDateString() :  `${new Date(schedule.startDate).toLocaleDateString()} / ${new Date(schedule.endDate).toLocaleDateString()}`}</div>
+            <div className="text-gray-800 font-medium">{formatTime(schedule.startTime)}</div>
+            <div className="text-gray-800 font-medium">{formatTime(schedule.endTime)}</div>
+            <div className="text-gray-800 font-medium">{schedule.price}</div>
+            <div className="text-gray-800 font-medium">N/A</div>
+            <div className="text-gray-800 font-medium">{schedule.status}</div>
+          </div>
+        ))
+       ) : 'no session data'}
+
+      </div>
     </div>
   );
 }

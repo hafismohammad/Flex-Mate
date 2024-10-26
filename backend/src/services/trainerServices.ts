@@ -30,7 +30,7 @@ class TrainerService {
       const existingTrainer = await this.trainerRepository.existsTrainer(trainerData.email);
   
       if (existingTrainer) {
-        return null; // Return null if the email already exists
+        return null; 
       }
   
       // Generate random OTP
@@ -47,13 +47,12 @@ class TrainerService {
   
       console.log(`OTP will expire at: ${this.expiryOTP_time}`);
   
-      // You may also want to send the OTP email here if it's commented out in the previous code
       // const isMailSent = await sendOTPmail(trainerData.email, this.OTP);
       // if (!isMailSent) {
       //   throw new Error("Email not sent");
       // }
   
-      return { email: trainerData.email }; // Return a success response with the trainer's email
+      return { email: trainerData.email }; 
     } catch (error) {
       console.error("Error in service:", (error as Error).message);
       throw new Error("Error in Trainer service");
@@ -143,7 +142,6 @@ async resendOTP(email: string): Promise<void> {
 
       const trainerData = await this.trainerRepository.findTrainer(email);
 
-      // Ensure both trainerData and trainerData._id are defined
       if (trainerData && trainerData._id) {
         const isPasswordValid = await bcrypt.compare(
           password,
@@ -214,10 +212,8 @@ async resendOTP(email: string): Promise<void> {
 
   async kycSubmit(formData: any, documents: any): Promise<any> {
     try {
-        // First, save the KYC data with documents in the database
         await this.trainerRepository.saveKyc(formData, documents);
 
-        // After successful saving, change the KYC status to 'submitted' or any relevant status
         return await this.trainerRepository.changeKycStatus(formData.trainer_id, documents.profileImageUrl);
     } catch (error) {
         console.error("Error in kycSubmit service:", error);
@@ -261,7 +257,6 @@ async updateTrainer(trainer_id: string, trainerData: Partial<ITrainer>) {
           throw new Error("Trainer not found");
       }
 
-      // Update fields if they are present in the trainerData
       if (name) existingTrainer.name = name;
       if (email) existingTrainer.email = email;
       if (phone) existingTrainer.phone = phone;
@@ -269,7 +264,6 @@ async updateTrainer(trainer_id: string, trainerData: Partial<ITrainer>) {
       if (gender) existingTrainer.gender = gender;
       if (language) existingTrainer.language = language;
 
-      // Save the updated trainer data
       await existingTrainer.save();
 
       return existingTrainer;
@@ -291,7 +285,19 @@ async AddNewSession(sessionData: ISession) {
   try {
     return await this.trainerRepository.createNewSession(sessionData)
   } catch (error) {
-    throw new Error("Error creating new session");
+    if((error as Error).message === 'Time conflict with an existing session.') {
+      throw new Error("Time conflict with an existing session.");
+    } else {
+
+      throw new Error("Error creating new session");
+    }
+  }
+}
+async getSessionShedules(trainer_id: string) {
+  try {
+    return  await this.trainerRepository.fetchSessionData(trainer_id)
+  } catch (error) {
+    throw new Error("Error getting sessin shedule data");
   }
 }
 

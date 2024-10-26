@@ -360,11 +360,28 @@ class TrainerController {
         sessionData.price = price;
       }
 
-      await this.trainerService.AddNewSession(sessionData)
-      res.status(201).json({ message: "Session created successfully." });
+     const createdSessionData = await this.trainerService.AddNewSession(sessionData)
+      res.status(201).json({ message: "Session created successfully.", createdSessionData });
+    } catch (error : any) {
+      if ((error as Error).message === 'Time conflict with an existing session.') {
+        res.status(400).json({ message: "Time conflict with an existing session." });
+      } else {
+        console.error("Detailed server error:", error);
+        res.status(500).json({ message: error.message || "Internal server error" });
+      }
+    }
+  }
+
+  async getSessionSchedules(req: Request, res: Response) {
+    try {
+      const trainer_id = req.params.trainerId
+      const sheduleData = await this.trainerService.getSessionShedules(trainer_id)
+      // console.log('sheduleData',sheduleData);
+      
+      res.status(200).json({message: 'Session data feched sucessfully', sheduleData})      
     } catch (error) {
       console.error("Error saving session data:", error);
-      res.status(500).json({ message: "An error occurred" });
+      res.status(500).json({ message: "An error occurred fetching session shedule " });
     }
   }
 }
