@@ -234,19 +234,37 @@ class TrainerRepository {
 
   async createNewSession(sessionData: ISession) {
     try {
+
+      const trainer = await this.trainerModel.findById(sessionData.trainerId)
+      console.log('trainer ==', trainer);
+      
+      if (!trainer) {
+        throw new Error('Trainer not found.');
+    }
+      const dailySessionLimit = trainer.dailySessionLimit;
+
       const newStartTime = moment(sessionData.startTime, 'HH:mm');
       const newEndTime = moment(sessionData.endTime, 'HH:mm');
+
+      const allSessions = await this.sessionModel.find({trainerId: sessionData.trainerId})
   
-      const existingSession = await this.sessionModel.find({
+      const existingSessions = await this.sessionModel.find({
         trainerId: sessionData.trainerId,
         startDate: sessionData.isSingleSession
           ? sessionData.startDate
           : { $gte: sessionData.startDate, $lte: sessionData.endDate },
       });
+
+
+      if (allSessions.length >= dailySessionLimit) {
+        console.log('session limit');
+        
+        throw new Error(`Daily session limit of ${dailySessionLimit} reached.`);
+    }
   
-      const hasConflict = existingSession.some((existingSession) => {
-        const existingStartTime = moment(existingSession.startTime, 'HH:mm');
-        const existingEndTime = moment(existingSession.endTime, 'HH:mm');
+      const hasConflict = existingSessions.some((existingSessions) => {
+        const existingStartTime = moment(existingSessions.startTime, 'HH:mm');
+        const existingEndTime = moment(existingSessions.endTime, 'HH:mm');
   
         return (
           newStartTime.isBefore(existingEndTime) && newEndTime.isAfter(existingStartTime)

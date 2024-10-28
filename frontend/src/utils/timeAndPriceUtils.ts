@@ -1,4 +1,3 @@
-import { stringify } from "querystring";
 
 export const formatTime = (time: string): string => {
     const [hours, minutes] = time.split(":").map(Number);

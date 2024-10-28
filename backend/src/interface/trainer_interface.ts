@@ -11,10 +11,11 @@ export interface ITrainer {
   password: string;
   dob?: string;
   profileImage?: string;
-  gender?: 'male' | 'female' | 'other' | ''; // Updated gender field with specific options
-  yearsOfExperience?: number; // Added yearsOfExperience field
-  language?: string; // Added language field
+  gender?: 'male' | 'female' | 'other' | ''; 
+  yearsOfExperience?: number;
+  language?: string;
   specialization: Types.ObjectId;  
+  dailySessionLimit: number 
   kycStatus: 'pending' | 'approved' | 'submitted' | 'rejected';
   isBlocked?: boolean;
 }

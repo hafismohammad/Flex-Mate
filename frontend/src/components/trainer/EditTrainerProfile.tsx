@@ -11,6 +11,7 @@ interface FormData {
     yearsOfExperience: number;
     gender: string;
     language: string;
+    dailySessionLimit: number
 }
 
 interface Specialization {
@@ -22,9 +23,10 @@ interface TrainerProfileData {
     email: string;
     phone: string;
     specialization: Specialization;
-    gender: string; // Add this if it's part of the response
-    experience: string; // Add this if it's part of the response
-    language: string; // Add this if it's part of the response
+    gender: string; 
+    experience: string; 
+    language: string; 
+    dailySessionLimit: number
 }
 
 const EditTrainerProfile: React.FC = () => {
@@ -37,6 +39,7 @@ const EditTrainerProfile: React.FC = () => {
         yearsOfExperience: 0,
         gender: "",
         language: "",
+        dailySessionLimit: 0
     });
 
     const {trainerInfo} = useSelector((state: RootState) => state.trainer)
@@ -56,7 +59,8 @@ const EditTrainerProfile: React.FC = () => {
                     phoneNumber: trainerData.phone || '',
                     yearsOfExperience: trainerData.yearsOfExperience || 0,
                     gender: trainerData.gender || '',
-                    language: trainerData.language || ''
+                    language: trainerData.language || '',
+                    dailySessionLimit: trainerData.dailySessionLimit || ''
                 });
             } catch (err) {
                 setError('Failed to load trainer data');
@@ -171,6 +175,13 @@ const EditTrainerProfile: React.FC = () => {
                             <option value="german">German</option>
                             <option value="mandarin">Mandarin</option>
                         </select>
+                        <input
+                            name="dailySessionLimit"
+                            value={formData.dailySessionLimit}
+                            onChange={handleChange}
+                            placeholder="Daily Session Limit"
+                            className="p-3 border border-gray-300 bg-slate-100 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
                     </div>
 
                     <button

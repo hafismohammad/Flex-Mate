@@ -49,6 +49,8 @@ function CurrentSchedules() {
         return;
       }
 
+
+
       if (new Date(selectedDate) > maxDate) {
         toast.error("The session date must be within the next 20 days.");
         return;
@@ -58,6 +60,11 @@ function CurrentSchedules() {
         toast.error("Please fill in all fields for the package session.");
         return;
       }
+
+      if (startTime >= endTime) {
+        toast.error('End time must be after start time');
+        return;
+    }
 
       if (new Date(startDate) > maxDate) {
         toast.error("The package start date must be within the next 20 days.");

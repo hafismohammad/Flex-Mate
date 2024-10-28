@@ -18,6 +18,7 @@ interface TrainerProfileData {
     gender: string; 
     yearsOfExperience: string;
     language: string;
+    dailySessionLimit?: number;
 }
 
 function TrainerProfile() {
@@ -111,8 +112,12 @@ console.log('traianer',trainer);
                         <span className="block text-sm font-semibold text-gray-500">Language</span>
                         <span className="text-lg text-gray-800">{trainer.language || 'Not specified'}</span>
                     </div>
+                    <div className="bg-slate-100 p-4 rounded-lg shadow-sm transition-transform transform hover:scale-105">
+                        <span className="block text-sm font-semibold text-gray-500">dailySessionLimit</span>
+                        <span className="text-lg text-gray-800">{trainer.dailySessionLimit || 'Not specified'}</span>
+                    </div>
                 </div>
-
+                
                 <button
                     onClick={handleEditClick}
                     className="mt-4 mb-8 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-200"

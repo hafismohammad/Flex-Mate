@@ -278,12 +278,10 @@ class TrainerController {
     try {
       const trainer_id = req.params.trainerId;
       const trainerData = await this.trainerService.findTrainer(trainer_id);
-      res
-        .status(200)
-        .json({
-          message: "Trainer data fetch succeffully",
-          trainerData: trainerData,
-        });
+      res.status(200).json({
+        message: "Trainer data fetch succeffully",
+        trainerData: trainerData,
+      });
     } catch (error: any) {
       throw Error(error);
     }
@@ -292,7 +290,7 @@ class TrainerController {
   async updateTrainer(req: Request, res: Response) {
     try {
       const trainer_id = req.params.trainerId;
-      const trainerData = req.body; // This will include only the fields you want to update
+      const trainerData = req.body;
 
       const updatedTrainer = await this.trainerService.updateTrainer(
         trainer_id,
@@ -319,7 +317,7 @@ class TrainerController {
 
       res.status(200).json({
         message: "Rejection reason fetched successfully",
-        reason: reason, 
+        reason: reason,
       });
     } catch (error) {
       console.error("Error fetching rejection reason:", error);
@@ -344,15 +342,15 @@ class TrainerController {
       const sessionData: any = {};
 
       if (isSingleSession) {
-        sessionData.isSingleSession = isSingleSession
-        sessionData.trainerId = trainerId
+        sessionData.isSingleSession = isSingleSession;
+        sessionData.trainerId = trainerId;
         sessionData.startDate = selectedDate;
         sessionData.startTime = startTime;
         sessionData.endTime = endTime;
         sessionData.price = price;
       } else {
-        sessionData.isSingleSession = isSingleSession
-        sessionData.trainerId = trainerId
+        sessionData.isSingleSession = isSingleSession;
+        sessionData.trainerId = trainerId;
         sessionData.startDate = startDate;
         sessionData.endDate = endDate;
         sessionData.startTime = startTime;
@@ -360,28 +358,45 @@ class TrainerController {
         sessionData.price = price;
       }
 
-     const createdSessionData = await this.trainerService.AddNewSession(sessionData)
-      res.status(201).json({ message: "Session created successfully.", createdSessionData });
-    } catch (error : any) {
-      if ((error as Error).message === 'Time conflict with an existing session.') {
-        res.status(400).json({ message: "Time conflict with an existing session." });
-      } else {
-        console.error("Detailed server error:", error);
-        res.status(500).json({ message: error.message || "Internal server error" });
-      }
-    }
+      const createdSessionData = await this.trainerService.AddNewSession(
+        sessionData
+      );
+      res
+        .status(201)
+        .json({ message: "Session created successfully.", createdSessionData });
+    } catch (error: any) {
+  if (error.message === "Time conflict with an existing session.") {
+    res.status(400).json({ message: "Time conflict with an existing session." });
+  } else if (error.message.includes("Daily session limit")) {
+    res.status(400).json({ message: error.message });
+  } else if (error.message === "End time must be after start time") {
+    res.status(400).json({ message: "End time must be after start time" });
+  } else if (error.message === "Session duration must be at least 30 minutes") {
+    res.status(400).json({ message: "Session duration must be at least 30 minutes" });
+  } else {
+    console.error("Detailed server error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
   }
 
   async getSessionSchedules(req: Request, res: Response) {
     try {
-      const trainer_id = req.params.trainerId
-      const sheduleData = await this.trainerService.getSessionShedules(trainer_id)
+      const trainer_id = req.params.trainerId;
+      const sheduleData = await this.trainerService.getSessionShedules(
+        trainer_id
+      );
       // console.log('sheduleData',sheduleData);
-      
-      res.status(200).json({message: 'Session data feched sucessfully', sheduleData})      
+
+      res
+        .status(200)
+        .json({ message: "Session data feched sucessfully", sheduleData });
     } catch (error) {
       console.error("Error saving session data:", error);
-      res.status(500).json({ message: "An error occurred fetching session shedule " });
+      res
+        .status(500)
+        .json({ message: "An error occurred fetching session shedule " });
     }
   }
 }

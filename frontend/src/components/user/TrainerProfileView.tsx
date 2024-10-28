@@ -50,13 +50,13 @@ function TrainerProfileView() {
     fetchSeessionSchedules();
   }, []);
   
-  // const sessionDates = Array.from(
-  //   new Set(
-  //     sessionSchedules
-  //       .filter((session) => session.trainerId === trainerId)
-  //       .map((session) => new Date(session.startDate).toDateString())
-  //   )
-  // ).map((dateStr) => new Date(dateStr));
+  const sessionDates = Array.from(
+    new Set(
+      sessionSchedules
+        .filter((session) => session.trainerId === trainerId && session.isSingleSession === isSingleSession)
+        .map((session) => new Date(session.startDate).toDateString())
+    )
+  ).map((dateStr) => new Date(dateStr));
 
   return (
     <>
@@ -134,8 +134,9 @@ function TrainerProfileView() {
           <DatePicker
             minDate={new Date()} 
             selected={selectedDate}
-            onChange={(date) => setSelectedDate(date)}
             inline
+            highlightDates={sessionDates}
+            onChange={(date) => setSelectedDate(date)}
             className="h-80 w-80 border border-gray-300 rounded-lg shadow-lg p-2"
           />
         </div>
@@ -150,7 +151,6 @@ function TrainerProfileView() {
         </div>
         <div className="flex justify-center mt-20">
           <div className="bg-blue-50 rounded-md shadow-lg p-6 w-[80%] h-[75vh]">
-            {/* Buttons for Session Selection */}
             <div className="mt-5 space-x-4 flex justify-center">
               <button
                 onClick={handleSingleSession}
