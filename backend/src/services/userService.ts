@@ -1,5 +1,5 @@
 import { IUser, ILoginUser } from "../interface/common";
-import {generateAccessToken, generateRefreshToken} from '../utils/jwtHelper'
+import {generateAccessToken, generateRefreshToken, verifyRefreshToken} from '../utils/jwtHelper'
 import UserRepository from "../repositories/userRepository";
 import sendOTPmail from "../config/email_config";
 import bcrypt from "bcryptjs";
@@ -165,6 +165,31 @@ async login({ email, password }: ILoginUser): Promise<any> {
   } catch (error) {
     console.error('Login error:', error);
     return null;
+  }
+}
+
+async generateTokn(user_refresh_token: string) {
+  try {
+    const payload = verifyRefreshToken(user_refresh_token);
+    // console.log('payload', payload);
+
+    let id: string | undefined;
+    let email: string | undefined;
+
+    if (payload && typeof payload === "object") {
+      id = payload?.id;
+      email = payload?.email;
+    }
+
+    if (id && email) {
+      const userNewAccessToken = generateAccessToken({ id, email });
+      return userNewAccessToken;
+    } else {
+      throw new Error("Invalid token payload structure");
+    }
+  } catch (error) {
+    console.error("Error generating token:", error);
+    throw error;
   }
 }
 

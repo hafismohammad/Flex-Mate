@@ -44,15 +44,15 @@ const TrainerKyc: React.FC = () => {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
   
-    // Validate form inputs before proceeding
+ 
     if (!validateForm()) {
       return;
     }
   
-    // Creating FormData object to handle files and other data
+    
     const formData = new FormData();
-    formData.append('trainer_id', trainer_id!); // Use non-null assertion
-    formData.append('specialization', specialization!); // Use non-null assertion
+    formData.append('trainer_id', trainer_id!);
+    formData.append('specialization', specialization!); 
     formData.append('name', name);
     formData.append('email', email);
     formData.append('phone', phone);
@@ -63,7 +63,6 @@ const TrainerKyc: React.FC = () => {
     if (aadhaarBackSide) formData.append('aadhaarBackSide', aadhaarBackSide);
     if (certificate) formData.append('certificate', certificate);
   
-    // Check for auth token
     if (!token) {
       setSubmissionError("Authorization token is required.");
       return;

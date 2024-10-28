@@ -64,6 +64,33 @@ class UserController {
     }
   }
 
+  async refreshToken(req: Request, res: Response) {
+    const refresh_token = req.cookies?.refresh_token;
+
+    if (!refresh_token) {
+      res.status(403).json({ message: "Refresh token not found" });
+      return;
+    }
+
+    try {
+      const newAccessToken = await this.userService.generateTokn(
+        refresh_token
+      );
+
+      const UserNewAccessToken = Object.assign(
+        {},
+        { accessToken: newAccessToken }
+      );
+
+      // console.log('new token', UserNewAccessToken);
+
+      res.status(200).json({ accessToken: newAccessToken });
+    } catch (error) {
+      console.error("Error generating new access token:", error);
+      res.status(500).json({ message: "Failed to refresh token" });
+    }
+  }
+
   // Verify OTP
   async verifyOtp(req: Request, res: Response) {
     try {

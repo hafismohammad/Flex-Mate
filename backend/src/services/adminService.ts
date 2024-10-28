@@ -1,5 +1,5 @@
 import AdminRepository from "../repositories/adminRepository";
-import {generateAccessToken, generateRefreshToken} from '../utils/jwtHelper'
+import {generateAccessToken, generateRefreshToken, verifyRefreshToken} from '../utils/jwtHelper'
 
 class AdminService {
   private adminRepository: AdminRepository;
@@ -31,6 +31,32 @@ class AdminService {
       } else console.log("admin not exists");
     } catch (error) {
       console.error("Error in admin login:", error);
+      throw error;
+    }
+  }
+
+
+  async generateTokn(admin_refresh_token: string) {
+    try {
+      const payload = verifyRefreshToken(admin_refresh_token);
+      // console.log('payload', payload);
+
+      let id: string | undefined;
+      let email: string | undefined;
+
+      if (payload && typeof payload === "object") {
+        id = payload?.id;
+        email = payload?.email;
+      }
+
+      if (id && email) {
+        const AdminNewAccessToken = generateAccessToken({ id, email });
+        return AdminNewAccessToken;
+      } else {
+        throw new Error("Invalid token payload structure");
+      }
+    } catch (error) {
+      console.error("Error generating token:", error);
       throw error;
     }
   }

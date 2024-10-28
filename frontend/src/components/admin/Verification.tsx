@@ -6,6 +6,7 @@ import { addSpecialization } from '../../actions/adminAction';
 import axios from "axios";
 import API_URL from "../../../axios/API_URL";
 import { Link, useNavigate } from "react-router-dom";
+import adminAxiosInstance from "../../../axios/adminAxiosInstance";
 
 interface Trainer {
   id: string; 
@@ -34,7 +35,7 @@ function Verification() {
   useEffect(() => {
     const getAllTrainersKycData = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/admin/allTrainerKyc`);
+        const response = await adminAxiosInstance.get(`/api/admin/allTrainerKyc`);
         const trainersData: Trainer[] = response.data.data.map((trainer: any) => ({          
           id: trainer._id, 
           name: trainer.name,

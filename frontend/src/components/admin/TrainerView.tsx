@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { FaUser, FaFileAlt, FaCheck, FaTimes } from "react-icons/fa";
 import API_URL from "../../../axios/API_URL";
 import { useParams } from "react-router-dom";
+import adminAxiosInstance from "../../../axios/adminAxiosInstance";
 
 interface Errors {
   rejectionReason?: string;
@@ -32,8 +33,8 @@ function TrainerView() {
   useEffect(() => {
     const fetchTrainerDetails = async () => {
       try {
-        const response = await axios.get(
-          `${API_URL}/api/admin/trainerKycDetails/${trainerId}`
+        const response = await adminAxiosInstance.get(
+          `/api/admin/trainerKycDetails/${trainerId}`
         );
         const trainerData = response.data.kycData;
         const kycData = trainerData._doc;
@@ -67,7 +68,7 @@ function TrainerView() {
 
   const handleApproveStatusChange = async (newStatus: string) => {
     try {
-      await axios.patch(`${API_URL}/api/admin/updateKycStatus/${trainerId}`, { status: newStatus });
+      await adminAxiosInstance.patch(`/api/admin/updateKycStatus/${trainerId}`, { status: newStatus });
       setTrainer((prevTrainer) => prevTrainer ? { ...prevTrainer, kycStatus: newStatus } : null);
     } catch (error) {
       console.error("Error updating trainer status:", error);
@@ -111,7 +112,7 @@ function TrainerView() {
     }
 
     try {
-      await axios.patch(`${API_URL}/api/admin/updateKycStatus/${trainerId}`, {
+      await adminAxiosInstance.patch(`/api/admin/updateKycStatus/${trainerId}`, {
         status: "rejected",
         rejectionReason,
       });

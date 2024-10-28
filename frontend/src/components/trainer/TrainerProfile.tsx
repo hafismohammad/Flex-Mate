@@ -3,7 +3,7 @@ import bgImage from '../../assets/trainers-tablet.jpg';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../app/store';
-import axiosInstance from '../../../axios/axiosInstance';
+import axiosInstance from '../../../axios/trainerAxiosInstance';
 
 interface Specialization {
     name: string;

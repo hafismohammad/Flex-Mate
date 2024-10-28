@@ -144,12 +144,10 @@ class TrainerController {
     }
 
     try {
-      // Wait for the new access token to be generated
       const newAccessToken = await this.trainerService.generateTokn(
         trainer_refresh_token
       );
 
-      // Ensure the new access token is a plain object (although usually it's just a string)
       const TrainerNewAccessToken = Object.assign(
         {},
         { accessToken: newAccessToken }
@@ -157,7 +155,6 @@ class TrainerController {
 
       // console.log('new token', TrainerNewAccessToken);
 
-      // Send the new access token as a response
       res.status(200).json({ accessToken: newAccessToken });
     } catch (error) {
       console.error("Error generating new access token:", error);
@@ -238,6 +235,7 @@ class TrainerController {
 
   async logoutTrainer(req: Request, res: Response) {
     try {
+      
       res.clearCookie("trainer_refresh_token", {
         httpOnly: true,
         sameSite: "none",

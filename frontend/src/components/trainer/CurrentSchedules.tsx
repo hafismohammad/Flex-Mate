@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import SessionModal from "../../components/trainer/SessionModal";
 import API_URL from "../../../axios/API_URL";
-import axiosInstance from "../../../axios/axiosInstance";
+import axiosInstance from "../../../axios/trainerAxiosInstance";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 import {ISessionSchedule} from '../../types/trainer'

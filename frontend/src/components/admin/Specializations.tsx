@@ -5,6 +5,7 @@ import { AppDispatch } from "../../app/store";
 import { addSpecialization } from "../../actions/adminAction";
 import axios from "axios";
 import API_URL from "../../../axios/API_URL";
+import adminAxiosInstance from "../../../axios/adminAxiosInstance";
 
 interface Errors {
   name?: string;
@@ -34,8 +35,8 @@ const Specializations = () => {
 
   const getAllSpecializations = async () => {
     try {
-      const response = await axios.get(
-        `${API_URL}/api/admin/allSpecializations`
+      const response = await adminAxiosInstance.get(
+        `/api/admin/allSpecializations`
       );
       setSpecializations(response.data);
     } catch (error) {
@@ -91,8 +92,8 @@ const Specializations = () => {
   const handleStatus = async (specId: string, currentStatus: boolean) => {
     try {
       const updatedStatus = !currentStatus;
-      const response = await axios.patch(
-        `${API_URL}/api/admin/toggle-status/${specId}`,
+      const response = await adminAxiosInstance.patch(
+        `/api/admin/toggle-status/${specId}`,
         {
           isListed: updatedStatus,
         }

@@ -203,6 +203,7 @@ class TrainerService {
       throw error;
     }
   }
+  
 
   async generateTokn(trainer_refresh_token: string) {
     try {

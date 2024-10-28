@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import API_URL from "../../../axios/API_URL";
+import adminAxiosInstance from "../../../axios/adminAxiosInstance";
 
 interface User {
   _id: string; 
@@ -17,7 +18,7 @@ function UserListing() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/admin/allUsers`);
+        const response = await adminAxiosInstance.get(`/api/admin/allUsers`);
         setUsers(response.data.users);
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -35,8 +36,8 @@ function UserListing() {
 
   const handleBlockUnblock = async (userId: string, currentStatus: boolean) => {
     try {
-      const response = await axios.patch(
-        `${API_URL}/api/admin/user-block-unblock/${userId}`,
+      const response = await adminAxiosInstance.patch(
+        `/api/admin/user-block-unblock/${userId}`,
         { status: !currentStatus }
       );
   

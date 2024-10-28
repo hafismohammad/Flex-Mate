@@ -48,7 +48,7 @@ export const fetchAllSpecializations = createAsyncThunk(
   'admin/getAllSpecialization',
   async (_, thunkAPI) => {
     try {      
-      const response = await AdminService.getAllSpecializaton()
+      const response = await AdminService.getAllSpecialization()
       // console.log(response.data,'dfdf');
       
       return response.data

@@ -7,7 +7,7 @@ function TrainerProfileViewPage() {
     <div>
         <Header />
         <TrainerProfileView />
-        
+        <Footer />
     </div>
   )
 }

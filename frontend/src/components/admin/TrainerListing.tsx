@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import API_URL from "../../../axios/API_URL";
+import adminAxiosInstance from "../../../axios/adminAxiosInstance";
 
 interface Trainer {
   _id: string; 
@@ -17,7 +18,7 @@ function TrainerListing() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/admin/allTrainer`);
+        const response = await adminAxiosInstance.get(`/api/admin/allTrainer`);
         setTrainers(response.data.trainer);
       } catch (error) {
         console.error("Error fetching trainers:", error);
@@ -35,8 +36,8 @@ function TrainerListing() {
   const handleBlockUnblock = async (trainerId: string, currentStatus: boolean) => {
     try {
         
-      const response = await axios.patch(
-        `${API_URL}/api/admin/trainer-block-unblock/${trainerId}`,
+      const response = await adminAxiosInstance.patch(
+        `/api/admin/trainer-block-unblock/${trainerId}`,
         { status: !currentStatus }
       );
   

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
-import axiosInstance from "../../../axios/axiosInstance";
+import axiosInstance from "../../../axios/trainerAxiosInstance";
 import TrainerKyc from "./Trainerkyc";
 import { useEffect, useState } from "react";
 

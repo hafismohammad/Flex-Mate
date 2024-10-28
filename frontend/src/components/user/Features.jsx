@@ -1,16 +1,10 @@
 import { useEffect, useState } from "react";
-import cardImg_1 from "../../assets/card-1.jpg";
-import cardImg_2 from "../../assets/card-2.jpg";
-import cardImg_3 from "../../assets/card-3.jpg";
-import cardImg_4 from "../../assets/card-4.jpg";
-import cardImg_5 from "../../assets/card-5.jpg";
-import cardImg_6 from "../../assets/card-6.jpg";
+
 
 import AOS from "aos";
 import "aos/dist/aos.css";
-import axios from "axios";
-import API_URL from "../../../axios/API_URL";
 import { useNavigate } from "react-router-dom";
+import userAxiosInstance from "../../../axios/userAxionInstance";
 
 
 
@@ -31,8 +25,8 @@ function Features() {
   useEffect(() => {
     const getAllSpecializations = async () => {
       try {
-        const response = await axios.get(
-          `${API_URL}/api/user/allspecializations`
+        const response = await userAxiosInstance.get(
+          `/api/user/allspecializations`
         );
         setSpecializations(response.data);
       } catch (error) {

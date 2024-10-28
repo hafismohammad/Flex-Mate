@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom"; 
 import LOGO from "../../assets/LOGO-2.png";
 import { useDispatch } from "react-redux";
-import { adminLogout } from '../../actions/adminAction';
+import {logoutTrainer} from '../../actions/trainerAction'
 import {
   FaBars,
   FaListAlt,
@@ -25,7 +25,7 @@ function TrainerSidebar() {
 
   const handleLogout = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault(); 
-    dispatch(adminLogout());
+    dispatch(logoutTrainer());
     navigate('/trainer/login'); 
   };
 

@@ -1,14 +1,17 @@
-import axiosInstance from "../../axios/axiosInstance";
-import {ITrainerKycData} from '../types/trainer'
+import axiosInstance from "../../axios/trainerAxiosInstance";
+import { ITrainerKycData } from "../types/trainer";
 
 const getAllSpecializations = async () => {
   try {
     const response = await axiosInstance.get(`/api/trainer/getSpecializations`);
     console.log("All data from backend", response.data);
-    return response.data; 
+    return response.data;
   } catch (error: any) {
-    console.error("Error fetching specializations:", error.response ? error.response.data : error.message);
-    throw error; 
+    console.error(
+      "Error fetching specializations:",
+      error.response ? error.response.data : error.message
+    );
+    throw error;
   }
 };
 
@@ -24,11 +27,17 @@ export interface ITrainer {
 
 const registerTrainer = async (trainerData: ITrainer) => {
   try {
-    const response = await axiosInstance.post(`/api/trainer/signup`, trainerData);
+    const response = await axiosInstance.post(
+      `/api/trainer/signup`,
+      trainerData
+    );
     return response.data;
   } catch (error: any) {
-    console.error('Error registering trainer:', error.response ? error.response.data : error.message);
-    throw error; 
+    console.error(
+      "Error registering trainer:",
+      error.response ? error.response.data : error.message
+    );
+    throw error;
   }
 };
 
@@ -40,61 +49,86 @@ const verifyOtp = async ({
   otp: string;
 }) => {
   try {
-    const response = await axiosInstance.post(`/api/trainer/otp`, { trainerData, otp });
+    const response = await axiosInstance.post(`/api/trainer/otp`, {
+      trainerData,
+      otp,
+    });
     if (response.data) {
       localStorage.setItem("trainer", JSON.stringify(response.data));
     }
     return response.data;
   } catch (error: any) {
-    console.error('Error verifying OTP:', error.response ? error.response.data : error.message);
+    console.error(
+      "Error verifying OTP:",
+      error.response ? error.response.data : error.message
+    );
     throw error;
   }
 };
 
-const trainerLogin = async (trainerData: { email: string; password: string }) => {
+const trainerLogin = async (trainerData: {
+  email: string;
+  password: string;
+}) => {
   try {
-    const response = await axiosInstance.post(`/api/trainer/login`, trainerData, { withCredentials: true });
-    console.log('Trainer login successful:', response);
+    const response = await axiosInstance.post(
+      `/api/trainer/login`,
+      trainerData,
+      { withCredentials: true }
+    );
+    console.log("Trainer login successful:", response);
     return response;
   } catch (error: any) {
-    console.error('Error during trainer login:', error.response ? error.response.data : error.message);
+    console.error(
+      "Error during trainer login:",
+      error.response ? error.response.data : error.message
+    );
     throw error;
   }
 };
 
-const kycSubmission = async (formData: FormData) => {  
+const kycSubmission = async (formData: FormData) => {
   try {
     const response = await axiosInstance.post(`/api/trainer/kyc`, formData, {
       withCredentials: true,
       headers: {
-        'Content-Type': 'multipart/form-data',  
+        "Content-Type": "multipart/form-data",
       },
     });
     return response.data;
   } catch (error: any) {
-    console.error('Error kyc submission trainer:', error.response ? error.response.data : error.message);
+    console.error(
+      "Error kyc submission trainer:",
+      error.response ? error.response.data : error.message
+    );
     throw error;
   }
 };
-
-
 
 const logoutTrainer = async () => {
   try {
     const response = await axiosInstance.post(`/api/trainer/logout`);
     return response.data;
   } catch (error: any) {
-    console.error('Error during trainer logout:', error.response ? error.response.data : error.message);
+    console.error(
+      "Error during trainer logout:",
+      error.response ? error.response.data : error.message
+    );
     throw error;
   }
 };
 
 const kycStatus = async (trainer_id: string) => {
   try {
-    const response = await axiosInstance.get(`/api/trainer/kycStatus/${trainer_id}`);
+    const response = await axiosInstance.get(
+      `/api/trainer/kycStatus/${trainer_id}`
+    );
     return response.data;
   } catch (error: any) {
-    console.error('Error during KYC status fetching:', error.response ? error.response.data : error.message);
+    console.error(
+      "Error during KYC status fetching:",
+      error.response ? error.response.data : error.message
+    );
     throw error;
   }
 };
@@ -106,7 +140,7 @@ const trainerService = {
   trainerLogin,
   kycSubmission,
   logoutTrainer,
-  kycStatus
+  kycStatus,
 };
 
 export default trainerService;

@@ -12,6 +12,7 @@ import {
   numberOfSessions,
 } from "../../utils/timeAndPriceUtils";
 import { AiOutlineClose } from "react-icons/ai";
+import userAxiosInstance from "../../../axios/userAxionInstance";
 
 function TrainerProfileView() {
   const [trainer, setTrainer] = useState<TrainerProfile | null>(null);
@@ -27,8 +28,8 @@ function TrainerProfileView() {
   useEffect(() => {
     const fetchTrainer = async () => {
       try {
-        const response = await axios.get(
-          `${API_URL}/api/user/getTrainer/${trainerId}`
+        const response = await userAxiosInstance.get(
+          `/api/user/getTrainer/${trainerId}`
         );
         setTrainer(response.data[0]);
       } catch (error) {
@@ -57,7 +58,7 @@ function TrainerProfileView() {
 
   useEffect(() => {
     const fetchSeessionSchedules = async () => {
-      const response = await axios.get(`${API_URL}/api/user/sessionSchedules`);
+      const response = await userAxiosInstance.get(`/api/user/sessionSchedules`);
       // console.log(response.data);
       setSessionSchedules(response.data);
     };
@@ -77,7 +78,7 @@ function TrainerProfileView() {
   ).map((dateStr) => new Date(dateStr));
 
   return (
-    <>
+    <div className="mb-40">
       <div>
         <img
           className="w-full h-[37vh]"
@@ -340,7 +341,7 @@ function TrainerProfileView() {
           </div>
         </div>
       ) : null}
-    </>
+    </div>
   );
 }
 

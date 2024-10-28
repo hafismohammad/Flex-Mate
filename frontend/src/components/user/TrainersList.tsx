@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import API_URL from "../../../axios/API_URL";
 import { useNavigate, useParams } from "react-router-dom";
 import {Trainer} from '../../types/trainer'
+import userAxiosInstance from "../../../axios/userAxionInstance";
 
 
 
@@ -11,21 +12,19 @@ function TrainersList() {
   const [searchTerm, setSearchTerm] = useState<string>("");
 
   const { specId } = useParams();
-  console.log("Specialization name:", specId);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAllTrainers = async () => {
       try {
-        const response = await axios.get<Trainer[]>(
-          `${API_URL}/api/user/allTrainers`
+        const response = await userAxiosInstance.get<Trainer[]>(
+          `/api/user/allTrainers`,
         );
         const trainers = response.data;
 
         // console.log('trainers',trainers.specialization.name);
         if (specId) {
-          console.log('spec inside');
           
           const filteredTrainers = trainers.filter(
             (trainer) => trainer.specialization._id === specId
@@ -47,7 +46,7 @@ function TrainersList() {
 
     fetchAllTrainers();
   }, []); 
-  // console.log("Trainers data:", trainersData);
+
 
   const filteredTrainers = trainersData.filter(
     (trainer) =>
