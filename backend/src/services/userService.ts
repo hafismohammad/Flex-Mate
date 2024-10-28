@@ -200,6 +200,14 @@ async getTrainer(trainerId: string) {
   }
 }
 
+async getSessionSchedules() {
+  try {
+    return await this.userRepository.fetchAllSessionSchedules()
+  } catch (error) {
+    
+  }
+}
+
 }
 
 export default UserService;

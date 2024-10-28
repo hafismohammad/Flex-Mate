@@ -8,7 +8,7 @@ import axiosInstance from "../../../axios/axiosInstance";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 import {ISessionSchedule} from '../../types/trainer'
-import {formatTime} from '../../utils/timeUtils'
+import {formatTime, calculateDuration, formatPriceToINR} from '../../utils/timeAndPriceUtils'
 
 function CurrentSchedules() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -65,9 +65,11 @@ function CurrentSchedules() {
       }
 
       if (new Date(startDate) >= new Date(endDate)) {
-        alert("Start date must be before end date.");
+        toast("Start date must be before end date.");
         return;
       }
+      
+
     }
 
     try {
@@ -98,20 +100,20 @@ function CurrentSchedules() {
         newSchedule,
     ]);    
 
-      if (response.status === 201) {
+      if (response.status === 201) {  
         toast.success("Session created successfully");
       }
     } catch (error: any) {
       if (error.response?.status === 400) {
         const errorMessage = error.response.data.message || "Time conflict with an existing session.";
-        toast.error(errorMessage); // Shows specific conflict message
+        toast.error(errorMessage); 
       } else if (error.response?.status === 401) {
         console.error("Unauthorized request. Redirecting to login.");
         window.location.href = "/trainer/login";
       } else {
         console.error("Unexpected error:", error);
         const generalErrorMessage = error.response?.data.message || "An unexpected error occurred";
-        toast.error(generalErrorMessage); // For other non-conflict errors
+        toast.error(generalErrorMessage); 
       }
     }
     
@@ -190,12 +192,16 @@ function CurrentSchedules() {
             <div className="text-gray-800 font-medium mt-3">{schedule.isSingleSession ? new Date(schedule.startDate).toLocaleDateString() :  `${new Date(schedule.startDate).toLocaleDateString()} / ${new Date(schedule.endDate).toLocaleDateString()}`}</div>
             <div className="text-gray-800 font-medium">{formatTime(schedule.startTime)}</div>
             <div className="text-gray-800 font-medium">{formatTime(schedule.endTime)}</div>
-            <div className="text-gray-800 font-medium">{schedule.price}</div>
-            <div className="text-gray-800 font-medium">N/A</div>
-            <div className="text-gray-800 font-medium">{schedule.status}</div>
+            <div className="text-gray-800 font-medium">{formatPriceToINR(schedule.price)}</div>
+            <div className="text-gray-800 font-medium">{calculateDuration(schedule.startTime, schedule.endTime)}</div>
+            <div className={`font-medium ${{'Pending':'text-yellow-500', 'Confirmed': 'text-green-500', 'Completed': 'text-blue-500','Cancelled': 'text-red-500', 'InProgress': 'text-purple-500'}[schedule.status] || 'text-gray-800'}`}>{schedule.status}</div>
           </div>
         ))
-       ) : 'no session data'}
+       ) : (
+        <div className="flex justify-center">
+          <h1 className="font-medium ">No Session Schedules</h1>
+        </div>
+       )}
 
       </div>
     </div>

@@ -18,6 +18,6 @@ const sessionSchema = new Schema<ISession>({
   },
 });
 
-const Session = model<ISession>("Session", sessionSchema);
+const SessionModel = model<ISession>("Session", sessionSchema);
 
-export default Session;
+export default SessionModel;

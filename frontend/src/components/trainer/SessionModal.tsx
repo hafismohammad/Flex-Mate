@@ -2,6 +2,7 @@
 import React from 'react';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
+import {formatPriceToINR} from '../../utils/timeAndPriceUtils'
 
 interface SessionModalProps {
   isOpen: boolean;
@@ -82,6 +83,8 @@ const SessionModal: React.FC<SessionModalProps> = ({
               <>
                 <label className="block text-gray-700 mb-2">Select Date</label>
                 <DatePicker
+                  maxDate={new Date(new Date().setDate(new Date().getDate() + 20))}
+                  minDate={new Date()} 
                   selected={selectedDate}
                   onChange={(date) => setSelectedDate(date)}
                   placeholderText="Select date"
@@ -106,8 +109,8 @@ const SessionModal: React.FC<SessionModalProps> = ({
                 />
                 <label className="block text-gray-700 mt-4">Session Price</label>
                 <input
-                  onChange={(e) => setPrice(e.target.value)}
-                  value={price}
+                  onChange={(e) => setPrice(e.target.value.replace(/[^\d.]/g, ''))}
+                  value={`₹ ${price}`}
                   className="px-3 py-3 mt-3 rounded-lg w-full"
                   type="text"
                   placeholder="Enter Session Price"
@@ -118,6 +121,8 @@ const SessionModal: React.FC<SessionModalProps> = ({
               <>
                 <label className="block text-gray-700 mb-2">Start Date</label>
                 <DatePicker
+                  maxDate={new Date(new Date().setDate(new Date().getDate() + 20))}
+                  minDate={new Date()} 
                   selected={startDate}
                   onChange={(date) => setStartDate(date)}
                   placeholderText="Select start date"
@@ -126,6 +131,8 @@ const SessionModal: React.FC<SessionModalProps> = ({
                 />
                 <label className="block text-gray-700 mb-2 mt-4">End Date</label>
                 <DatePicker
+                  maxDate={new Date(new Date().setDate(new Date().getDate() + 20))}
+                  minDate={new Date()} 
                   selected={endDate}
                   onChange={(date) => setEndDate(date)}
                   placeholderText="Select end date"
@@ -154,8 +161,8 @@ const SessionModal: React.FC<SessionModalProps> = ({
                 </div>
                 <label className="block text-gray-700 mt-4">Package Price</label>
                 <input
-                  onChange={(e) => setPrice(e.target.value)}
-                  value={price}
+                  onChange={(e) => setPrice(e.target.value.replace(/[^\d]/g, ''))}
+                  value={`₹ ${price}`}
                   className="px-3 py-3 mt-3 rounded-lg w-full"
                   type="text"
                   placeholder="Enter Package Price"

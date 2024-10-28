@@ -18,5 +18,6 @@ router.post("/logout", userController.logout.bind(userController));
 router.get("/allTrainers", userController.getAllTrainers.bind(userController))
 router.get("/allspecializations", userController.getAllspecializations.bind(userController))
 router.get("/getTrainer/:trainerId", userController.getTrainer.bind(userController))
+router.get("/sessionSchedules", userController.getSessionSchedules.bind(userController))
 
 export default router;

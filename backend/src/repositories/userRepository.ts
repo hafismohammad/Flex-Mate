@@ -4,12 +4,14 @@ import OtpModel from "../models/otpModel";
 import mongoose from "mongoose";
 import TrainerModel from "../models/trainerModel";
 import SpecializationModel from "../models/specializationModel";
+import SessionModel from "../models/sessionModel";
 
 class UserRepository {
   private userModel = UserModel;
   private otpModel = OtpModel;
   private trainerModel = TrainerModel
   private specializationModel = SpecializationModel
+  private sessionModle = SessionModel
 
   // Check if user already exists by email
   async existsUser(email: string): Promise<IUser | null> {
@@ -112,9 +114,18 @@ class UserRepository {
   async getTrainer(trainerId: string) {
     try {
       const trainer = await this.trainerModel.find({_id : trainerId}).populate('specialization')
-      console.log(trainer);
+      // console.log(trainer);
       
       return trainer
+    } catch (error) {
+      
+    }
+  }
+
+  async fetchAllSessionSchedules() {
+    try {
+      const schedules = await this.sessionModle.find({})
+      return schedules      
     } catch (error) {
       
     }

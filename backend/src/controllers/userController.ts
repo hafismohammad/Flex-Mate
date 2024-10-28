@@ -177,6 +177,16 @@ class UserController {
       res.status(500).json({ message: "Server error" });
     }
   }
+
+  async getSessionSchedules(req: Request, res: Response) {
+    try {
+
+      const sessionSchedules = await this.userService.getSessionSchedules()
+      res.status(200).json(sessionSchedules)
+    } catch (error) {
+      
+    }
+  }
   
 
 }

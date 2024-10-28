@@ -74,7 +74,7 @@ export interface KycDocument {
     endTime: string;
     price: number;
     duration?: string; 
-    status: boolean;
+    status: 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled' | 'InProgress'; 
     trainerId: string;
   }
   
