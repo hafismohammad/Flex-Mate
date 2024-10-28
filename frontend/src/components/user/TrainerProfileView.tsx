@@ -7,7 +7,11 @@ import { TrainerProfile } from "../../types/trainer";
 import LOGO from "../../assets/LOGO-2.png";
 import DatePicker from "react-datepicker";
 import { ISessionSchedule } from "../../types/common";
-import { formatPriceToINR, numberOfSessions } from "../../utils/timeAndPriceUtils";
+import {
+  formatPriceToINR,
+  numberOfSessions,
+} from "../../utils/timeAndPriceUtils";
+import { AiOutlineClose } from "react-icons/ai";
 
 function TrainerProfileView() {
   const [trainer, setTrainer] = useState<TrainerProfile | null>(null);
@@ -16,6 +20,8 @@ function TrainerProfileView() {
   const [sessionSchedules, setSessionSchedules] = useState<ISessionSchedule[]>(
     []
   );
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const { trainerId } = useParams();
 
   useEffect(() => {
@@ -33,6 +39,14 @@ function TrainerProfileView() {
     fetchTrainer();
   }, [trainerId]);
 
+  const handleBooking = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
   const handleSingleSession = () => {
     setIsSingleSession(true);
   };
@@ -49,11 +63,15 @@ function TrainerProfileView() {
     };
     fetchSeessionSchedules();
   }, []);
-  
+
   const sessionDates = Array.from(
     new Set(
       sessionSchedules
-        .filter((session) => session.trainerId === trainerId && session.isSingleSession === isSingleSession)
+        .filter(
+          (session) =>
+            session.trainerId === trainerId &&
+            session.isSingleSession === isSingleSession
+        )
         .map((session) => new Date(session.startDate).toDateString())
     )
   ).map((dateStr) => new Date(dateStr));
@@ -132,7 +150,7 @@ function TrainerProfileView() {
           <img src={LOGO} alt="logo" className="w-80 h-20" />
 
           <DatePicker
-            minDate={new Date()} 
+            minDate={new Date()}
             selected={selectedDate}
             inline
             highlightDates={sessionDates}
@@ -211,7 +229,11 @@ function TrainerProfileView() {
                           </h1>
                           {!isSingleSession && (
                             <h1 className="font-medium text-2xl mt-2">
-                              Number of Sessions: {numberOfSessions(session.startDate, session.endDate)}
+                              Number of Sessions:{" "}
+                              {numberOfSessions(
+                                session.startDate,
+                                session.endDate
+                              )}
                             </h1>
                           )}
                         </div>
@@ -233,7 +255,10 @@ function TrainerProfileView() {
                               </h1>
                             )}
                           </div>
-                          <button className="bg-blue-500 hover:bg-blue-600 px-4 py-3 text-white">
+                          <button
+                            onClick={handleBooking}
+                            className="bg-blue-500 hover:bg-blue-600 px-4 py-3 text-white"
+                          >
                             Book Now
                           </button>
                         </div>
@@ -248,6 +273,73 @@ function TrainerProfileView() {
           </div>
         </div>
       </div>
+
+      {/* Checkout modal  */}
+
+      {isModalOpen ? (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg p-6 md:p-8 w-full max-w-2xl shadow-lg h-[85vh] overflow-y-auto relative">
+            <button
+              className="absolute top-4 right-4 text-gray-500 hover:text-red-500 text-2xl focus:outline-none"
+              onClick={closeModal}
+            >
+              <AiOutlineClose />
+            </button>
+
+            <h1 className="text-3xl font-bold text-center text-gray-800 mb-4">
+              Confirm Your Booking
+            </h1>
+            <p className="text-center text-gray-500 mb-8">
+              Review your booking details below before proceeding to payment.
+            </p>
+
+            <div className="bg-gray-100 p-6 rounded-lg shadow-inner mb-8">
+              <div className="grid grid-cols-2 gap-6">
+                <div className="flex flex-col">
+                  <label className="font-semibold text-gray-700">
+                    Trainer Name
+                  </label>
+                  <p className="text-gray-900">Trainer1</p>
+                </div>
+
+                <div className="flex flex-col">
+                  <label className="font-semibold text-gray-700">
+                    Date and Time
+                  </label>
+                  <p className="text-gray-900">Date: 11/11/2024</p>
+                  <p className="text-gray-900">Time: 7:00 AM - 8:00 AM</p>
+                </div>
+
+                <div className="flex flex-col">
+                  <label className="font-semibold text-gray-700">
+                    Duration
+                  </label>
+                  <p className="text-gray-900">1 hour</p>
+                </div>
+
+                <div className="flex flex-col">
+                  <label className="font-semibold text-gray-700">
+                    Payment Summary
+                  </label>
+                  <p className="text-gray-900">Session Cost: ₹10,000.00</p>
+                  <p className="text-gray-900">Service Fee: ₹500.00</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-blue-100 p-4 rounded-lg shadow mb-8 text-center">
+              <label className="font-semibold text-lg text-blue-700">
+                Total Cost
+              </label>
+              <p className="text-2xl font-bold text-blue-900">₹10,500.00</p>
+            </div>
+
+            <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-md transition-colors duration-200 shadow-md">
+              Proceed to Payment
+            </button>
+          </div>
+        </div>
+      ) : null}
     </>
   );
 }

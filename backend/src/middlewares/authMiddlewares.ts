@@ -9,7 +9,7 @@ interface CustomRequest extends Request {
 
 const authMiddleware = (req: CustomRequest, res: Response, next: NextFunction): void => {
   const token = req.header('Authorization')?.split(' ')[1];
-  console.log('Middleware hit');
+  // console.log('Middleware hit');
 
   if (!token) {    
     res.status(401).json({ message: 'Access denied, token missing' });
