@@ -72,7 +72,7 @@ function CurrentSchedules() {
       }
 
       if (new Date(startDate) >= new Date(endDate)) {
-        toast("Start date must be before end date.");
+        toast.error("Start date must be before end date.");
         return;
       }
       

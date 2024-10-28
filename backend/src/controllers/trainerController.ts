@@ -365,20 +365,25 @@ class TrainerController {
         .status(201)
         .json({ message: "Session created successfully.", createdSessionData });
     } catch (error: any) {
-  if (error.message === "Time conflict with an existing session.") {
-    res.status(400).json({ message: "Time conflict with an existing session." });
-  } else if (error.message.includes("Daily session limit")) {
-    res.status(400).json({ message: error.message });
-  } else if (error.message === "End time must be after start time") {
-    res.status(400).json({ message: "End time must be after start time" });
-  } else if (error.message === "Session duration must be at least 30 minutes") {
-    res.status(400).json({ message: "Session duration must be at least 30 minutes" });
-  } else {
-    console.error("Detailed server error:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-}
-
+      if (error.message === "Time conflict with an existing session.") {
+        res
+          .status(400)
+          .json({ message: "Time conflict with an existing session." });
+      } else if (error.message.includes("Daily session limit")) {
+        res.status(400).json({ message: error.message });
+      } else if (error.message === "End time must be after start time") {
+        res.status(400).json({ message: "End time must be after start time" });
+      } else if (
+        error.message === "Session duration must be at least 30 minutes"
+      ) {
+        res
+          .status(400)
+          .json({ message: "Session duration must be at least 30 minutes" });
+      } else {
+        console.error("Detailed server error:", error);
+        res.status(500).json({ message: "Internal server error" });
+      }
+    }
   }
 
   async getSessionSchedules(req: Request, res: Response) {
