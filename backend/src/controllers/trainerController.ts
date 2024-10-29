@@ -102,38 +102,43 @@ class TrainerController {
     }
   }
 
-  async trainerLogin(req: Request, res: Response): Promise<void> {
-    try {
-      const { email, password }: ITrainer = req.body;
+  // trainerController.ts
+async trainerLogin(req: Request, res: Response): Promise<void> {
+  try {
+    const { email, password }: ITrainer = req.body;
 
-      const trainerData = await this.trainerService.trainerLogin({
-        email,
-        password,
+    const trainerData = await this.trainerService.trainerLogin({ email, password });
+
+    if (trainerData) {
+      const { accessToken, refreshToken, trainer } = trainerData;
+
+      res.cookie("trainer_refresh_token", refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
-      if (trainerData) {
-        const { accessToken, refreshToken, trainer } = trainerData;
-
-        res.cookie("trainer_refresh_token", refreshToken, {
-          httpOnly: true,
-          secure: true,
-          sameSite: "none",
-          maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
-
-        res.status(200).json({
-          message: "Login successful",
-          trainer: trainer,
-          token: accessToken,
-        });
-      } else {
-        res.status(401).json({ message: "Invalid email or password" });
-      }
-    } catch (error) {
+      res.status(200).json({
+        message: "Login successful",
+        trainer: trainer,
+        token: accessToken,
+      });
+    }
+  } catch (error: any) {
+    if (error.message === "Trainer is blocked") {
+      res.status(403).json({ message: "Trainer is blocked" });
+    } else if (error.message === "Invalid email or password") {
+      res.status(401).json({ message: "Invalid email or password" });
+    } else if (error.message === "Trainer not exists") {
+      res.status(404).json({ message: "Trainer not found" });
+    } else {
       console.log("Login controller:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   }
+}
+
 
   async refreshToken(req: Request, res: Response) {
     const trainer_refresh_token = req.cookies?.trainer_refresh_token;
@@ -235,7 +240,6 @@ class TrainerController {
 
   async logoutTrainer(req: Request, res: Response) {
     try {
-      
       res.clearCookie("trainer_refresh_token", {
         httpOnly: true,
         sameSite: "none",
@@ -289,26 +293,28 @@ class TrainerController {
     try {
       const trainer_id = req.params.trainerId;
       const trainerData = req.body;
-  
+
       const documents: { [key: string]: string | undefined } = {};
-  
+
       if (req.file) {
-  
         // Await the result of uploadToCloudinary to access secure_url
-        const profileImageUrl = await uploadToCloudinary(req.file.buffer, 'trainer_profileImage');
+        const profileImageUrl = await uploadToCloudinary(
+          req.file.buffer,
+          "trainer_profileImage"
+        );
         documents.profileImage = profileImageUrl.secure_url;
       } else {
-        console.log('No file received');
+        console.log("No file received");
       }
-  // console.log('document', documents);
-  
+      // console.log('document', documents);
+
       const updatedTrainerData = { ...trainerData, ...documents };
-  
+
       const updatedTrainer = await this.trainerService.updateTrainer(
         trainer_id,
         updatedTrainerData
       );
-  
+
       res
         .status(200)
         .json({ message: "Trainer updated successfully", updatedTrainer });
@@ -317,7 +323,6 @@ class TrainerController {
       res.status(500).json({ message: "Failed to update trainer" });
     }
   }
-  
 
   async fetchRejectionReason(req: Request, res: Response) {
     try {
@@ -419,11 +424,16 @@ class TrainerController {
   }
 
   async deleteSessionSchedule(req: Request, res: Response) {
-    let session_id = req.params.sessionId
+    let session_id = req.params.sessionId;
     // console.log(session_id);
-    
-    const deletedSchedule = await this.trainerService.deleteSession(session_id)
-    res.status(200).json({message: 'Session deleted successfully', deletedSchedule:deletedSchedule})
+
+    const deletedSchedule = await this.trainerService.deleteSession(session_id);
+    res
+      .status(200)
+      .json({
+        message: "Session deleted successfully",
+        deletedSchedule: deletedSchedule,
+      });
   }
 }
 

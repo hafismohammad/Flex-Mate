@@ -53,6 +53,15 @@ userAxiosInstance.interceptors.response.use(
             }
         }
 
+        if (error.response?.status === 403) {
+            console.error('Access denied, account is blocked');
+            
+            // Clear the token and redirect to login
+            localStorage.removeItem("access_token");
+            window.location.href = '/login';
+        }
+        
+
         console.error('User response error:', error.response?.data);
         return Promise.reject(error);
     }

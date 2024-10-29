@@ -24,7 +24,6 @@ interface TrainerProfileData {
 
 function TrainerProfile() {
   const [trainer, setTrainer] = useState<TrainerProfileData | null>(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const { trainerInfo } = useSelector((state: RootState) => state.trainer);
@@ -41,9 +40,7 @@ function TrainerProfile() {
         setTrainer(response.data.trainerData);
       } catch (err) {
         setError("Failed to load trainer data");
-      } finally {
-        setLoading(false);
-      }
+      } 
     };
     fetchTrainer();
   }, [trainerId]);
@@ -52,9 +49,6 @@ function TrainerProfile() {
     console.log("Edit button clicked!");
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
 
   if (error) {
     return <div>{error}</div>;

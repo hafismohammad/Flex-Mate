@@ -136,6 +136,17 @@ class UserRepository {
 
     return result.deletedCount || 0;
   }
+
+
+  static async getIsBlockedUser(user_id: string): Promise<boolean> {
+    try {
+       const user = await UserModel.findById(user_id);
+       return  user?.isBlocked ?? false;
+
+    } catch (error: any) {
+      throw new Error(`Failed to fetch user's blocked status: ${error.message}`);
+    }
+  }
    
 }
 

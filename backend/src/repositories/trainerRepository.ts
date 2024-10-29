@@ -315,6 +315,16 @@ class TrainerRepository {
     throw error
    }
   }
+
+  static async getIsBlockedTrainer(trainer_id: string): Promise<boolean> {
+    try {
+       const trainer = await TrainerModel.findById(trainer_id);
+       return  trainer?.isBlocked ?? false;
+
+    } catch (error: any) {
+      throw new Error(`Failed to fetch trainer's blocked status: ${error.message}`);
+    }
+  }
 }
 
 export default TrainerRepository;

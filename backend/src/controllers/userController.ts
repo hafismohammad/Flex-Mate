@@ -30,39 +30,46 @@ class UserController {
   }
 
   // Login user
-  async login(req: Request, res: Response): Promise<void> {
-    try {
-      console.log("login route hit");
+async login(req: Request, res: Response): Promise<void> {
+  try {
+    console.log("login route hit");
 
-      const { email, password }: ILoginUser = req.body;
+    const { email, password }: ILoginUser = req.body;
 
-      const user = await this.userService.login({ email, password });
+    const user = await this.userService.login({ email, password });
 
-      if (user) {
-        const { accessToken, refreshToken } = user;
+    if (user) {
+      console.log("user", user);
 
-        res.cookie("refresh_token", refreshToken, {
-          httpOnly: true,
-          sameSite: "none",
-          secure: true,
-          maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
+      const { accessToken, refreshToken } = user;
 
+      // Set refresh token as cookie
+      res.cookie("refresh_token", refreshToken, {
+        httpOnly: true,
+        sameSite: "none",
+        secure: true,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
 
+      res.status(200).json({
+        message: "Login successful",
+        user: user.user,
+        token: accessToken,
+      });
+    }
 
-        res.status(200).json({
-          message: "Login successful",
-          user: user.user,
-          token: accessToken,
-        });
-      } else {
-        res.status(401).json({ message: "Invalid email or password" });
-      }
-    } catch (error) {
-      console.log("Login controller:", error);
-      res.status(500).json({ message: "Internal server error" });
+  } catch (error: any) {
+    // Handle specific errors
+    if (error.message === "User is blocked") {
+      res.status(403).json({ message: "User is blocked" });
+    } else if (error.message === "Invalid email or password") {
+      res.status(401).json({ message: "Invalid email or password" });
+    } else {
+      res.status(500).json({ message: "An unexpected error occurred" });
     }
   }
+}
+
 
   async refreshToken(req: Request, res: Response) {
     const refresh_token = req.cookies?.refresh_token;

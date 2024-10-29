@@ -10,7 +10,6 @@ import {
 import sendOTPmail from "../config/email_config";
 import bcrypt from "bcryptjs";
 import { ISession } from "../interface/trainer_interface";
-import moment from "moment";
 
 class TrainerService {
   private trainerRepository: TrainerRepository;
@@ -157,52 +156,50 @@ class TrainerService {
   }
 
   // login trainer
-  async trainerLogin({ email, password }: { email: string; password: string }) {
-    try {
-      // console.log('email',email);
 
-      const trainerData = await this.trainerRepository.findTrainer(email);
+async trainerLogin({ email, password }: { email: string; password: string }) {
+  try {
+    const trainerData = await this.trainerRepository.findTrainer(email);
 
-      if (trainerData && trainerData._id) {
-        const isPasswordValid = await bcrypt.compare(
-          password,
-          trainerData.password
-        );
-
-        if (!isPasswordValid) {
-          console.log("Invalid password:", password);
-          throw new Error("Password is wrong");
-        }
-
-        // Generate access and refresh tokens
-        const accessToken = generateAccessToken({
-          id: trainerData._id.toString(),
-          email: trainerData.email,
-        });
-        const refreshToken = generateRefreshToken({
-          id: trainerData._id.toString(),
-          email: trainerData.email,
-        });
-
-        return {
-          accessToken,
-          refreshToken,
-          trainer: {
-            id: trainerData._id.toString(),
-            email: trainerData.email,
-            password: trainerData.password,
-            phone: trainerData.phone,
-            specialization: trainerData.specialization,
-          },
-        };
-      } else {
-        console.log("Trainer not exists");
+    
+    if (trainerData && trainerData._id) {
+      const isPasswordValid = await bcrypt.compare(password, trainerData.password);
+      
+      if (!isPasswordValid) {
+        throw new Error("Invalid email or password");
       }
-    } catch (error) {
-      console.error("Error in trainer login:", error);
-      throw error;
+      
+      if (trainerData?.isBlocked) {
+        throw new Error("Trainer is blocked");
+      }
+      const accessToken = generateAccessToken({
+        id: trainerData._id.toString(),
+        email: trainerData.email,
+      });
+      const refreshToken = generateRefreshToken({
+        id: trainerData._id.toString(),
+        email: trainerData.email,
+      });
+
+      return {
+        accessToken,
+        refreshToken,
+        trainer: {
+          id: trainerData._id.toString(),
+          email: trainerData.email,
+          phone: trainerData.phone,
+          specialization: trainerData.specialization,
+        },
+      };
+    } else {
+      throw new Error("Trainer not exists");
     }
+  } catch (error) {
+    console.error("Error in trainer login:", error);
+    throw error;
   }
+}
+
 
   async generateTokn(trainer_refresh_token: string) {
     try {

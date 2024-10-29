@@ -131,14 +131,17 @@ class UserService {
 async login({ email, password }: ILoginUser): Promise<any> {
   try {
     const userData: IUser | null = await this.userRepository.findUser(email);
-// console.log(userData);
 
-    if (userData && userData.password) {
-      const isPasswordMatch = await bcrypt.compare(password, userData.password);
+    if (userData) {
+      if (userData.isBlocked) {
+        throw new Error("User is blocked");
+      }
+
+      const isPasswordMatch = await bcrypt.compare(password, userData.password || "");
 
       if (isPasswordMatch) {
         if (!userData._id) {
-          throw new Error('User ID is missing');
+          throw new Error("User ID is missing");
         }
 
         // Generate access and refresh tokens
@@ -153,20 +156,20 @@ async login({ email, password }: ILoginUser): Promise<any> {
             name: userData.name,
             email: userData.email,
             phone: userData.phone,
+            isBlocked: userData.isBlocked,
           },
         };
       }
-    } else {
-      console.log('User not found');
-      
     }
 
-    return null;
+    throw new Error("Invalid email or password");
+
   } catch (error) {
-    console.error('Login error:', error);
-    return null;
+    console.error("Login error:", error);
+    throw error; 
   }
 }
+
 
 async generateTokn(user_refresh_token: string) {
   try {

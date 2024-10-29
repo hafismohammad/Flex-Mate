@@ -21,6 +21,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   const { userInfo, error } = useSelector((state: RootState) => state.user);
+console.log('userInfo', userInfo);
 
   const validate = (): Errors => {
     const newErrors: Errors = {};
@@ -49,22 +50,22 @@ const Login = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+  
     const formErrors = validate();
     setErrors(formErrors);
-
+  
     if (Object.keys(formErrors).length > 0) {
       clearErrors();
       return;
     }
-
+  
     setErrors({});
-
+  
     const userData = {
       email,
       password,
     };
-
+  
     dispatch(loginUser(userData))
       .unwrap()
       .then(() => {
@@ -73,10 +74,19 @@ const Login = () => {
           navigate("/");
         }, 1000);
       })
-      .catch(() => {
-        toast.error("Login failed");
+      .catch((error: any) => {
+        // Check for specific backend error messages
+        if (error?.message === "User is blocked") {
+          toast.error("Your account is blocked.");
+        } else if (error?.message === "Invalid email or password") {
+          toast.error("Invalid email or password.");
+        } else {
+          toast.error("Login failed. Please check your credentials.");
+        }
       });
   };
+  
+  
 
   return (
     <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4">

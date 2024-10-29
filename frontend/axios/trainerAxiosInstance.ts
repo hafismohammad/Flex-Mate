@@ -1,23 +1,20 @@
-import axios, {  AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'axios';
-import API_URL from './API_URL'; 
+import axios, { AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'axios';
+import API_URL from './API_URL';
 
 interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
     _retry?: boolean; 
 }
 
-// Create an Axios instance
 const axiosInstance = axios.create({
     baseURL: API_URL,
     withCredentials: true, 
 });
 
-// Request Interceptor
 axiosInstance.interceptors.request.use(
     (config: CustomAxiosRequestConfig) => {
         const token = localStorage.getItem("trainer_access_token");
 
         if (token) {
-            
             config.headers['Authorization'] = `Bearer ${token}`;
         }
         return config;
@@ -28,7 +25,6 @@ axiosInstance.interceptors.request.use(
     }
 );
 
-// Response Interceptor
 axiosInstance.interceptors.response.use(
     (response: AxiosResponse) => response,
     async (error: AxiosError) => {
@@ -41,16 +37,26 @@ axiosInstance.interceptors.response.use(
                 const response = await axiosInstance.post<{ accessToken: string }>('/api/trainer/refresh-token', {}, { withCredentials: true });
                 const { accessToken } = response.data;
 
-    
                 localStorage.setItem("trainer_access_token", accessToken);
                 originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
 
+                console.log('response in axios instance', response);
+                
                 return axiosInstance(originalRequest);
             } catch (refreshError) {
                 console.error('Error refreshing token:', refreshError);
                 window.location.href = '/trainer/login'; 
                 return Promise.reject(refreshError);
             }
+        }
+
+        // Handle 403 Forbidden errors (blocked account)
+        if (error.response?.status === 403) {
+            console.error('Access denied, account is blocked');
+            
+            // Clear the token and redirect to login
+            localStorage.removeItem("trainer_access_token");
+            window.location.href = '/trainer/login';
         }
 
         // Log the error details

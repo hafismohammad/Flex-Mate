@@ -28,7 +28,8 @@ function Features() {
         const response = await userAxiosInstance.get(
           `/api/user/allspecializations`
         );
-        setSpecializations(response.data);
+        const listedSpecializations = response.data.filter(spec => spec.isListed);
+        setSpecializations(listedSpecializations);
       } catch (error) {
         console.error("Error fetching specializations:", error);
       }
