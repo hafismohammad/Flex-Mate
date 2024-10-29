@@ -34,10 +34,11 @@ router.get('/getKycStatus', trainerController.getAllKycStatus.bind(trainerContro
 router.get('/kycStatus/:trainerId', authMiddlewares, trainerController.trainerKycStatus.bind(trainerController));
 router.put('/resubmitKyc/:trainerId', authMiddlewares, trainerController.resubmitkyc.bind(trainerController))
 router.get('/getTrainer/:trainerId', authMiddlewares, trainerController.getTrainer.bind(trainerController))
-router.patch(`/updateTrainerData/:trainerId`, authMiddlewares, trainerController.updateTrainer.bind(trainerController))
+router.patch(`/updateTrainerData/:trainerId`, authMiddlewares, upload.single('profileImage'),  trainerController.updateTrainer.bind(trainerController))
 router.get('/rejectionReason/:trainerId', authMiddlewares, trainerController.fetchRejectionReason.bind(trainerController))
 router.post('/session/:tranerId', authMiddlewares, trainerController.storeSessionData.bind(trainerController))
 router.get('/sessiosShedules/:trainerId', authMiddlewares, trainerController.getSessionSchedules.bind(trainerController))
+router.delete('/deleteSessionSchedule/:sessionId', authMiddlewares, trainerController.deleteSessionSchedule.bind(trainerController))
 
 
 

@@ -114,7 +114,7 @@ class TrainerRepository {
 
   async saveKyc(formData: any, documents: any): Promise<any> {
     try {
-      console.log("KYC Data to save:", { ...formData, ...documents });
+      // console.log("KYC Data to save:", { ...formData, ...documents });
 
       const kycData = {
         trainerId: formData.trainer_id,
@@ -302,7 +302,18 @@ class TrainerRepository {
       });
       // console.log(sesseionData);
       return sesseionData;
-    } catch (error) {}
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async deleteSession(session_id: string) {
+   try {
+    const deletedSchedule =  await this.sessionModel.findByIdAndDelete(session_id)
+    return deletedSchedule
+   } catch (error) {
+    throw error
+   }
   }
 }
 

@@ -71,7 +71,7 @@ function Features() {
               </div>
               <div className="p-4">
                 <button onClick={() => handleClick(feature._id)} className="w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200">
-                  Read More
+                  View {feature.name} Trainers
                 </button>
               </div>
             </div>

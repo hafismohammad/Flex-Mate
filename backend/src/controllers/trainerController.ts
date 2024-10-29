@@ -289,12 +289,26 @@ class TrainerController {
     try {
       const trainer_id = req.params.trainerId;
       const trainerData = req.body;
-
+  
+      const documents: { [key: string]: string | undefined } = {};
+  
+      if (req.file) {
+  
+        // Await the result of uploadToCloudinary to access secure_url
+        const profileImageUrl = await uploadToCloudinary(req.file.buffer, 'trainer_profileImage');
+        documents.profileImage = profileImageUrl.secure_url;
+      } else {
+        console.log('No file received');
+      }
+  // console.log('document', documents);
+  
+      const updatedTrainerData = { ...trainerData, ...documents };
+  
       const updatedTrainer = await this.trainerService.updateTrainer(
         trainer_id,
-        trainerData
+        updatedTrainerData
       );
-
+  
       res
         .status(200)
         .json({ message: "Trainer updated successfully", updatedTrainer });
@@ -303,6 +317,7 @@ class TrainerController {
       res.status(500).json({ message: "Failed to update trainer" });
     }
   }
+  
 
   async fetchRejectionReason(req: Request, res: Response) {
     try {
@@ -401,6 +416,14 @@ class TrainerController {
         .status(500)
         .json({ message: "An error occurred fetching session shedule " });
     }
+  }
+
+  async deleteSessionSchedule(req: Request, res: Response) {
+    let session_id = req.params.sessionId
+    // console.log(session_id);
+    
+    const deletedSchedule = await this.trainerService.deleteSession(session_id)
+    res.status(200).json({message: 'Session deleted successfully', deletedSchedule:deletedSchedule})
   }
 }
 

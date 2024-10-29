@@ -203,7 +203,6 @@ class TrainerService {
       throw error;
     }
   }
-  
 
   async generateTokn(trainer_refresh_token: string) {
     try {
@@ -271,6 +270,7 @@ class TrainerService {
   async updateTrainer(trainer_id: string, trainerData: Partial<ITrainer>) {
     try {
       const {
+        profileImage,
         name,
         email,
         phone,
@@ -279,15 +279,19 @@ class TrainerService {
         language,
         dailySessionLimit,
       } = trainerData;
+      // console.log('trainerData', trainerData);
+      
+console.log('profileimage', profileImage);
 
       const existingTrainer = await this.trainerRepository.updateTrainerData(
         trainer_id
       );
-
+      // console.log(existingTrainer);
+      
       if (!existingTrainer) {
         throw new Error("Trainer not found");
       }
-
+      if (profileImage) existingTrainer.profileImage = profileImage
       if (name) existingTrainer.name = name;
       if (email) existingTrainer.email = email;
       if (phone) existingTrainer.phone = phone;
@@ -319,21 +323,21 @@ class TrainerService {
     try {
       const startTimeInput = sessionData.startTime;
       const endTimeInput = sessionData.endTime;
-  
+
       const startTime = new Date(`1970-01-01T${startTimeInput}`);
       const endTime = new Date(`1970-01-01T${endTimeInput}`);
-  
+
       if (startTime >= endTime) {
         throw new Error("End time must be after start time");
       }
-  
+
       const MINIMUM_SESSION_DURATION = 30;
       const duration = (endTime.getTime() - startTime.getTime()) / (1000 * 60);
-  
+
       if (duration < MINIMUM_SESSION_DURATION) {
         throw new Error("Session duration must be at least 30 minutes");
       }
-  
+
       return await this.trainerRepository.createNewSession(sessionData);
     } catch (error: any) {
       if (error.message.includes("Daily session limit")) {
@@ -342,19 +346,29 @@ class TrainerService {
         throw new Error("Time conflict with an existing session.");
       } else if (error.message === "End time must be after start time") {
         throw new Error("End time must be after start time");
-      } else if (error.message === "Session duration must be at least 30 minutes") {
+      } else if (
+        error.message === "Session duration must be at least 30 minutes"
+      ) {
         throw new Error("Session duration must be at least 30 minutes");
       } else {
         throw new Error("Error creating new session");
       }
     }
   }
-  
+
   async getSessionShedules(trainer_id: string) {
     try {
       return await this.trainerRepository.fetchSessionData(trainer_id);
     } catch (error) {
       throw new Error("Error getting sessin shedule data");
+    }
+  }
+
+  async deleteSession(session_id: string) {
+    try {
+      return await this.trainerRepository.deleteSession(session_id);
+    } catch (error) {
+      throw error
     }
   }
 }

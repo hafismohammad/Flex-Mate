@@ -1,4 +1,4 @@
-import express, { Application, NextFunction, Request, Response } from "express";
+import express, { Application} from "express";
 import cors from "cors";
 import connectDB from "./utils/db";
 import cookieParser from "cookie-parser";
@@ -6,12 +6,16 @@ import userRoute from "../src/routes/userRoute";
 import AdminRoute from "../src/routes/adminRoute";
 import TrainerRoute from "../src/routes/trainerRoute";
 import path from "path";
+import {startDeleteExpiredSessionsCron } from './corn/deleteExpiredSessions'
 
 // Express app initialization
 const app: Application = express();
 
 // MongoDB connection
 connectDB();
+
+// Start cron job
+startDeleteExpiredSessionsCron()
 
 app.use(cookieParser());
 const corsOptions = {

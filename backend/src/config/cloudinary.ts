@@ -21,10 +21,10 @@ export const uploadToCloudinary = (fileBuffer: Buffer, folder: string): Promise<
           if (error) {
             reject(error);
           } else {
-            resolve(result as CloudinaryUploadResult); // Cast the result to CloudinaryUploadResult
+            resolve(result as CloudinaryUploadResult); 
           }
         }
-      ).end(fileBuffer); // Stream the buffer
+      ).end(fileBuffer);
     });
   };
   

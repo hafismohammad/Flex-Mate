@@ -9,6 +9,9 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 import {ISessionSchedule} from '../../types/trainer'
 import {formatTime, calculateDuration, formatPriceToINR} from '../../utils/timeAndPriceUtils'
+import Swal from 'sweetalert2';
+
+
 
 function CurrentSchedules() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -148,6 +151,37 @@ function CurrentSchedules() {
     fetchSessionData();
   }, [trainerId]);
 
+  const handleDelete = (sessionId: string) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "This session will be permanently deleted!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await axiosInstance.delete(`api/trainer/deleteSessionSchedule/${sessionId}`);
+          console.log(response.data);
+          setSessionSchedules((schedule) => 
+          schedule.filter((schedule) => schedule._id != sessionId)
+          ) 
+          // Swal.fire(
+          //   "Deleted!",
+          //   "The session has been deleted.",
+          //   "success"
+          // );
+          return toast.success('Session deleted successfully')
+        } catch (error) {
+          Swal.fire("Error", "Failed to delete the session.", "error");
+        }
+      }
+    });
+  };
+  
+
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
       <Toaster />
@@ -183,7 +217,7 @@ function CurrentSchedules() {
       />
 
       <div className="bg-white shadow-lg rounded-lg p-6">
-        <div className="grid grid-cols-7 gap-1 text-lg font-semibold text-gray-600 mb-4 border-b border-gray-200 pb-2">
+        <div className="grid grid-cols-8 gap-1 text-lg font-semibold text-gray-600 mb-4 border-b border-gray-200 pb-2">
           <div>Session Type</div>
           <div>Date</div>
           <div>Start Time</div>
@@ -191,10 +225,11 @@ function CurrentSchedules() {
           <div>Price</div>
           <div>Duration</div>
           <div>Status</div>
+          <div>Action</div>
         </div>
       {sessionSchedules.length > 0 ? (
         sessionSchedules.map((schedule) => (
-          <div key={schedule._id} className="grid grid-cols-7 gap-1 items-center p-4 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none mb-2">
+          <div key={schedule._id} className="grid grid-cols-8 gap-1 items-center p-4 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none mb-2">
             <div className="text-gray-800 font-medium">{schedule.isSingleSession ? 'Single Session' : 'Package'}</div>
             <div className="text-gray-800 font-medium mt-3">{schedule.isSingleSession ? new Date(schedule.startDate).toLocaleDateString() :  `${new Date(schedule.startDate).toLocaleDateString()} / ${new Date(schedule.endDate).toLocaleDateString()}`}</div>
             <div className="text-gray-800 font-medium">{formatTime(schedule.startTime)}</div>
@@ -202,6 +237,7 @@ function CurrentSchedules() {
             <div className="text-gray-800 font-medium">{formatPriceToINR(schedule.price)}</div>
             <div className="text-gray-800 font-medium">{calculateDuration(schedule.startTime, schedule.endTime)}</div>
             <div className={`font-medium ${{'Pending':'text-yellow-500', 'Confirmed': 'text-green-500', 'Completed': 'text-blue-500','Cancelled': 'text-red-500', 'InProgress': 'text-purple-500'}[schedule.status] || 'text-gray-800'}`}>{schedule.status}</div>
+            <button onClick={() => handleDelete(schedule._id)} className="bg-red-500 px-2 py-2 rounded-lg text-white hover:bg-red-600 shadow-md">Delete</button>
           </div>
         ))
        ) : (

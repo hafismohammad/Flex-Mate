@@ -11,7 +11,7 @@ class UserRepository {
   private otpModel = OtpModel;
   private trainerModel = TrainerModel
   private specializationModel = SpecializationModel
-  private sessionModle = SessionModel
+  private sessionModel = SessionModel
 
   // Check if user already exists by email
   async existsUser(email: string): Promise<IUser | null> {
@@ -98,9 +98,6 @@ class UserRepository {
   }
   
 
-  
-  
-
   async fetchSpecializations() {
     try {
       const data =   await this.specializationModel.find({})
@@ -124,12 +121,22 @@ class UserRepository {
 
   async fetchAllSessionSchedules() {
     try {
-      const schedules = await this.sessionModle.find({})
+      const schedules = await this.sessionModel.find({})
       return schedules      
     } catch (error) {
       
     }
   }
+
+  async deleteExpiredUnbookedSessions(currentDate: Date): Promise<number> {
+    const result = await this.sessionModel.deleteMany({
+      selectedDate: { $lt: currentDate },
+      status: "Pending",
+    });
+
+    return result.deletedCount || 0;
+  }
+   
 }
 
 export default UserRepository;

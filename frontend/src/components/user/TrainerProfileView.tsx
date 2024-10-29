@@ -7,10 +7,7 @@ import { TrainerProfile } from "../../types/trainer";
 import LOGO from "../../assets/LOGO-2.png";
 import DatePicker from "react-datepicker";
 import { ISessionSchedule } from "../../types/common";
-import {
-  formatPriceToINR,
-  numberOfSessions,
-} from "../../utils/timeAndPriceUtils";
+import { formatPriceToINR, numberOfSessions, calculateDuration} from "../../utils/timeAndPriceUtils";
 import { AiOutlineClose } from "react-icons/ai";
 import userAxiosInstance from "../../../axios/userAxionInstance";
 
@@ -21,6 +18,8 @@ function TrainerProfileView() {
   const [sessionSchedules, setSessionSchedules] = useState<ISessionSchedule[]>(
     []
   );
+  const [selectedSession, setSelectedSession] =
+    useState<ISessionSchedule | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { trainerId } = useParams();
@@ -40,7 +39,8 @@ function TrainerProfileView() {
     fetchTrainer();
   }, [trainerId]);
 
-  const handleBooking = () => {
+  const handleBooking = (session: ISessionSchedule) => {
+    setSelectedSession(session);
     setIsModalOpen(true);
   };
 
@@ -58,12 +58,16 @@ function TrainerProfileView() {
 
   useEffect(() => {
     const fetchSeessionSchedules = async () => {
-      const response = await userAxiosInstance.get(`/api/user/sessionSchedules`);
+      const response = await userAxiosInstance.get(
+        `/api/user/sessionSchedules`
+      );
       // console.log(response.data);
       setSessionSchedules(response.data);
     };
     fetchSeessionSchedules();
   }, []);
+
+  console.log(sessionSchedules);
 
   const sessionDates = Array.from(
     new Set(
@@ -173,21 +177,19 @@ function TrainerProfileView() {
             <div className="mt-5 space-x-4 flex justify-center">
               <button
                 onClick={handleSingleSession}
-                className={`${
-                  isSingleSession
+                className={`${isSingleSession
                     ? "bg-blue-500 hover:bg-blue-600"
                     : "bg-gray-500 hover:bg-gray-600"
-                } text-white px-4 py-3 shadow-md`}
+                  } text-white px-4 py-3 shadow-md`}
               >
                 Single Session
               </button>
               <button
                 onClick={handlePackageSession}
-                className={`${
-                  isSingleSession
+                className={`${isSingleSession
                     ? "bg-gray-500 hover:bg-gray-600"
                     : "bg-blue-500 hover:bg-blue-600"
-                } text-white px-4 py-3 shadow-md`}
+                  } text-white px-4 py-3 shadow-md`}
               >
                 Package Sessions
               </button>
@@ -197,30 +199,21 @@ function TrainerProfileView() {
               {sessionSchedules.filter(
                 (session) =>
                   session.isSingleSession === isSingleSession &&
-                  session.trainerId === trainerId
+                  session.trainerId === trainerId &&
+                  (!selectedDate || new Date(session.startDate).toLocaleDateString() === selectedDate.toLocaleDateString())
               ).length === 0 ? (
                 <div className="flex justify-center">
                   <h1 className="text-black">
-                    {isSingleSession
-                      ? "No Single Sessions available."
-                      : "No Packages available."}
+                    {isSingleSession ? "No Single Sessions available." : "No Packages available."}
                   </h1>
                 </div>
               ) : (
                 sessionSchedules
-                  .filter((session) => {
-                    const sessionDate = new Date(
-                      session.startDate
-                    ).toLocaleDateString();
-                    const selectedDateStr = selectedDate
-                      ? selectedDate.toLocaleDateString()
-                      : null;
-                    return (
-                      session.isSingleSession === isSingleSession &&
-                      session.trainerId === trainerId &&
-                      sessionDate === selectedDateStr
-                    );
-                  })
+                  .filter((session) =>
+                    session.isSingleSession === isSingleSession &&
+                    session.trainerId === trainerId &&
+                    (!selectedDate || new Date(session.startDate).toLocaleDateString() === selectedDate.toLocaleDateString())
+                  )
                   .map((session) => (
                     <div key={session._id} className="mb-8">
                       <div className="flex justify-between items-center">
@@ -228,6 +221,7 @@ function TrainerProfileView() {
                           <h1 className="font-medium text-2xl">
                             Time: {session.startTime} - {session.endTime}
                           </h1>
+                          <p>Duration: ({calculateDuration(session.startTime, session.endTime)})</p>
                           {!isSingleSession && (
                             <h1 className="font-medium text-2xl mt-2">
                               Number of Sessions:{" "}
@@ -257,7 +251,7 @@ function TrainerProfileView() {
                             )}
                           </div>
                           <button
-                            onClick={handleBooking}
+                            onClick={() => handleBooking(session)}
                             className="bg-blue-500 hover:bg-blue-600 px-4 py-3 text-white"
                           >
                             Book Now
@@ -277,7 +271,7 @@ function TrainerProfileView() {
 
       {/* Checkout modal  */}
 
-      {isModalOpen ? (
+      {isModalOpen && selectedSession && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white rounded-lg p-6 md:p-8 w-full max-w-2xl shadow-lg h-[85vh] overflow-y-auto relative">
             <button
@@ -297,33 +291,51 @@ function TrainerProfileView() {
             <div className="bg-gray-100 p-6 rounded-lg shadow-inner mb-8">
               <div className="grid grid-cols-2 gap-6">
                 <div className="flex flex-col">
-                  <label className="font-semibold text-gray-700">
+                  <label className="font-semibold text-gray-700 mb-2">
                     Trainer Name
                   </label>
-                  <p className="text-gray-900">Trainer1</p>
+                  <p className="text-gray-900">{trainer?.name}</p>
                 </div>
 
                 <div className="flex flex-col">
-                  <label className="font-semibold text-gray-700">
+                  <label className="font-semibold text-gray-700 mb-2">
                     Date and Time
                   </label>
-                  <p className="text-gray-900">Date: 11/11/2024</p>
-                  <p className="text-gray-900">Time: 7:00 AM - 8:00 AM</p>
+                 {selectedSession.isSingleSession ? (
+                  <>
+                   <p className="text-gray-900">
+                   Starting Date: {new Date(selectedSession.startDate).toLocaleDateString()}
+                 </p>
+                  </>
+                 ) : (
+                  <>
+                  <p className="text-gray-900">
+                  Starting Date: {new Date(selectedSession.endDate).toLocaleDateString()}
+                </p>
+                <p className="text-gray-900">
+                  Ending Date: {new Date(selectedSession.startDate).toLocaleDateString()}
+                </p>
+                 </>
+                 )}
+                  <p className="text-gray-900">
+                    Time: {selectedSession.startTime} -{" "}
+                    {selectedSession.endTime}
+                  </p>
                 </div>
 
                 <div className="flex flex-col">
                   <label className="font-semibold text-gray-700">
-                    Duration
+                    Duration 
                   </label>
-                  <p className="text-gray-900">1 hour</p>
+                  <p className="text-gray-900">{calculateDuration(selectedSession.startTime, selectedSession.endTime)}</p>
                 </div>
 
                 <div className="flex flex-col">
                   <label className="font-semibold text-gray-700">
                     Payment Summary
                   </label>
-                  <p className="text-gray-900">Session Cost: ₹10,000.00</p>
-                  <p className="text-gray-900">Service Fee: ₹500.00</p>
+                  <p className="text-gray-900">Session Cost: ₹{selectedSession.price}</p>
+                  {/* <p className="text-gray-900">Service Fee: ₹500.00</p> */}
                 </div>
               </div>
             </div>
@@ -332,7 +344,7 @@ function TrainerProfileView() {
               <label className="font-semibold text-lg text-blue-700">
                 Total Cost
               </label>
-              <p className="text-2xl font-bold text-blue-900">₹10,500.00</p>
+              <p className="text-2xl font-bold text-blue-900">₹ {selectedSession.price}</p>
             </div>
 
             <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-md transition-colors duration-200 shadow-md">
@@ -340,7 +352,7 @@ function TrainerProfileView() {
             </button>
           </div>
         </div>
-      ) : null}
+      )}
     </div>
   );
 }
