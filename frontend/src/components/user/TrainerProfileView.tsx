@@ -1,8 +1,6 @@
 import { useParams } from "react-router-dom";
 import profileBG from "../../assets/trainer-profile-view-img.jpg";
 import { useEffect, useState } from "react";
-import axios from "axios";
-import API_URL from "../../../axios/API_URL";
 import { TrainerProfile } from "../../types/trainer";
 import LOGO from "../../assets/LOGO-2.png";
 import DatePicker from "react-datepicker";
@@ -11,6 +9,7 @@ import { formatPriceToINR, numberOfSessions, calculateDuration} from "../../util
 import { AiOutlineClose } from "react-icons/ai";
 import userAxiosInstance from "../../../axios/userAxionInstance";
 import {loadStripe} from '@stripe/stripe-js'
+import Loading from "../spinner/Loading";
 
 function TrainerProfileView() {
   const [trainer, setTrainer] = useState<TrainerProfile | null>(null);
@@ -22,6 +21,8 @@ function TrainerProfileView() {
   const [selectedSession, setSelectedSession] =
     useState<ISessionSchedule | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
 
   const { trainerId } = useParams();
 
@@ -48,6 +49,7 @@ function TrainerProfileView() {
 
 const handlePayment = async (sessionId: string) => {
   try {
+    setLoading(true)
     const response = await userAxiosInstance.post(`/api/user/makePayment/${sessionId}`);
     const stripe = await loadStripe('pk_test_51QFSikP9mn4OerLiFUemMPfvrAmFDjKKizT0flSQdVK36hHsqyjqwvTT00hrd3RLAzl9cqtWSWnOn2gd7ITftQTU00Lrwxv4SX');
 
@@ -290,82 +292,86 @@ const handlePayment = async (sessionId: string) => {
       {isModalOpen && selectedSession && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white rounded-lg p-6 md:p-8 w-full max-w-2xl shadow-lg h-[85vh] overflow-y-auto relative">
+           {!loading ? (
+          <>
             <button
-              className="absolute top-4 right-4 text-gray-500 hover:text-red-500 text-2xl focus:outline-none"
-              onClick={closeModal}
-            >
-              <AiOutlineClose />
-            </button>
+             className="absolute top-4 right-4 text-gray-500 hover:text-red-500 text-2xl focus:outline-none"
+             onClick={closeModal}
+           >
+             <AiOutlineClose />
+           </button>
 
-            <h1 className="text-3xl font-bold text-center text-gray-800 mb-4">
-              Confirm Your Booking
-            </h1>
-            <p className="text-center text-gray-500 mb-8">
-              Review your booking details below before proceeding to payment.
-            </p>
+           <h1 className="text-3xl font-bold text-center text-gray-800 mb-4">
+             Confirm Your Booking
+           </h1>
+           <p className="text-center text-gray-500 mb-8">
+             Review your booking details below before proceeding to payment.
+           </p>
 
-            <div className="bg-gray-100 p-6 rounded-lg shadow-inner mb-8">
-              <div className="grid grid-cols-2 gap-6">
-                <div className="flex flex-col">
-                  <label className="font-semibold text-gray-700 mb-2">
-                    Trainer Name
-                  </label>
-                  <p className="text-gray-900">{trainer?.name}</p>
-                </div>
+           <div className="bg-gray-100 p-6 rounded-lg shadow-inner mb-8">
+             <div className="grid grid-cols-2 gap-6">
+               <div className="flex flex-col">
+                 <label className="font-semibold text-gray-700 mb-2">
+                   Trainer Name
+                 </label>
+                 <p className="text-gray-900">{trainer?.name}</p>
+               </div>
 
-                <div className="flex flex-col">
-                  <label className="font-semibold text-gray-700 mb-2">
-                    Date and Time
-                  </label>
-                 {selectedSession.isSingleSession ? (
-                  <>
-                   <p className="text-gray-900">
-                   Starting Date: {new Date(selectedSession.startDate).toLocaleDateString()}
-                 </p>
-                  </>
-                 ) : (
-                  <>
+               <div className="flex flex-col">
+                 <label className="font-semibold text-gray-700 mb-2">
+                   Date and Time
+                 </label>
+                {selectedSession.isSingleSession ? (
+                 <>
                   <p className="text-gray-900">
-                  Starting Date: {new Date(selectedSession.endDate).toLocaleDateString()}
-                </p>
-                <p className="text-gray-900">
-                  Ending Date: {new Date(selectedSession.startDate).toLocaleDateString()}
+                  Starting Date: {new Date(selectedSession.startDate).toLocaleDateString()}
                 </p>
                  </>
-                 )}
-                  <p className="text-gray-900">
-                    Time: {selectedSession.startTime} -{" "}
-                    {selectedSession.endTime}
-                  </p>
-                </div>
+                ) : (
+                 <>
+                 <p className="text-gray-900">
+                 Starting Date: {new Date(selectedSession.endDate).toLocaleDateString()}
+               </p>
+               <p className="text-gray-900">
+                 Ending Date: {new Date(selectedSession.startDate).toLocaleDateString()}
+               </p>
+                </>
+                )}
+                 <p className="text-gray-900">
+                   Time: {selectedSession.startTime} -{" "}
+                   {selectedSession.endTime}
+                 </p>
+               </div>
 
-                <div className="flex flex-col">
-                  <label className="font-semibold text-gray-700">
-                    Duration 
-                  </label>
-                  <p className="text-gray-900">{calculateDuration(selectedSession.startTime, selectedSession.endTime)}</p>
-                </div>
+               <div className="flex flex-col">
+                 <label className="font-semibold text-gray-700">
+                   Duration 
+                 </label>
+                 <p className="text-gray-900">{calculateDuration(selectedSession.startTime, selectedSession.endTime)}</p>
+               </div>
 
-                <div className="flex flex-col">
-                  <label className="font-semibold text-gray-700">
-                    Payment Summary
-                  </label>
-                  <p className="text-gray-900">Session Cost: ₹{selectedSession.price}</p>
-                  {/* <p className="text-gray-900">Service Fee: ₹500.00</p> */}
-                </div>
-              </div>
-            </div>
+               <div className="flex flex-col">
+                 <label className="font-semibold text-gray-700">
+                   Payment Summary
+                 </label>
+                 <p className="text-gray-900">Session Cost: ₹{selectedSession.price}</p>
+                 {/* <p className="text-gray-900">Service Fee: ₹500.00</p> */}
+               </div>
+             </div>
+           </div>
 
-            <div className="bg-blue-100 p-4 rounded-lg shadow mb-8 text-center">
-              <label className="font-semibold text-lg text-blue-700">
-                Total Cost
-              </label>
-              <p className="text-2xl font-bold text-blue-900">₹ {selectedSession.price}</p>
-            </div>
+           <div className="bg-blue-100 p-4 rounded-lg shadow mb-8 text-center">
+             <label className="font-semibold text-lg text-blue-700">
+               Total Cost
+             </label>
+             <p className="text-2xl font-bold text-blue-900">₹ {selectedSession.price}</p>
+           </div>
 
-            <button onClick={() => handlePayment(selectedSession._id)} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-md transition-colors duration-200 shadow-md">
-              Proceed to Payment
-            </button>
+           <button onClick={() => handlePayment(selectedSession._id)} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-md transition-colors duration-200 shadow-md">
+             Proceed to Payment
+           </button>
+          </> 
+           ): <div className="absolute inset-0 flex justify-center items-center"> <Loading /></div> }
           </div>
         </div>
       )}

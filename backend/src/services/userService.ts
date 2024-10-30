@@ -5,6 +5,7 @@ import sendOTPmail from "../config/email_config";
 import bcrypt from "bcryptjs";
 import { ISession } from "../interface/trainer_interface";
 import stripe from '../config/stripeClient'
+import { start } from "repl";
 
 class UserService {
   private userRepository: UserRepository;
@@ -241,70 +242,51 @@ async getSessionSchedules() {
 
 async checkoutPayment(session_id: string) {
   try {
-    const bookingData = await this.userRepository.findSessionDetails(session_id)
-
-    const lineItems = [{
-            price_data: {
-              currency: 'inr',
-              product_data: {
-                name: bookingData?.isSingleSession ? 'Single Training Session' : 'Package Training Session',
-                description: `Session with trainer ID: ${bookingData?.trainerId}`,
-              },
-              unit_amount: 10000 * 100, 
-            },
-            quantity: 1,
-          }];
-          
-          // Create the Stripe session
-          const session = await stripe.checkout.sessions.create({
-            payment_method_types: ['card'],
-            line_items: lineItems,
-            mode: 'payment',
-            success_url: `http://localhost:5173/paymentSuccess`,  // Replace with your actual success URL
-            cancel_url: `http://localhost:5173/paymentFailed`,    // Replace with your actual cancel URL
-          });
-      // console.log('sessin', session);
-      
-          return session;  // Return the session to the controller
-        } catch (error) {
-          console.error('Error creating Stripe session:', error);
-          throw new Error('Failed to create checkout session.');
-        }
-
-  } catch (error: any) {
+    const sessionData = await this.userRepository.findSessionDetails(session_id);
     
+    if (!sessionData || !sessionData.trainerId || !sessionData.price) {
+      throw new Error("Missing session data, trainer ID, or price");
+    }
+
+    const trainer_id = sessionData.trainerId.toString(); 
+    const trainerData = await this.userRepository.findTrainerDetails(trainer_id);
+console.log('trainerData', trainerData);
+
+    if (!trainerData) {
+      throw new Error("Trainer data not found");
+    }
+
+    const lineItems = [
+  {
+    price_data: {
+      currency: 'inr',
+      unit_amount: sessionData.price * 100,
+      product_data: {
+        name: `Trainer Name: ${trainerData.name} - (${trainerData.specialization.name}) `,
+        description: sessionData.isSingleSession ? `Description: Session from ${sessionData.startTime} to ${sessionData.endTime} on ${sessionData.startDate.toLocaleDateString()}`: `Description: Session from ${sessionData.startTime} to ${sessionData.endTime} on ${sessionData.startDate.toLocaleDateString()} to ${sessionData.endDate.toLocaleDateString()}`,
+      },
+    },
+    quantity: 1,
+  },
+];
+    
+
+    // Create the Stripe session
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: lineItems,
+      mode: 'payment',
+      success_url: `http://localhost:5173/paymentSuccess`,
+      cancel_url: `http://localhost:5173/paymentFailed`,
+    });
+
+    return session;
+  } catch (error) {
+    console.error('Error creating Stripe session:', error);
+    throw new Error('Failed to create checkout session.');
   }
+}
 
-
-// async checkoutPayment(sessionData: ISession) {
-//   try {
-//     const lineItems = [{
-//       price_data: {
-//         currency: 'inr',
-//         product_data: {
-//           name: sessionData.isSingleSession ? 'Single Training Session' : 'Package Training Session',
-//           description: `Session with trainer ID: ${sessionData.trainerId}`,
-//         },
-//         unit_amount: Math.round(sessionData.price * 100),  
-//       },
-//       quantity: 1,
-//     }];
-    
-//     // Create the Stripe session
-//     const session = await stripe.checkout.sessions.create({
-//       payment_method_types: ['card'],
-//       line_items: lineItems,
-//       mode: 'payment',
-//       success_url: ``,  // Replace with your actual success URL
-//       cancel_url: ``,    // Replace with your actual cancel URL
-//     });
-
-//     return session;  // Return the session to the controller
-//   } catch (error) {
-//     console.error('Error creating Stripe session:', error);
-//     throw new Error('Failed to create checkout session.');
-//   }
-// }
 
 }
 

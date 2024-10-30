@@ -139,8 +139,42 @@ class UserRepository {
 
 
   async findSessionDetails(session_id: string) {
-    return await this.sessionModel.findById(session_id).populate('trainerId')
+    return await this.sessionModel.findById(session_id)
   }
+  
+  async findTrainerDetails(trainer_id: string) {
+    const trainerData = await this.trainerModel.aggregate([
+      { $match: { _id: new mongoose.Types.ObjectId(trainer_id) } },
+      {
+        $lookup: {
+          from: 'specializations', // The name of the collection for `specialization`
+          localField: 'specialization',
+          foreignField: '_id',
+          as: 'specializationData'
+        }
+      },
+      { $unwind: { path: "$specializationData", preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          name: 1,
+          email: 1,
+          specialization: "$specializationData", // Assign populated specialization here
+          kycStatus: 1,
+          isBlocked: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          profileImage: 1,
+          gender: 1,
+          language: 1,
+          yearsOfExperience: 1,
+          dailySessionLimit: 1
+        }
+      }
+    ]);
+  
+    return trainerData[0]; // Since aggregation returns an array, take the first element
+  }
+  
 
 
   static async getIsBlockedUser(user_id: string): Promise<boolean> {
