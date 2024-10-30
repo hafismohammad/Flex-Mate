@@ -10,6 +10,7 @@ import { ISessionSchedule } from "../../types/common";
 import { formatPriceToINR, numberOfSessions, calculateDuration} from "../../utils/timeAndPriceUtils";
 import { AiOutlineClose } from "react-icons/ai";
 import userAxiosInstance from "../../../axios/userAxionInstance";
+import {loadStripe} from '@stripe/stripe-js'
 
 function TrainerProfileView() {
   const [trainer, setTrainer] = useState<TrainerProfile | null>(null);
@@ -41,8 +42,23 @@ function TrainerProfileView() {
 
   const handleBooking = (session: ISessionSchedule) => {
     setSelectedSession(session);
+
     setIsModalOpen(true);
   };
+
+const handlePayment = async (sessionId: string) => {
+  try {
+    const response = await userAxiosInstance.post(`/api/user/makePayment/${sessionId}`);
+    const stripe = await loadStripe('pk_test_51QFSikP9mn4OerLiFUemMPfvrAmFDjKKizT0flSQdVK36hHsqyjqwvTT00hrd3RLAzl9cqtWSWnOn2gd7ITftQTU00Lrwxv4SX');
+
+    if (stripe) {
+      await stripe.redirectToCheckout({ sessionId: response.data.id });
+    }
+  } catch (error) {
+    console.error('Error initiating payment:', error);
+  }
+};
+
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -347,7 +363,7 @@ function TrainerProfileView() {
               <p className="text-2xl font-bold text-blue-900">₹ {selectedSession.price}</p>
             </div>
 
-            <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-md transition-colors duration-200 shadow-md">
+            <button onClick={() => handlePayment(selectedSession._id)} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-md transition-colors duration-200 shadow-md">
               Proceed to Payment
             </button>
           </div>

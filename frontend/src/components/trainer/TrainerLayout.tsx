@@ -9,8 +9,7 @@ import {logoutTrainer} from '../../actions/trainerAction'
 function TrainerLayout() {
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
 
-  const dispath = useDispatch<AppDispatch>()
-  const navigate = useNavigate()
+
 
   const toggleProfileDropdown = () => {
     setIsProfileDropdownOpen(!isProfileDropdownOpen);

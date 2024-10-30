@@ -221,6 +221,29 @@ async login(req: Request, res: Response): Promise<void> {
       
     }
   }
+
+  async checkoutPayment(req: Request, res: Response) {
+    try {
+      const session_id = req.params.sessionId;
+      const paymentResponse = await this.userService.checkoutPayment(session_id);
+      // console.log('paymentResponse', paymentResponse);
+      res.status(200).json({ id: paymentResponse.id });
+    } catch (error) {
+      console.error('Error in checkoutPayment:', error);
+      res.status(500).json({ message: 'Failed to create checkout session' });
+    }
+  }
+
+  // async checkoutPayment(req: Request, res: Response) {
+  //   try {
+  //     // const sessionData = req.body;
+  //     const paymentResponse = await this.userService.checkoutPayment(sessionData);
+  //     res.status(200).json({ id: paymentResponse.id });
+  //   } catch (error) {
+  //     console.error('Error in checkoutPayment:', error);
+  //     res.status(500).json({ message: 'An error occurred during checkout.' });
+  //   }
+  // }
   
 
 }

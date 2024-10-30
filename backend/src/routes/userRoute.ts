@@ -21,5 +21,6 @@ router.get("/allTrainers", authMiddleware, userController.getAllTrainers.bind(us
 router.get("/allspecializations", authMiddleware, userController.getAllspecializations.bind(userController))
 router.get("/getTrainer/:trainerId", authMiddleware, userController.getTrainer.bind(userController))
 router.get("/sessionSchedules", authMiddleware, userController.getSessionSchedules.bind(userController))
+router.post("/makePayment/:sessionId", authMiddleware, userController.checkoutPayment.bind(userController))
 
 export default router;

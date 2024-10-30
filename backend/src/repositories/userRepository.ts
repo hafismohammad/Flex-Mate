@@ -130,11 +130,16 @@ class UserRepository {
 
   async deleteExpiredUnbookedSessions(currentDate: Date): Promise<number> {
     const result = await this.sessionModel.deleteMany({
-      selectedDate: { $lt: currentDate },
+      startDate: { $lt: currentDate },
       status: "Pending",
     });
 
     return result.deletedCount || 0;
+  }
+
+
+  async findSessionDetails(session_id: string) {
+    return await this.sessionModel.findById(session_id).populate('trainerId')
   }
 
 
@@ -147,6 +152,8 @@ class UserRepository {
       throw new Error(`Failed to fetch user's blocked status: ${error.message}`);
     }
   }
+
+
    
 }
 

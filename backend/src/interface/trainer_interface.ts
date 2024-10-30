@@ -60,7 +60,7 @@ export interface ISession {
   endTime: string;
   isSingleSession: boolean;
   numberOfSessions: number;
-  price: number;
+  price: number | undefined
   status: 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled' | 'InProgress';
 }
 

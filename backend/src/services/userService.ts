@@ -3,6 +3,8 @@ import {generateAccessToken, generateRefreshToken, verifyRefreshToken} from '../
 import UserRepository from "../repositories/userRepository";
 import sendOTPmail from "../config/email_config";
 import bcrypt from "bcryptjs";
+import { ISession } from "../interface/trainer_interface";
+import stripe from '../config/stripeClient'
 
 class UserService {
   private userRepository: UserRepository;
@@ -235,6 +237,74 @@ async getSessionSchedules() {
     
   }
 }
+
+
+async checkoutPayment(session_id: string) {
+  try {
+    const bookingData = await this.userRepository.findSessionDetails(session_id)
+
+    const lineItems = [{
+            price_data: {
+              currency: 'inr',
+              product_data: {
+                name: bookingData?.isSingleSession ? 'Single Training Session' : 'Package Training Session',
+                description: `Session with trainer ID: ${bookingData?.trainerId}`,
+              },
+              unit_amount: 10000 * 100, 
+            },
+            quantity: 1,
+          }];
+          
+          // Create the Stripe session
+          const session = await stripe.checkout.sessions.create({
+            payment_method_types: ['card'],
+            line_items: lineItems,
+            mode: 'payment',
+            success_url: `http://localhost:5173/paymentSuccess`,  // Replace with your actual success URL
+            cancel_url: `http://localhost:5173/paymentFailed`,    // Replace with your actual cancel URL
+          });
+      // console.log('sessin', session);
+      
+          return session;  // Return the session to the controller
+        } catch (error) {
+          console.error('Error creating Stripe session:', error);
+          throw new Error('Failed to create checkout session.');
+        }
+
+  } catch (error: any) {
+    
+  }
+
+
+// async checkoutPayment(sessionData: ISession) {
+//   try {
+//     const lineItems = [{
+//       price_data: {
+//         currency: 'inr',
+//         product_data: {
+//           name: sessionData.isSingleSession ? 'Single Training Session' : 'Package Training Session',
+//           description: `Session with trainer ID: ${sessionData.trainerId}`,
+//         },
+//         unit_amount: Math.round(sessionData.price * 100),  
+//       },
+//       quantity: 1,
+//     }];
+    
+//     // Create the Stripe session
+//     const session = await stripe.checkout.sessions.create({
+//       payment_method_types: ['card'],
+//       line_items: lineItems,
+//       mode: 'payment',
+//       success_url: ``,  // Replace with your actual success URL
+//       cancel_url: ``,    // Replace with your actual cancel URL
+//     });
+
+//     return session;  // Return the session to the controller
+//   } catch (error) {
+//     console.error('Error creating Stripe session:', error);
+//     throw new Error('Failed to create checkout session.');
+//   }
+// }
 
 }
 

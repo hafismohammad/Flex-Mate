@@ -5,6 +5,8 @@ import Login from '../pages/user/LoginPage';
 import Home from '../pages/user/HomePage';
 import Trainers from '../pages/user/TrainersPage'
 import TrainerProfileViewPage from '../pages/user/TrainerProfileViewPage';
+import SuccessPaymentPage from '../pages/user/SuccessPaymentPage';
+import FailedPaymentPage from '../pages/user/FailedPaymentPage';
 
 function UserRoutes() {
   return (
@@ -17,6 +19,8 @@ function UserRoutes() {
         <Route path='/trainers' element={<Trainers />} />
         <Route path='/trainers/:specId' element={<Trainers />} />
         <Route path='/trainerProfileView/:trainerId' element={<TrainerProfileViewPage />} />
+        <Route path='/paymentSuccess' element={<SuccessPaymentPage />} />
+        <Route path='/paymentFailed' element={<FailedPaymentPage />} />
       </Routes>
     </div>
   );
