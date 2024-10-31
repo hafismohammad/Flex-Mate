@@ -103,42 +103,44 @@ class TrainerController {
   }
 
   // trainerController.ts
-async trainerLogin(req: Request, res: Response): Promise<void> {
-  try {
-    const { email, password }: ITrainer = req.body;
+  async trainerLogin(req: Request, res: Response): Promise<void> {
+    try {
+      const { email, password }: ITrainer = req.body;
 
-    const trainerData = await this.trainerService.trainerLogin({ email, password });
-
-    if (trainerData) {
-      const { accessToken, refreshToken, trainer } = trainerData;
-
-      res.cookie("trainer_refresh_token", refreshToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
+      const trainerData = await this.trainerService.trainerLogin({
+        email,
+        password,
       });
 
-      res.status(200).json({
-        message: "Login successful",
-        trainer: trainer,
-        token: accessToken,
-      });
-    }
-  } catch (error: any) {
-    if (error.message === "Trainer is blocked") {
-      res.status(403).json({ message: "Trainer is blocked" });
-    } else if (error.message === "Invalid email or password") {
-      res.status(401).json({ message: "Invalid email or password" });
-    } else if (error.message === "Trainer not exists") {
-      res.status(404).json({ message: "Trainer not found" });
-    } else {
-      console.log("Login controller:", error);
-      res.status(500).json({ message: "Internal server error" });
+      if (trainerData) {
+        const { accessToken, refreshToken, trainer } = trainerData;
+
+        res.cookie("trainer_refresh_token", refreshToken, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "none",
+          maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+
+        res.status(200).json({
+          message: "Login successful",
+          trainer: trainer,
+          token: accessToken,
+        });
+      }
+    } catch (error: any) {
+      if (error.message === "Trainer is blocked") {
+        res.status(403).json({ message: "Trainer is blocked" });
+      } else if (error.message === "Invalid email or password") {
+        res.status(401).json({ message: "Invalid email or password" });
+      } else if (error.message === "Trainer not exists") {
+        res.status(404).json({ message: "Trainer not found" });
+      } else {
+        console.log("Login controller:", error);
+        res.status(500).json({ message: "Internal server error" });
+      }
     }
   }
-}
-
 
   async refreshToken(req: Request, res: Response) {
     const trainer_refresh_token = req.cookies?.trainer_refresh_token;
@@ -428,12 +430,26 @@ async trainerLogin(req: Request, res: Response): Promise<void> {
     // console.log(session_id);
 
     const deletedSchedule = await this.trainerService.deleteSession(session_id);
-    res
-      .status(200)
-      .json({
-        message: "Session deleted successfully",
-        deletedSchedule: deletedSchedule,
-      });
+    res.status(200).json({
+      message: "Session deleted successfully",
+      deletedSchedule: deletedSchedule,
+    });
+  }
+
+  async fetchBookingDetails(req: Request, res: Response) {
+    try {
+      const trainer_id = req.params.trainerId;
+
+      const bookingDetails = await this.trainerService.getBookingDetails(
+        trainer_id
+      );
+
+      res.status(200).json(bookingDetails);
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "An error occurred fetching booking details " });
+    }
   }
 }
 

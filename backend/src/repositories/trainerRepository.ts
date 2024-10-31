@@ -11,6 +11,7 @@ import { ISpecialization } from "../interface/trainer_interface";
 import SessionModel from "../models/sessionModel";
 import mongoose, { Types } from "mongoose";
 import moment from "moment";
+import BookingModel from "../models/booking";
 
 class TrainerRepository {
   private specializationModel = SpecializationModel;
@@ -19,6 +20,7 @@ class TrainerRepository {
   private kycModel = KYCModel;
   private kycRejectionModel = KycRejectionReasonModel;
   private sessionModel = SessionModel;
+  private bookingModel = BookingModel
 
   // Method to find all specializations
   async findAllSpecializations() {
@@ -316,6 +318,71 @@ class TrainerRepository {
    }
   }
 
+  async fetchBookingDetails(trainer_id: string) {
+    try {
+      const bookingDetails = await this.bookingModel.aggregate([
+        { $match: { trainerId: new mongoose.Types.ObjectId(trainer_id) } },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'userId',
+            foreignField: '_id',
+            as: 'userDetails',
+          },
+        },
+        {
+          $lookup: {
+            from: 'trainers',
+            localField: 'trainerId',
+            foreignField: '_id',
+            as: 'trainerDetails',
+          },
+        },
+        {
+          $lookup: {
+            from: 'sessions',
+            localField: 'sessionId',
+            foreignField: '_id',
+            as: 'sessionDetails',
+          },
+        },
+        { $unwind: "$userDetails" },
+        { $unwind: "$trainerDetails" },
+        { $unwind: "$sessionDetails" },
+        {
+          $project: {
+            bookingId: "$_id",
+            userName: "$userDetails.name",
+            trainerName: "$trainerDetails.name",
+            sessionDate: "$sessionDetails.startDate",
+            sessionType: "$sessionType",
+            sessionStartTime: "$startTime",
+            sessionEndTime: "$endTime",
+            bookingDate: "$bookingDate",
+            sessionDates: {
+              $cond: {
+                if: "$sessionDetails.isSingleSession",
+                then: { startDate: "$sessionDetails.startDate" },
+                else: {
+                  startDate: "$sessionDetails.startDate",
+                  endDate: "$sessionDetails.endDate"
+                }
+              },
+            },
+            amount: "$amount",
+            paymentStatus: "$paymentStatus",
+          }
+        }
+      ]);
+  
+      console.log('bookingDetails', bookingDetails);
+  
+      return bookingDetails;
+    } catch (error) {
+      throw error;
+    }
+  }
+  
   static async getIsBlockedTrainer(trainer_id: string): Promise<boolean> {
     try {
        const trainer = await TrainerModel.findById(trainer_id);

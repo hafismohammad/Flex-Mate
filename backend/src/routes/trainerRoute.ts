@@ -39,6 +39,7 @@ router.get('/rejectionReason/:trainerId', authMiddlewares, trainerController.fet
 router.post('/session/:tranerId', authMiddlewares, trainerController.storeSessionData.bind(trainerController))
 router.get('/sessiosShedules/:trainerId', authMiddlewares, trainerController.getSessionSchedules.bind(trainerController))
 router.delete('/deleteSessionSchedule/:sessionId', authMiddlewares, trainerController.deleteSessionSchedule.bind(trainerController))
+router.get('/bookingDetails/:trainerId', authMiddlewares, trainerController.fetchBookingDetails.bind(trainerController))
 
 
 

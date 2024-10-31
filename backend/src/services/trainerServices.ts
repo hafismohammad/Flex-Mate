@@ -368,6 +368,14 @@ console.log('profileimage', profileImage);
       throw error
     }
   }
+
+  async getBookingDetails(trainer_id: string) {
+    try {
+      return await this.trainerRepository.fetchBookingDetails(trainer_id)
+    } catch (error) {
+      throw error
+    }
+  }
 }
 
 export default TrainerService;
