@@ -3,6 +3,9 @@ import UserRepository from "../repositories/userRepository";
 import UserService from "../services/userService";
 import UserController from "../controllers/userController";
 import authMiddleware from "../middlewares/authMiddlewares";
+import bodyParser from 'body-parser';
+
+
 
 const router = express.Router();
 
@@ -22,5 +25,7 @@ router.get("/allspecializations", authMiddleware, userController.getAllspecializ
 router.get("/getTrainer/:trainerId", authMiddleware, userController.getTrainer.bind(userController))
 router.get("/sessionSchedules", authMiddleware, userController.getSessionSchedules.bind(userController))
 router.post("/makePayment/:sessionId", authMiddleware, userController.checkoutPayment.bind(userController))
+router.post("/createBooking", authMiddleware, userController.createBooking.bind(userController))
+
 
 export default router;

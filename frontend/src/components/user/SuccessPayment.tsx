@@ -1,13 +1,37 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { FaCheckCircle } from 'react-icons/fa';
+import userAxiosInstance from '../../../axios/userAxionInstance';
 
 function SuccessPayment() {
   const navigate = useNavigate();
 
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const sessionId = queryParams.get('session_id')
+  const userId = queryParams.get('user_id')
+
+
+
+
   useEffect(() => {
-    // You could add a function here to fetch or confirm payment details if needed
-  }, []);
+    const createBooking = async () => {
+      try {
+        await userAxiosInstance.post('/api/user/createBooking', {
+          sessionId,
+          userId,
+        });
+        console.log('Booking created successfully');
+      } catch (error) {
+        console.error('Error creating booking:', error);
+      }
+    };
+
+    if (sessionId && userId) {
+      createBooking();
+    }
+  }, [sessionId, userId]);
+  
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-blue-50 px-4">

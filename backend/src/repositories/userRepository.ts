@@ -1,10 +1,11 @@
-import { IUser, IOtp } from "../interface/common";
+import { IUser, IOtp, IBooking } from "../interface/common";
 import UserModel from "../models/userModel";
 import OtpModel from "../models/otpModel";
 import mongoose from "mongoose";
 import TrainerModel from "../models/trainerModel";
 import SpecializationModel from "../models/specializationModel";
 import SessionModel from "../models/sessionModel";
+import BookingModel from "../models/booking";
 
 class UserRepository {
   private userModel = UserModel;
@@ -12,7 +13,7 @@ class UserRepository {
   private trainerModel = TrainerModel
   private specializationModel = SpecializationModel
   private sessionModel = SessionModel
-
+  private bookingModel = BookingModel
   // Check if user already exists by email
   async existsUser(email: string): Promise<IUser | null> {
     try {
@@ -172,7 +173,7 @@ class UserRepository {
       }
     ]);
   
-    return trainerData[0]; // Since aggregation returns an array, take the first element
+    return trainerData[0]; 
   }
   
 
@@ -187,7 +188,26 @@ class UserRepository {
     }
   }
 
+async fetchUserId(user_id: string) {
+  try {
+    const user = this.userModel.findById(user_id)
+    return user
+  } catch (error) {
+    
+  }
+}
 
+async createBooking(bookingDetails: IBooking) {
+  try {
+    // Create a new booking using the Booking model
+    const newBooking = await this.bookingModel.create(bookingDetails);
+    console.log('Booking created successfully:', newBooking);
+    return newBooking;
+  } catch (error) {
+    console.error('Error creating booking:', error);
+    throw new Error('Failed to create booking.');
+  }
+}
    
 }
 

@@ -10,6 +10,8 @@ import { AiOutlineClose } from "react-icons/ai";
 import userAxiosInstance from "../../../axios/userAxionInstance";
 import {loadStripe} from '@stripe/stripe-js'
 import Loading from "../spinner/Loading";
+import { useSelector } from "react-redux";
+import { RootState } from "../../app/store";
 
 function TrainerProfileView() {
   const [trainer, setTrainer] = useState<TrainerProfile | null>(null);
@@ -23,7 +25,7 @@ function TrainerProfileView() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-
+  const {userInfo} = useSelector((state: RootState)  => state.user)
   const { trainerId } = useParams();
 
   useEffect(() => {
@@ -47,10 +49,11 @@ function TrainerProfileView() {
     setIsModalOpen(true);
   };
 
+
 const handlePayment = async (sessionId: string) => {
   try {
     setLoading(true)
-    const response = await userAxiosInstance.post(`/api/user/makePayment/${sessionId}`);
+    const response = await userAxiosInstance.post(`/api/user/makePayment/${sessionId}`, {userData: userInfo});
     const stripe = await loadStripe('pk_test_51QFSikP9mn4OerLiFUemMPfvrAmFDjKKizT0flSQdVK36hHsqyjqwvTT00hrd3RLAzl9cqtWSWnOn2gd7ITftQTU00Lrwxv4SX');
 
     if (stripe) {

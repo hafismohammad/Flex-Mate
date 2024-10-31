@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import UserService from "../services/userService";
 import { IUser, ILoginUser } from "../interface/common";
+import stripe from "../config/stripeClient";
 
 class UserController {
   private userService: UserService;
@@ -224,14 +225,27 @@ async login(req: Request, res: Response): Promise<void> {
 
   async checkoutPayment(req: Request, res: Response) {
     try {
-      const session_id = req.params.sessionId;
-      const paymentResponse = await this.userService.checkoutPayment(session_id);
+      const userId = req.body.userData.id      
+      const session_id = req.params.sessionId;  
+      const paymentResponse = await this.userService.checkoutPayment(session_id, userId);
       res.status(200).json({ id: paymentResponse.id });
     } catch (error) {
       console.error('Error in checkoutPayment:', error);
       res.status(500).json({ message: 'Failed to create checkout session' });
     }
   }
+
+  async createBooking(req: Request, res: Response) {
+    try {
+      const {sessionId, userId} = req.body
+     const bookingDetails = await this.userService.findBookingDetails(sessionId, userId)
+      console.log('succefully booked', bookingDetails);
+      
+    } catch (error) {
+      
+    }
+  }
+
 
 }
 

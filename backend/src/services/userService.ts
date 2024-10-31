@@ -1,4 +1,4 @@
-import { IUser, ILoginUser } from "../interface/common";
+import { IUser, ILoginUser, IBooking } from "../interface/common";
 import {generateAccessToken, generateRefreshToken, verifyRefreshToken} from '../utils/jwtHelper'
 import UserRepository from "../repositories/userRepository";
 import sendOTPmail from "../config/email_config";
@@ -6,6 +6,7 @@ import bcrypt from "bcryptjs";
 import { ISession } from "../interface/trainer_interface";
 import stripe from '../config/stripeClient'
 import { start } from "repl";
+import Stripe from "stripe";
 
 class UserService {
   private userRepository: UserRepository;
@@ -240,7 +241,7 @@ async getSessionSchedules() {
 }
 
 
-async checkoutPayment(session_id: string) {
+async checkoutPayment(session_id: string, userId: string) {
   try {
     const sessionData = await this.userRepository.findSessionDetails(session_id);
     
@@ -250,33 +251,33 @@ async checkoutPayment(session_id: string) {
 
     const trainer_id = sessionData.trainerId.toString(); 
     const trainerData = await this.userRepository.findTrainerDetails(trainer_id);
-console.log('trainerData', trainerData);
 
     if (!trainerData) {
       throw new Error("Trainer data not found");
     }
 
     const lineItems = [
-  {
-    price_data: {
-      currency: 'inr',
-      unit_amount: sessionData.price * 100,
-      product_data: {
-        name: `Trainer Name: ${trainerData.name} - (${trainerData.specialization.name}) `,
-        description: sessionData.isSingleSession ? `Description: Session from ${sessionData.startTime} to ${sessionData.endTime} on ${sessionData.startDate.toLocaleDateString()}`: `Description: Session from ${sessionData.startTime} to ${sessionData.endTime} on ${sessionData.startDate.toLocaleDateString()} to ${sessionData.endDate.toLocaleDateString()}`,
+      {
+        price_data: {
+          currency: 'inr',
+          unit_amount: sessionData.price * 100,
+          product_data: {
+            name: `Trainer Name: ${trainerData.name} - (${trainerData.specialization.name})`,
+            description: sessionData.isSingleSession
+              ? `Description: Session from ${sessionData.startTime} to ${sessionData.endTime} on ${sessionData.startDate.toLocaleDateString()}`
+              : `Description: Session from ${sessionData.startTime} to ${sessionData.endTime} on ${sessionData.startDate.toLocaleDateString()} to ${sessionData.endDate.toLocaleDateString()}`,
+          },
+        },
+        quantity: 1,
       },
-    },
-    quantity: 1,
-  },
-];
-    
+    ];
 
     // Create the Stripe session
-    const session = await stripe.checkout.sessions.create({
+    const session: Stripe.Checkout.Session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'payment',
-      success_url: `http://localhost:5173/paymentSuccess`,
+      success_url: `http://localhost:5173/paymentSuccess?session_id=${sessionData._id}&user_id=${userId}`,
       cancel_url: `http://localhost:5173/paymentFailed`,
     });
 
@@ -286,6 +287,53 @@ console.log('trainerData', trainerData);
     throw new Error('Failed to create checkout session.');
   }
 }
+
+async findBookingDetails(session_id: string, user_id: string) {
+  try {
+    const user = await this.userRepository.fetchUserId(user_id);
+    const session = await this.userRepository.findSessionDetails(session_id);
+
+    // Ensure trainerId is defined
+    const trainerId = session?.trainerId;
+
+    if (!trainerId) {
+      throw new Error("Trainer ID is not available in the session.");
+    }
+
+    const trainer = await this.getTrainer(trainerId.toString());
+
+    console.log('session data', session, 'userdata', user, 'trainer data', trainer);
+
+    if (!trainer || trainer.length === 0) {
+      throw new Error("Trainer not found.");
+    }
+    const bookingDetails: IBooking = {
+      sessionId: session._id,
+      trainerId: trainer[0]._id, 
+      userId: user?._id,
+      sessionType: session.isSingleSession ? 'Single Session' : 'Package Session',
+      bookingDate: new Date(),  
+      startDate: session.startDate,
+      endDate: session.endDate,  
+      startTime: session.startTime,
+      endTime: session.endTime,
+      amount: session.price,
+      paymentStatus: "Confirmed", 
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    await this.userRepository.createBooking(bookingDetails)
+
+    console.log('Booking Details:', bookingDetails);
+
+    return bookingDetails;
+  } catch (error) {
+    console.error('Error fetching booking details:', error);
+    throw new Error('Failed to fetch booking details.');
+  }
+}
+
 
 
 }
