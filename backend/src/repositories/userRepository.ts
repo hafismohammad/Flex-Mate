@@ -188,14 +188,23 @@ class UserRepository {
     }
   }
 
-async fetchUserId(user_id: string) {
+
+
+
+async findExistingBooking(bookingDetails: IBooking) {
   try {
-    const user = this.userModel.findById(user_id)
-    return user
+    // Check for an existing booking using sessionId and userId
+    const existingBooking = await this.bookingModel.findOne({
+      sessionId: bookingDetails.sessionId,
+      userId: bookingDetails.userId,
+    });
+    return existingBooking; // Returns null if no booking is found
   } catch (error) {
-    
+    console.error('Error finding existing booking:', error);
+    throw new Error('Failed to find existing booking.');
   }
 }
+
 
 async createBooking(bookingDetails: IBooking) {
   try {

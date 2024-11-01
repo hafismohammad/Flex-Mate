@@ -216,7 +216,7 @@ function CurrentSchedules() {
       />
 
       <div className="bg-white shadow-lg rounded-lg p-6">
-        <div className="grid grid-cols-8 gap-1 text-lg font-semibold text-gray-600 mb-4 border-b border-gray-200 pb-2">
+        <div className="grid grid-cols-8 gap-1 text-lg font-bold text-gray-600 mb-4 border-b border-gray-200 pb-2">
           <div>Session Type</div>
           <div>Date</div>
           <div>Start Time</div>

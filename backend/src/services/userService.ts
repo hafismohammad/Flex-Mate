@@ -7,6 +7,7 @@ import { ISession } from "../interface/trainer_interface";
 import stripe from '../config/stripeClient'
 import { start } from "repl";
 import Stripe from "stripe";
+import mongoose from "mongoose";
 
 class UserService {
   private userRepository: UserRepository;
@@ -281,6 +282,7 @@ async checkoutPayment(session_id: string, userId: string) {
       cancel_url: `http://localhost:5173/paymentFailed`,
     });
 
+
     return session;
   } catch (error) {
     console.error('Error creating Stripe session:', error);
@@ -290,10 +292,8 @@ async checkoutPayment(session_id: string, userId: string) {
 
 async findBookingDetails(session_id: string, user_id: string) {
   try {
-    const user = await this.userRepository.fetchUserId(user_id);
     const session = await this.userRepository.findSessionDetails(session_id);
 
-    // Ensure trainerId is defined
     const trainerId = session?.trainerId;
 
     if (!trainerId) {
@@ -302,15 +302,15 @@ async findBookingDetails(session_id: string, user_id: string) {
 
     const trainer = await this.getTrainer(trainerId.toString());
 
-    console.log('session data', session, 'userdata', user, 'trainer data', trainer);
+    // console.log('session data', session, 'userdata', user, 'trainer data', trainer);
 
     if (!trainer || trainer.length === 0) {
       throw new Error("Trainer not found.");
     }
     const bookingDetails: IBooking = {
-      sessionId: session._id,
-      trainerId: trainer[0]._id, 
-      userId: user?._id,
+      sessionId: new mongoose.Types.ObjectId(session._id), 
+      trainerId: new mongoose.Types.ObjectId(trainer[0]._id), 
+      userId: new mongoose.Types.ObjectId(user_id), 
       sessionType: session.isSingleSession ? 'Single Session' : 'Package Session',
       bookingDate: new Date(),  
       startDate: session.startDate,
@@ -323,9 +323,16 @@ async findBookingDetails(session_id: string, user_id: string) {
       updatedAt: new Date(),
     };
 
+    const existingBooking = await this.userRepository.findExistingBooking(bookingDetails);
+    if (existingBooking) {
+      console.log('Booking already exists.');
+      
+      throw new Error("Booking already exists."); 
+    }
+
     await this.userRepository.createBooking(bookingDetails)
 
-    console.log('Booking Details:', bookingDetails);
+    // console.log('Booking Details:', bookingDetails);
 
     return bookingDetails;
   } catch (error) {

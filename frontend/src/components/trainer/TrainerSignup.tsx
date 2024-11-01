@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "../../app/store";
 import { fetchSpecializations } from "../../actions/trainerAction";
 import { useSelector } from "react-redux";
-import {registerTrainer} from '../../actions/trainerAction'
+import { registerTrainer } from "../../actions/trainerAction";
 import toast, { Toaster } from "react-hot-toast";
 import { log } from "console";
 
@@ -21,6 +21,7 @@ interface Errors {
 interface Specialization {
   id: string;
   name: string;
+  isListed: boolean
 }
 
 function TrainerSignup() {
@@ -28,15 +29,15 @@ function TrainerSignup() {
   const [email, setEmail] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [specialization, setSpecialization] = useState<string>(""); 
+  const [specialization, setSpecialization] = useState<string>("");
   const [errors, setErrors] = useState<Errors>({});
 
   const dispatch = useDispatch<AppDispatch>();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const specializationsData = useSelector(
     (state: RootState) => state.trainer.specializations
   );
- const signupError = useSelector((state: RootState) => state.trainer.error)
+  const signupError = useSelector((state: RootState) => state.trainer.error);
   useEffect(() => {
     dispatch(fetchSpecializations());
   }, [dispatch]);
@@ -67,7 +68,7 @@ function TrainerSignup() {
       newErrors.password = "Password must be at least 6 characters";
     }
 
-    if (!specialization) { 
+    if (!specialization) {
       newErrors.specialization = "Please select a specialization";
     }
 
@@ -84,14 +85,14 @@ function TrainerSignup() {
     e.preventDefault();
     const formErrors = validate();
     setErrors(formErrors);
-  
+
     if (Object.keys(formErrors).length > 0) {
       clearErrors();
       return;
     }
-  
+
     setErrors({});
-  
+
     const trainerData = {
       name,
       email,
@@ -100,23 +101,20 @@ function TrainerSignup() {
       specialization,
     };
 
-    // Dispatch the registration action
     await dispatch(registerTrainer(trainerData));
 
-    // Check if there's an error related to registration
-    if (!signupError) {  // Changed from checking if signupError
-      console.log('signup', signupError);
-      navigate("/trainer/otp", { state: trainerData }); 
+    if (!signupError) {
+      console.log("signup", signupError);
+      navigate("/trainer/otp", { state: trainerData });
     } else {
-      toast.error(signupError);  // Show error using toast if it exists
+      toast.error(signupError);
     }
   };
-  
 
   // useEffect(() => {
   //   console.log('signup',signupError);
-  //   toast.error(signupError); 
-    
+  //   toast.error(signupError);
+
   // },[handleSubmit])
 
   return (
@@ -134,7 +132,10 @@ function TrainerSignup() {
             Your platform for flexible work solutions.
           </p>
         </div>
-        <div className="w-full md:w-1/2 p-6 sm:p-8 overflow-y-auto" style={{ maxHeight: "90vh" }}>
+        <div
+          className="w-full md:w-1/2 p-6 sm:p-8 overflow-y-auto"
+          style={{ maxHeight: "90vh" }}
+        >
           <div className="flex justify-center mb-6">
             <img src={LOGO} alt="logo" className="w-30 h-10 object-contain" />
           </div>
@@ -151,7 +152,9 @@ function TrainerSignup() {
                 onChange={(e) => setName(e.target.value)}
                 className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+              {errors.name && (
+                <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+              )}
             </div>
 
             <div className="mt-4">
@@ -162,7 +165,9 @@ function TrainerSignup() {
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+              )}
             </div>
 
             <div className="mt-4">
@@ -173,7 +178,9 @@ function TrainerSignup() {
                 onChange={(e) => setPhone(e.target.value)}
                 className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
+              {errors.phone && (
+                <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
+              )}
             </div>
 
             <div className="mt-4">
@@ -184,26 +191,38 @@ function TrainerSignup() {
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+              )}
             </div>
 
             <div className="mt-4">
               <select
                 value={specialization}
-                onChange={(e) => setSpecialization(e.target.value)} // Update specialization state
+                onChange={(e) => setSpecialization(e.target.value)} 
                 className="bg-white font-normal border border-gray-300 text-gray-700 text-md rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 transition duration-200 ease-in-out hover:border-blue-500 hover:shadow-md"
               >
                 <option value="" disabled>
                   Choose a Specialization
                 </option>
-                {specializationsData.map((specializationItem: Specialization) => (
-                  <option key={specializationItem.id} value={specializationItem.id}>
-                    {specializationItem.name}
-                  </option>
-                ))}
+                {specializationsData
+                  .filter(
+                    (specializationItem: Specialization) =>
+                      specializationItem.isListed
+                  ) 
+                  .map((specializationItem: Specialization) => (
+                    <option
+                      key={specializationItem.id}
+                      value={specializationItem.id}
+                    >
+                      {specializationItem.name}
+                    </option>
+                  ))}
               </select>
               {errors.specialization && (
-                <p className="text-red-500 text-sm mt-1">{errors.specialization}</p>
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.specialization}
+                </p>
               )}
             </div>
 
@@ -216,7 +235,10 @@ function TrainerSignup() {
             <div className="text-center mt-4">
               <p className="text-gray-600">
                 Already have an account?{" "}
-                <Link to="/trainer/login" className="text-blue-500 hover:underline">
+                <Link
+                  to="/trainer/login"
+                  className="text-blue-500 hover:underline"
+                >
                   Login
                 </Link>
               </p>

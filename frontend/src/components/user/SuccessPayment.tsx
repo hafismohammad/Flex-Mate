@@ -5,33 +5,36 @@ import userAxiosInstance from '../../../axios/userAxionInstance';
 
 function SuccessPayment() {
   const navigate = useNavigate();
-
-  const location = useLocation()
-  const queryParams = new URLSearchParams(location.search)
-  const sessionId = queryParams.get('session_id')
-  const userId = queryParams.get('user_id')
-
-
-
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const sessionId = queryParams.get('session_id');
+  const userId = queryParams.get('user_id');
 
   useEffect(() => {
     const createBooking = async () => {
-      try {
-        await userAxiosInstance.post('/api/user/createBooking', {
-          sessionId,
-          userId,
-        });
-        console.log('Booking created successfully');
-      } catch (error) {
-        console.error('Error creating booking:', error);
+      // Check if the booking has already been created
+      const bookingCreated = localStorage.getItem('bookingCreated');
+
+      if (sessionId && userId && !bookingCreated) {
+        try {
+          console.log('Creating booking...');
+          await userAxiosInstance.post('/api/user/createBooking', { sessionId, userId });
+          console.log('Booking created successfully');
+          // Set flag in local storage after successful booking
+          localStorage.setItem('bookingCreated', 'true');
+        } catch (error) {
+          console.error('Error creating booking:', error);
+        }
       }
     };
 
-    if (sessionId && userId) {
-      createBooking();
-    }
+    createBooking();
+
+    // Clean up function to reset the local storage flag when leaving the page
+    return () => {
+      localStorage.removeItem('bookingCreated');
+    };
   }, [sessionId, userId]);
-  
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-blue-50 px-4">
@@ -43,12 +46,6 @@ function SuccessPayment() {
         <p className="text-gray-600 mt-2">
           Thank you for your payment. Your transaction has been completed.
         </p>
-        
-        {/* <div className="mt-6">
-          <h2 className="text-lg font-semibold text-gray-700">Order Summary</h2>
-          <p className="text-gray-500 mt-1">Order ID: #123456789</p>
-          <p className="text-gray-500 mt-1">Date: {new Date().toLocaleDateString()}</p>
-        </div> */}
 
         <div className="mt-8">
           <button

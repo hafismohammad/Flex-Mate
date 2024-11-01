@@ -238,8 +238,10 @@ async login(req: Request, res: Response): Promise<void> {
   async createBooking(req: Request, res: Response) {
     try {
       const {sessionId, userId} = req.body
+      console.log(sessionId, '--', userId);
+      
      const bookingDetails = await this.userService.findBookingDetails(sessionId, userId)
-      console.log('succefully booked', bookingDetails);
+      // console.log('succefully booked', bookingDetails);
       
     } catch (error) {
       

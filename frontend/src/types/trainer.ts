@@ -35,6 +35,7 @@ export interface KycDocument {
     _id: string;
     name: string;
     description: string;
+    isListed: boolean
   }
   
   export interface Trainer {

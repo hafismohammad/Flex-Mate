@@ -43,30 +43,30 @@ function Bookings() {
         <h2 className="text-4xl font-bold text-gray-800">Bookings</h2>
       </div>
 
-      <div className='bg-white shadow-lg p-6'>
-        <div className='grid grid-cols-9 gap-1 text-lg font-semibold text-gray-600 mb-4 border-b border-gray-200 pb-2'>
-          <div>BOOKING ID</div>
-          <div>USER NAME</div>
-          <div>BOOKING DATE</div>
-          <div>SESSION TYPE</div>
-          <div>SESSION DATE</div>
-          <div>START TIME</div>
-          <div>END TIME</div>
-          <div>AMOUNT</div>
-          <div>STATUS</div>
+      <div className='bg-white shadow-lg p-6 '>
+        <div className='grid grid-cols-9 gap-1 text-lg font-bold text-gray-600  mb-4 border-b border-gray-200 pb-2'>
+          <div>Booking ID</div>
+          <div>User Name</div>
+          <div>Booking Date</div>
+          <div>Session Type</div>
+          <div>Session Date</div>
+          <div>Start Time</div>
+          <div>End Time</div>
+          <div>Amount</div>
+          <div>Status</div>
         </div>
 
         {bookingDetails.length > 0 ? (
           bookingDetails.map((booking) => (
             <div
               key={booking._id}
-              className='grid grid-cols-9 gap-1 items-center p-4 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none mb-2'
+              className='grid grid-cols-9 gap-1 items-center   p-4 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none mb-2'
             >
-              <div className='text-gray-800 font-medium'>6765</div>
-              <div className='text-gray-800 font-medium'>{booking.userName}</div>
-              <div className='text-gray-800 font-medium'>{new Date(booking.bookingDate).toLocaleDateString()}</div>
+              <div className='text-gray-800 font-medium'>{booking._id.substring(0, 8).toUpperCase()}</div>
+              <div className='text-gray-800 font-medium '>{booking.userName}</div>
+              <div className='text-gray-800 font-medium ml-5'>{new Date(booking.bookingDate).toLocaleDateString()}</div>
               <div className='text-gray-800 font-medium'>{booking.sessionType}</div>
-              <div className='text-gray-800 font-medium'>
+              <div className='text-gray-800 font-medium ml-5'>
                 {new Date(booking.sessionDates.startDate).toLocaleDateString()}
                 {booking.sessionDates.endDate && 
                   ` - ${new Date(booking.sessionDates.endDate).toLocaleDateString()}`
@@ -75,7 +75,7 @@ function Bookings() {
               <div className='text-gray-800 font-medium'>{formatTime(booking.sessionStartTime)}</div>
               <div className='text-gray-800 font-medium'>{formatTime(booking.sessionEndTime)}</div>
               <div className='text-gray-800 font-medium'>{formatPriceToINR(booking.amount)}</div>
-              <div className='text-gray-800 font-medium'>{booking.paymentStatus}</div>
+              <div className={`text-gray-800 font-semibold ${booking.paymentStatus === 'Confirmed' ? 'text-green-500' : 'text-red-500'}`}>{booking.paymentStatus}</div>
             </div>
           ))
         ) : (

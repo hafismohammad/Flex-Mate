@@ -2,42 +2,42 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import API_URL from "../../../axios/API_URL";
 import { useNavigate, useParams } from "react-router-dom";
-import {Trainer} from '../../types/trainer'
+import { Trainer } from "../../types/trainer";
 import userAxiosInstance from "../../../axios/userAxionInstance";
-
-
 
 function TrainersList() {
   const [trainersData, setTrainersData] = useState<Trainer[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
 
   const { specId } = useParams();
-
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAllTrainers = async () => {
       try {
         const response = await userAxiosInstance.get<Trainer[]>(
-          `/api/user/allTrainers`,
+          `/api/user/allTrainers`
         );
         const trainers = response.data;
 
-        // console.log('trainers',trainers.specialization.name);
         if (specId) {
-          
           const filteredTrainers = trainers.filter(
-            (trainer) => trainer.specialization._id === specId
+            (trainer) =>
+              trainer.specialization._id === specId &&
+              trainer.specialization.isListed 
           );
           const otherTrainers = trainers.filter(
-            (trainer) => trainer.specialization._id !== specId
+            (trainer) =>
+              trainer.specialization._id !== specId &&
+              trainer.specialization.isListed 
           );
 
           setTrainersData([...filteredTrainers, ...otherTrainers]);
         } else {
-          console.log('spec outside');
-          
-          setTrainersData(trainers);
+          const listedTrainers = trainers.filter(
+            (trainer) => trainer.specialization.isListed
+          );
+          setTrainersData(listedTrainers);
         }
       } catch (error) {
         console.error("Error fetching trainers:", error);
@@ -45,15 +45,12 @@ function TrainersList() {
     };
 
     fetchAllTrainers();
-  }, []); 
-
+  }, [specId]);
 
   const filteredTrainers = trainersData.filter(
     (trainer) =>
       trainer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      trainer.specialization.name
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase())
+      trainer.specialization.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleTrainerProfileView = (trainerId: string) => {
@@ -73,34 +70,33 @@ function TrainersList() {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {filteredTrainers.map((trainer: Trainer) => (
-         <div
-         key={trainer._id}
-         className="bg-white shadow-lg rounded-lg overflow-hidden mb-5 hover:shadow-[0px_10px_20px_-5px_rgba(0,0,0,0.4)] duration-300 flex flex-col justify-between"
-       >
-         <img
-           src={trainer.profileImage}
-           alt="Profile"
-           className="w-full h-48 object-cover"
-         />
-         <div className="p-4 flex-grow flex flex-col">
-           <div className="flex-grow">
-             <h3 className="text-xl font-semibold text-gray-800">
-               {trainer.name}
-             </h3>
-             <p className="text-gray-600">{trainer.specialization.name}</p>
-             <p className="text-gray-600">
-               {trainer.specialization.description}
-             </p>
-           </div>
-           <button
-             onClick={() => handleTrainerProfileView(trainer._id)}
-             className="mt-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded self-start"
-           >
-             View Profile
-           </button>
-         </div>
-       </div>
-       
+          <div
+            key={trainer._id}
+            className="bg-white shadow-lg rounded-lg overflow-hidden mb-5 hover:shadow-[0px_10px_20px_-5px_rgba(0,0,0,0.4)] duration-300 flex flex-col justify-between"
+          >
+            <img
+              src={trainer.profileImage}
+              alt="Profile"
+              className="w-full h-48 object-cover"
+            />
+            <div className="p-4 flex-grow flex flex-col">
+              <div className="flex-grow">
+                <h3 className="text-xl font-semibold text-gray-800">
+                  {trainer.name}
+                </h3>
+                <p className="text-gray-600">{trainer.specialization.name}</p>
+                <p className="text-gray-600">
+                  {trainer.specialization.description}
+                </p>
+              </div>
+              <button
+                onClick={() => handleTrainerProfileView(trainer._id)}
+                className="mt-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded self-start"
+              >
+                View Profile
+              </button>
+            </div>
+          </div>
         ))}
       </div>
     </div>
