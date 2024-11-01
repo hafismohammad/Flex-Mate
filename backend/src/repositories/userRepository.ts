@@ -90,6 +90,8 @@ class UserRepository {
 
   async fetchAllTrainers() {
     try {
+      console.log('dff');
+      
       const trainers = await this.trainerModel.find({}).populate('specialization')
       return trainers; 
     } catch (error) {

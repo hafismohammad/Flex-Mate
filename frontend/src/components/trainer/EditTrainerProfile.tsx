@@ -8,7 +8,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { FaCamera } from "react-icons/fa";
 
 interface FormData {
-  profileImage: string | File; // Allow either a URL or file
+  profileImage: string | File; 
   name: string;
   email: string;
   phoneNumber: string;
@@ -157,7 +157,7 @@ const EditTrainerProfile: React.FC = () => {
               className="w-40 h-40 rounded-full bg-slate-500 object-cover border-4 border-white shadow-lg"
             />
           </div>
-          <div className="absolute top-36 md:top-80 left-8 md:left-56 flex items-center justify-center">
+          <div className="absolute top-36 md:top-80 left-8 md:left-48 flex items-center justify-center">
           <label htmlFor="profileImageInput">
                 <FaCamera className="text-gray-600" size={18} />
               </label>
@@ -215,7 +215,6 @@ const EditTrainerProfile: React.FC = () => {
               </option>
               <option value="male">Male</option>
               <option value="female">Female</option>
-              <option value="non-binary">Non-binary</option>
               <option value="other">Other</option>
             </select>
             <select
@@ -231,7 +230,7 @@ const EditTrainerProfile: React.FC = () => {
               <option value="spanish">Spanish</option>
               <option value="french">French</option>
               <option value="german">German</option>
-              <option value="mandarin">Mandarin</option>
+              <option value="mandarin">Arab</option>
             </select>
             <input
               name="dailySessionLimit"

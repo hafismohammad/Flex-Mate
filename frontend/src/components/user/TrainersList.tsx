@@ -15,6 +15,8 @@ function TrainersList() {
   useEffect(() => {
     const fetchAllTrainers = async () => {
       try {
+        console.log('dfdfd');
+        
         const response = await userAxiosInstance.get<Trainer[]>(
           `/api/user/allTrainers`
         );

@@ -168,8 +168,9 @@ async login(req: Request, res: Response): Promise<void> {
 
   async getAllTrainers(req: Request, res: Response) {
     try {
+      
       const allTrainers = await this.userService.fetchAllTrainers();
-      // console.log(allTrainers);
+      console.log(allTrainers);
       
       res.status(200).json(allTrainers);
     } catch (error) {
