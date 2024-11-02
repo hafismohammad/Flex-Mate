@@ -26,6 +26,8 @@ router.get("/getTrainer/:trainerId", authMiddleware, userController.getTrainer.b
 router.get("/sessionSchedules", authMiddleware, userController.getSessionSchedules.bind(userController))
 router.post("/makePayment/:sessionId", authMiddleware, userController.checkoutPayment.bind(userController))
 router.post("/createBooking", authMiddleware, userController.createBooking.bind(userController))
+router.get('/getUser/:userId', authMiddleware, userController.getUser.bind(userController))
+router.patch('/updateUser', authMiddleware, userController.updateUserData.bind(userController))
 
 
 export default router;

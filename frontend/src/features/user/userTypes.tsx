@@ -2,11 +2,13 @@
 
 // Structure of the user object
 export interface User {
-    userId?: string;
+   id: string;
     name: string;
     phone: string;
     email: string;
     password: string;
+    dob?:string
+    gender?: string,
     isBlocked?: boolean;
   }
 

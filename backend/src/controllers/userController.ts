@@ -239,16 +239,37 @@ async login(req: Request, res: Response): Promise<void> {
   async createBooking(req: Request, res: Response) {
     try {
       const {sessionId, userId} = req.body
-      // console.log(sessionId, '--', userId);
-      
      const bookingDetails = await this.userService.findBookingDetails(sessionId, userId)
-      // console.log('succefully booked', bookingDetails);
-      
+
     } catch (error) {
+      console.log('Error in create booking');
+      res.status(500).json({message: 'Failed to create bookin'})
+    }
+  }
+
+  async getUser(req: Request, res: Response) {
+    try {
+      const userId = req.params.userId
+      const userData = await this.userService.fetchUserData(userId)
+      res.status(200).json(userData)
+    } catch (error) {
+      console.log('Error getting user data');
+      res.status(500).json({message: 'Failed to fetch user data'})
       
     }
   }
 
+  async updateUserData(req: Request, res: Response) {
+    try {
+      const userData = req.body
+      const userId = req.body._id
+      await this.userService.updateUser(userData, userId)
+      res.status(200).json({message: 'User Updated Successfully'})
+    } catch (error) {
+      console.error("Error updating user data:", error);
+      res.status(500).json({ message: 'Error updating user data' });
+    }
+  }
 
 }
 

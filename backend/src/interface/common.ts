@@ -10,10 +10,6 @@ export interface IUser {
   dob?: string;
   image?: string;
   gender?: string;
-  address?: {
-    street: string;
-    city: string;
-  };
   isBlocked: boolean;
 }
 

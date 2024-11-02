@@ -6,6 +6,7 @@ import TrainerModel from "../models/trainerModel";
 import SpecializationModel from "../models/specializationModel";
 import SessionModel from "../models/sessionModel";
 import BookingModel from "../models/booking";
+import { User } from "../interface/user_interface";
 
 class UserRepository {
   private userModel = UserModel;
@@ -221,6 +222,30 @@ class UserRepository {
       throw new Error("Failed to create booking.");
     }
   }
+
+  async fetchUser(userId: string) {
+    try {
+      const userData = await this.userModel.findById(userId)
+      return userData
+    } catch (error) {
+      throw new Error('Error fetching user')
+    }
+  }
+
+  async updateUser(userdata: User, userId: string) {
+    try {
+      
+     const updatedUser = await this.userModel.findByIdAndUpdate(
+        {_id: userId},
+        { $set: userdata },
+        { new: true }
+      )
+      return updatedUser
+    } catch (error) {
+      console.error("Error updating user:", error);
+    throw new Error("Failed to update user");
+    }
+  } 
 }
 
 export default UserRepository;
