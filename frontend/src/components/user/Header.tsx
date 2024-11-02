@@ -6,14 +6,19 @@ import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "../../app/store";
 import ProfileIcon from '../../assets/profile-icon.png'
 import {logoutUser} from '../../actions/userAction'
+import userAxiosInstance from "../../../axios/userAxionInstance";
 
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [image, setImage] = useState<string | null>(null)
+
+  
+  const { userInfo, token } = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  const {  token } = useSelector((state: RootState) => state.user);
+
 
 
   // Logout handler
@@ -22,7 +27,20 @@ function Header() {
     navigate("/login");
   };
 
+  useEffect(() => {
+    if (!userInfo?.id) return;
 
+    const fetchUserDetails = async () => {
+      try {
+        const response = await userAxiosInstance.get(`/api/user/getUser/${userInfo?.id}`);
+        
+        setImage(response.data.image);
+      } catch (error) {
+        console.error("Failed to fetch user details", error);
+      }
+    };
+    fetchUserDetails();
+  }, [userInfo?.id]);
 
   return (
 <header className="fixed top-0 left-0 w-full flex justify-between items-center bg-blue-800 text-white p-4 z-50 shadow-xl">
@@ -60,7 +78,7 @@ function Header() {
       <div>
         <img
           alt="user profile"
-          src={ProfileIcon}
+          src={ image||ProfileIcon}
           className="h-10 w-10 cursor-pointer rounded-full object-cover"
           onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
         />

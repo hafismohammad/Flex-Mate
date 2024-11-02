@@ -7,11 +7,13 @@ import userAxiosInstance from "../../../axios/userAxionInstance";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import profileDummy from '../../assets/profile-dummy.webp'
+import Loading from "../spinner/Loading";
 
 
 function UserProfileSideBar() {
   const [selectImage, setSelectedImage] = useState<File | null>(null);
   const [preview , setPreview] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
 
   const {userInfo} = useSelector((state: RootState) => state.user)
   const navigate = useNavigate();
@@ -43,6 +45,7 @@ function UserProfileSideBar() {
       toast.error("Please select an image first");
       return;
     }
+    setLoading(true)
     const formData = new FormData();
     formData.append("profileImage", selectImage);
 
@@ -59,6 +62,8 @@ function UserProfileSideBar() {
     } catch (error) {
       console.error("Image upload failed", error);
       toast.error("Failed to upload profile image");
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -79,6 +84,7 @@ function UserProfileSideBar() {
             alt="profile"
             className="bg-black mt-9 h-40 w-40 object-cover rounded-full"
           />
+         {loading && <Loading />}
         </div>
         <div className="flex justify-center mt-4">
           {!selectImage ? (

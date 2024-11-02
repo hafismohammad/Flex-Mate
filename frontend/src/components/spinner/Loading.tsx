@@ -1,8 +1,10 @@
-import { FaSpinner } from "react-icons/fa";
+import {ScaleLoader} from 'react-spinners'
 
 function Loading() {
   return (
-    <FaSpinner className="animate-spin inline-block mr-2 text-5xl  mt-10" />
+    <div className="absolute inset-0 h-full flex items-center justify-center bg-black bg-opacity-20 ">
+    <ScaleLoader color="#4299e1" />
+  </div>
   )
 }
 

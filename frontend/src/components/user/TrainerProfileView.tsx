@@ -392,7 +392,7 @@ const handlePayment = async (sessionId: string) => {
              Proceed to Payment
            </button>
           </> 
-           ): <div className="absolute inset-0 flex justify-center items-center"> <Loading /></div> }
+           ):  <Loading /> }
           </div>
         </div>
       )}

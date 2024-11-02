@@ -15,10 +15,10 @@ function Features() {
 
   useEffect(() => {
     AOS.init({
-      duration: 1500, 
-      delay: 100, 
-      easing: "ease-out-quart", 
-      once: true, 
+      duration: 600, 
+      delay: 50,     
+      easing: "ease-out-quart",
+      once: true,
     });
   }, []);
 
@@ -54,14 +54,16 @@ function Features() {
           specializations.map((feature) => (
             <div
               key={feature._id}
-              className="flex flex-col justify-between h-full bg-white w-full max-w-sm mx-auto rounded-md shadow-md hover:shadow-lg transition-shadow duration-300"
+               className="flex flex-col justify-between h-full bg-white w-full max-w-sm mx-auto rounded-md shadow-md hover:shadow-lg transition-shadow duration-300"
               data-aos="fade-up"
+               data-aos-offset="200"
             >
               <div className="overflow-hidden rounded-t-md">
                 <img
                   className="w-full h-48 object-cover"
                   src={feature.image}
                   alt={feature.title}
+                   loading="lazy"
                 />
               </div>
               <div className="p-4 flex-grow">
