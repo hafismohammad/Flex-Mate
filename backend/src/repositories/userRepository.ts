@@ -10,10 +10,10 @@ import BookingModel from "../models/booking";
 class UserRepository {
   private userModel = UserModel;
   private otpModel = OtpModel;
-  private trainerModel = TrainerModel
-  private specializationModel = SpecializationModel
-  private sessionModel = SessionModel
-  private bookingModel = BookingModel
+  private trainerModel = TrainerModel;
+  private specializationModel = SpecializationModel;
+  private sessionModel = SessionModel;
+  private bookingModel = BookingModel;
   // Check if user already exists by email
   async existsUser(email: string): Promise<IUser | null> {
     try {
@@ -90,45 +90,44 @@ class UserRepository {
 
   async fetchAllTrainers() {
     try {
-      console.log('dff');
-      
-      const trainers = await this.trainerModel.find({}).populate('specialization')
-      return trainers; 
+      console.log("dff");
+
+      const trainers = await this.trainerModel
+        .find({})
+        .populate("specialization");
+      return trainers;
     } catch (error) {
-      console.error('Error fetching trainers from the database:', error);
-      throw error; 
+      console.error("Error fetching trainers from the database:", error);
+      throw error;
     }
   }
-  
 
   async fetchSpecializations() {
     try {
-      const data =   await this.specializationModel.find({})
-      return data
+      const data = await this.specializationModel.find({});
+      return data;
     } catch (error) {
-      console.error('Error fetching specializations from the database:', error);
-      throw error; 
+      console.error("Error fetching specializations from the database:", error);
+      throw error;
     }
   }
 
   async getTrainer(trainerId: string) {
     try {
-      const trainer = await this.trainerModel.find({_id : trainerId}).populate('specialization')
+      const trainer = await this.trainerModel
+        .find({ _id: trainerId })
+        .populate("specialization");
       // console.log(trainer);
-      
-      return trainer
-    } catch (error) {
-      
-    }
+
+      return trainer;
+    } catch (error) {}
   }
 
   async fetchAllSessionSchedules() {
     try {
-      const schedules = await this.sessionModel.find({})
-      return schedules      
-    } catch (error) {
-      
-    }
+      const schedules = await this.sessionModel.find({});
+      return schedules;
+    } catch (error) {}
   }
 
   async deleteExpiredUnbookedSessions(currentDate: Date): Promise<number> {
@@ -140,28 +139,32 @@ class UserRepository {
     return result.deletedCount || 0;
   }
 
-
   async findSessionDetails(session_id: string) {
-    return await this.sessionModel.findById(session_id)
+    return await this.sessionModel.findById(session_id);
   }
-  
+
   async findTrainerDetails(trainer_id: string) {
     const trainerData = await this.trainerModel.aggregate([
       { $match: { _id: new mongoose.Types.ObjectId(trainer_id) } },
       {
         $lookup: {
-          from: 'specializations', // The name of the collection for `specialization`
-          localField: 'specialization',
-          foreignField: '_id',
-          as: 'specializationData'
-        }
+          from: "specializations",
+          localField: "specialization",
+          foreignField: "_id",
+          as: "specializationData",
+        },
       },
-      { $unwind: { path: "$specializationData", preserveNullAndEmptyArrays: true } },
+      {
+        $unwind: {
+          path: "$specializationData",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
       {
         $project: {
           name: 1,
           email: 1,
-          specialization: "$specializationData", // Assign populated specialization here
+          specialization: "$specializationData",
           kycStatus: 1,
           isBlocked: 1,
           createdAt: 1,
@@ -170,56 +173,54 @@ class UserRepository {
           gender: 1,
           language: 1,
           yearsOfExperience: 1,
-          dailySessionLimit: 1
-        }
-      }
+          dailySessionLimit: 1,
+        },
+      },
     ]);
-  
-    return trainerData[0]; 
-  }
-  
 
+    return trainerData[0];
+  }
 
   static async getIsBlockedUser(user_id: string): Promise<boolean> {
     try {
-       const user = await UserModel.findById(user_id);
-       return  user?.isBlocked ?? false;
-
+      const user = await UserModel.findById(user_id);
+      return user?.isBlocked ?? false;
     } catch (error: any) {
-      throw new Error(`Failed to fetch user's blocked status: ${error.message}`);
+      throw new Error(
+        `Failed to fetch user's blocked status: ${error.message}`
+      );
     }
   }
 
-
-
-
-async findExistingBooking(bookingDetails: IBooking) {
-  try {
-    // Check for an existing booking using sessionId and userId
-    const existingBooking = await this.bookingModel.findOne({
-      sessionId: bookingDetails.sessionId,
-      userId: bookingDetails.userId,
-    });
-    return existingBooking; // Returns null if no booking is found
-  } catch (error) {
-    console.error('Error finding existing booking:', error);
-    throw new Error('Failed to find existing booking.');
+  async findExistingBooking(bookingDetails: IBooking) {
+    try {
+      const existingBooking = await this.bookingModel.findOne({
+        sessionId: bookingDetails.sessionId,
+        userId: bookingDetails.userId,
+      });
+      await this.sessionModel.findByIdAndUpdate(
+        { _id: bookingDetails.sessionId },
+        { isBooked: true },
+        { new: true }
+      );
+      return existingBooking;
+    } catch (error) {
+      console.error("Error finding existing booking:", error);
+      throw new Error("Failed to find existing booking.");
+    }
   }
-}
 
-
-async createBooking(bookingDetails: IBooking) {
-  try {
-    // Create a new booking using the Booking model
-    const newBooking = await this.bookingModel.create(bookingDetails);
-    console.log('Booking created successfully:', newBooking);
-    return newBooking;
-  } catch (error) {
-    console.error('Error creating booking:', error);
-    throw new Error('Failed to create booking.');
+  async createBooking(bookingDetails: IBooking) {
+    try {
+      // Create a new booking using the Booking model
+      const newBooking = await this.bookingModel.create(bookingDetails);
+      console.log("Booking created successfully:", newBooking);
+      return newBooking;
+    } catch (error) {
+      console.error("Error creating booking:", error);
+      throw new Error("Failed to create booking.");
+    }
   }
-}
-   
 }
 
 export default UserRepository;

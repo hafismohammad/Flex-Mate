@@ -5,7 +5,7 @@ import { TrainerProfile } from "../../types/trainer";
 import LOGO from "../../assets/LOGO-2.png";
 import DatePicker from "react-datepicker";
 import { ISessionSchedule } from "../../types/common";
-import { formatPriceToINR, numberOfSessions, calculateDuration} from "../../utils/timeAndPriceUtils";
+import { formatPriceToINR, numberOfSessions, calculateDuration, formatTime} from "../../utils/timeAndPriceUtils";
 import { AiOutlineClose } from "react-icons/ai";
 import userAxiosInstance from "../../../axios/userAxionInstance";
 import {loadStripe} from '@stripe/stripe-js'
@@ -97,7 +97,8 @@ const handlePayment = async (sessionId: string) => {
       (session) =>
         session.trainerId === trainerId &&
         session.isSingleSession === isSingleSession &&
-        new Date(session.startDate).toLocaleDateString() === selectedDate.toLocaleDateString()
+        new Date(session.startDate).toLocaleDateString() === selectedDate.toLocaleDateString() &&
+        session.isBooked == false
     );
     setFilteredSessions(filtered);
   }, [selectedDate, isSingleSession, sessionSchedules, trainerId]);
@@ -109,7 +110,8 @@ const handlePayment = async (sessionId: string) => {
         .filter(
           (session) =>
             session.trainerId === trainerId &&
-            session.isSingleSession === isSingleSession 
+            session.isSingleSession === isSingleSession  &&
+            session.isBooked === false
         )
         .map((session) => new Date(session.startDate).toDateString())
     )
@@ -234,7 +236,8 @@ const handlePayment = async (sessionId: string) => {
                 (session) =>
                   session.isSingleSession === isSingleSession &&
                   session.trainerId === trainerId &&
-                  (!selectedDate || new Date(session.startDate).toLocaleDateString() === selectedDate.toLocaleDateString()
+                  (!selectedDate || new Date(session.startDate).toLocaleDateString() === selectedDate.toLocaleDateString() &&
+                  session.isBooked == false
                 )
               ).length === 0 ? (
                 <div className="flex justify-center">
@@ -247,14 +250,15 @@ const handlePayment = async (sessionId: string) => {
                   .filter((session) =>
                     session.isSingleSession === isSingleSession &&
                     session.trainerId === trainerId &&
-                    (!selectedDate || new Date(session.startDate).toLocaleDateString() === selectedDate.toLocaleDateString())
+                    (!selectedDate || new Date(session.startDate).toLocaleDateString() === selectedDate.toLocaleDateString()) &&
+                    session.isBooked == false
                   )
                   .map((session) => (
                     <div key={session._id} className="mb-8">
                       <div className="flex justify-between items-center">
                         <div>
                           <h1 className="font-medium text-2xl">
-                            Time: {session.startTime} - {session.endTime}
+                            Time: {formatTime(session.startTime)} - {formatTime(session.endTime)}
                           </h1>
                           <p>Duration: ({calculateDuration(session.startTime, session.endTime)})</p>
                           {!isSingleSession && (
@@ -355,8 +359,8 @@ const handlePayment = async (sessionId: string) => {
                 </>
                 )}
                  <p className="text-gray-900">
-                   Time: {selectedSession.startTime} -{" "}
-                   {selectedSession.endTime}
+                   Time: {formatTime(selectedSession.startTime)} -{" "}
+                   {formatTime(selectedSession.endTime)}
                  </p>
                </div>
 

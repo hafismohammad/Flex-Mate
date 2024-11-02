@@ -294,6 +294,9 @@ async findBookingDetails(session_id: string, user_id: string) {
   try {
     const session = await this.userRepository.findSessionDetails(session_id);
 
+
+  
+
     const trainerId = session?.trainerId;
 
     if (!trainerId) {

@@ -10,6 +10,7 @@ const sessionSchema = new Schema<ISession>({
   endTime: {type: String, require: true},
   isSingleSession: { type: Boolean, required: true },
   price: { type: Number, required: true },
+  isBooked: {type: Boolean,  default: false},
   status: {
     type: String,
     enum: ["Pending", "Confirmed", "Completed", "Cancelled", "InProgress"],

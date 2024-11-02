@@ -252,31 +252,46 @@ class TrainerRepository {
   
       const existingSessions = await this.sessionModel.find({
         trainerId: sessionData.trainerId,
-        startDate: {
-          $gte: sessionData.startDate,
-          $lte: sessionData.endDate,
-        },
+        $or: [
+     
+          {
+            startDate: { $gte: sessionData.startDate, $lte: sessionData.endDate },
+          },
+        
+          {
+            startDate: sessionData.startDate,
+            endDate: null,
+          },
+        ],
       });
   
       const hasConflict = existingSessions.some((existingSession) => {
         const existingStartDate = moment(existingSession.startDate);
-        const existingEndDate = moment(existingSession.endDate);
+        const existingEndDate = existingSession.endDate
+          ? moment(existingSession.endDate)
+          : existingStartDate;
         const existingStartTime = moment(existingSession.startTime, "HH:mm");
         const existingEndTime = moment(existingSession.endTime, "HH:mm");
       
         const newStartDate = moment(sessionData.startDate);
-        const newEndDate = moment(sessionData.endDate);
+        const newEndDate = sessionData.endDate
+          ? moment(sessionData.endDate)
+          : newStartDate;
         const newStartTime = moment(sessionData.startTime, "HH:mm");
         const newEndTime = moment(sessionData.endTime, "HH:mm");
       
-        const dateRangeOverlaps = 
-          (newStartDate.isSameOrBefore(existingEndDate) && newEndDate.isSameOrAfter(existingStartDate));
+        const dateRangeOverlaps =
+          newStartDate.isSameOrBefore(existingEndDate) &&
+          newEndDate.isSameOrAfter(existingStartDate);
       
-        const timeRangeOverlaps = 
+        const timeRangeOverlaps =
           newStartTime.isBefore(existingEndTime) && newEndTime.isAfter(existingStartTime);
-
+      
+    
         return dateRangeOverlaps && timeRangeOverlaps;
       });
+
+      
       
       if (hasConflict) {
         throw new Error("Time conflict with an existing session.");

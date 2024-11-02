@@ -7,6 +7,7 @@ export interface ISessionSchedule {
     endTime: string;
     price: number;
     duration?: string; 
+    isBooked: boolean,
     status: 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled' | 'InProgress'; 
     trainerId: string;
   }
