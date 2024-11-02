@@ -13,7 +13,7 @@ function Header() {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  const { userInfo, token } = useSelector((state: RootState) => state.user);
+  const {  token } = useSelector((state: RootState) => state.user);
 
 
   // Logout handler
@@ -72,7 +72,7 @@ function Header() {
             <li className="px-4 py-2 hover:bg-gray-100">
               <Link to="/profile">My Profile</Link>
             </li>
-            <li className="px-4 py-2 hover:bg-gray-100">
+            {/* <li className="px-4 py-2 hover:bg-gray-100">
               <Link to="/edit-profile">Edit Profile</Link>
             </li>
             <li className="px-4 py-2 hover:bg-gray-100">
@@ -80,7 +80,7 @@ function Header() {
             </li>
             <li className="px-4 py-2 hover:bg-gray-100">
               <Link to="/help">Help</Link>
-            </li>
+            </li> */}
             <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={handleLogout}>
               Logout
             </li>
