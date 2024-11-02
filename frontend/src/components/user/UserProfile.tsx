@@ -106,13 +106,13 @@ function UserProfile() {
           </div>
 
           <div className="flex justify-end p-8">
-            <button onClick={handleEdit} className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
+            <button onClick={handleEdit} className="bg-blue-500 text-white py-3 px-6 rounded-md hover:bg-blue-600">
               Edit
             </button>
           </div>
         </div>
       ) : (
-        <div className="h-[70vh] bg-white w-[75%] shadow-md rounded-md overflow-y-auto">
+        <div className="h-[75vh] bg-white w-[75%] shadow-md rounded-md overflow-y-auto">
           <h1 className="p-5 font-bold text-2xl">Edit Personal Information</h1>
           <form onSubmit={handleProfileUpdate}>
             <div className="mt-5 w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-6 p-8">
@@ -179,7 +179,7 @@ function UserProfile() {
             <div className="flex justify-end p-8">
               <button
                 type="submit"
-                className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+                className="bg-blue-500 text-white py-3 px-6 rounded-md hover:bg-blue-600"
               >
                 Save
               </button>

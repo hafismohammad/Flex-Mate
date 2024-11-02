@@ -4,6 +4,7 @@ import UserService from "../services/userService";
 import UserController from "../controllers/userController";
 import authMiddleware from "../middlewares/authMiddlewares";
 import bodyParser from 'body-parser';
+import upload from "../utils/multer";
 
 
 
@@ -28,6 +29,7 @@ router.post("/makePayment/:sessionId", authMiddleware, userController.checkoutPa
 router.post("/createBooking", authMiddleware, userController.createBooking.bind(userController))
 router.get('/getUser/:userId', authMiddleware, userController.getUser.bind(userController))
 router.patch('/updateUser', authMiddleware, userController.updateUserData.bind(userController))
+router.patch('/uploadProfileImage/:userId', authMiddleware, upload.single('profileImage'), userController.uploadProfileImage.bind(userController))
 
 
 export default router;

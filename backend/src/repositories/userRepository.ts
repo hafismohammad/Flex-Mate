@@ -246,6 +246,15 @@ class UserRepository {
     throw new Error("Failed to update user");
     }
   } 
+
+  async uploadPfileImage(imagUrl: string, user_id: string) {
+    try {
+      const profileImageUpdate = await this.userModel.findByIdAndUpdate({_id: user_id}, {image: imagUrl})
+      return profileImageUpdate
+    } catch (error) {
+      
+    }
+  }
 }
 
 export default UserRepository;

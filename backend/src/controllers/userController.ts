@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import UserService from "../services/userService";
 import { IUser, ILoginUser } from "../interface/common";
-import stripe from "../config/stripeClient";
+import { uploadToCloudinary } from "../config/cloudinary";
 
 class UserController {
   private userService: UserService;
@@ -31,46 +31,44 @@ class UserController {
   }
 
   // Login user
-async login(req: Request, res: Response): Promise<void> {
-  try {
-    console.log("login route hit");
+  async login(req: Request, res: Response): Promise<void> {
+    try {
+      console.log("login route hit");
 
-    const { email, password }: ILoginUser = req.body;
+      const { email, password }: ILoginUser = req.body;
 
-    const user = await this.userService.login({ email, password });
+      const user = await this.userService.login({ email, password });
 
-    if (user) {
-      console.log("user", user);
+      if (user) {
+        console.log("user", user);
 
-      const { accessToken, refreshToken } = user;
+        const { accessToken, refreshToken } = user;
 
-      // Set refresh token as cookie
-      res.cookie("refresh_token", refreshToken, {
-        httpOnly: true,
-        sameSite: "none",
-        secure: true,
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-      });
+        // Set refresh token as cookie
+        res.cookie("refresh_token", refreshToken, {
+          httpOnly: true,
+          sameSite: "none",
+          secure: true,
+          maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
 
-      res.status(200).json({
-        message: "Login successful",
-        user: user.user,
-        token: accessToken,
-      });
-    }
-
-  } catch (error: any) {
-    // Handle specific errors
-    if (error.message === "User is blocked") {
-      res.status(403).json({ message: "User is blocked" });
-    } else if (error.message === "Invalid email or password") {
-      res.status(401).json({ message: "Invalid email or password" });
-    } else {
-      res.status(500).json({ message: "An unexpected error occurred" });
+        res.status(200).json({
+          message: "Login successful",
+          user: user.user,
+          token: accessToken,
+        });
+      }
+    } catch (error: any) {
+      // Handle specific errors
+      if (error.message === "User is blocked") {
+        res.status(403).json({ message: "User is blocked" });
+      } else if (error.message === "Invalid email or password") {
+        res.status(401).json({ message: "Invalid email or password" });
+      } else {
+        res.status(500).json({ message: "An unexpected error occurred" });
+      }
     }
   }
-}
-
 
   async refreshToken(req: Request, res: Response) {
     const refresh_token = req.cookies?.refresh_token;
@@ -81,9 +79,7 @@ async login(req: Request, res: Response): Promise<void> {
     }
 
     try {
-      const newAccessToken = await this.userService.generateTokn(
-        refresh_token
-      );
+      const newAccessToken = await this.userService.generateTokn(refresh_token);
 
       const UserNewAccessToken = Object.assign(
         {},
@@ -158,7 +154,7 @@ async login(req: Request, res: Response): Promise<void> {
         secure: true,
       });
 
-      res.status(200).json({ message: "Logged out successfully", });
+      res.status(200).json({ message: "Logged out successfully" });
     } catch (error) {
       console.error("Logout error:", error);
 
@@ -168,45 +164,43 @@ async login(req: Request, res: Response): Promise<void> {
 
   async getAllTrainers(req: Request, res: Response) {
     try {
-      
       const allTrainers = await this.userService.fetchAllTrainers();
       console.log(allTrainers);
-      
+
       res.status(200).json(allTrainers);
     } catch (error) {
-      console.error('Error fetching trainers:', error);
-      res.status(500).json({ message: 'Error fetching trainers' });
+      console.error("Error fetching trainers:", error);
+      res.status(500).json({ message: "Error fetching trainers" });
     }
   }
 
   async getAllspecializations(req: Request, res: Response) {
     try {
-      
-      const allSpecializations = await this.userService.specializations()
+      const allSpecializations = await this.userService.specializations();
       // console.log(allSpecializations);
-      
-      res.status(200).json(allSpecializations)
+
+      res.status(200).json(allSpecializations);
     } catch (error) {
-      console.error('Error fetching trainers:', error);
-      res.status(500).json({ message: 'Error fetching trainers' });
+      console.error("Error fetching trainers:", error);
+      res.status(500).json({ message: "Error fetching trainers" });
     }
   }
 
   async getTrainer(req: Request, res: Response) {
     try {
       const trainerId = req.params.trainerId;
-      
+
       if (!trainerId) {
-         res.status(400).json({ message: "Trainer ID is required" });
+        res.status(400).json({ message: "Trainer ID is required" });
       }
-  
+
       const trainer = await this.userService.getTrainer(trainerId);
       // console.log(trainer);
-      
+
       if (!trainer) {
-         res.status(404).json({ message: "Trainer not found" });
+        res.status(404).json({ message: "Trainer not found" });
       }
-  
+
       res.status(200).json(trainer);
     } catch (error) {
       console.error("Error in getTrainer controller:", error);
@@ -216,61 +210,80 @@ async login(req: Request, res: Response): Promise<void> {
 
   async getSessionSchedules(req: Request, res: Response) {
     try {
-
-      const sessionSchedules = await this.userService.getSessionSchedules()
-      res.status(200).json(sessionSchedules)
-    } catch (error) {
-      
-    }
+      const sessionSchedules = await this.userService.getSessionSchedules();
+      res.status(200).json(sessionSchedules);
+    } catch (error) {}
   }
 
   async checkoutPayment(req: Request, res: Response) {
     try {
-      const userId = req.body.userData.id      
-      const session_id = req.params.sessionId;  
-      const paymentResponse = await this.userService.checkoutPayment(session_id, userId);
+      const userId = req.body.userData.id;
+      const session_id = req.params.sessionId;
+      const paymentResponse = await this.userService.checkoutPayment(
+        session_id,
+        userId
+      );
       res.status(200).json({ id: paymentResponse.id });
     } catch (error) {
-      console.error('Error in checkoutPayment:', error);
-      res.status(500).json({ message: 'Failed to create checkout session' });
+      console.error("Error in checkoutPayment:", error);
+      res.status(500).json({ message: "Failed to create checkout session" });
     }
   }
 
   async createBooking(req: Request, res: Response) {
     try {
-      const {sessionId, userId} = req.body
-     const bookingDetails = await this.userService.findBookingDetails(sessionId, userId)
-
+      const { sessionId, userId } = req.body;
+      const bookingDetails = await this.userService.findBookingDetails(
+        sessionId,
+        userId
+      );
     } catch (error) {
-      console.log('Error in create booking');
-      res.status(500).json({message: 'Failed to create bookin'})
+      console.log("Error in create booking");
+      res.status(500).json({ message: "Failed to create bookin" });
     }
   }
 
   async getUser(req: Request, res: Response) {
     try {
-      const userId = req.params.userId
-      const userData = await this.userService.fetchUserData(userId)
-      res.status(200).json(userData)
+      const userId = req.params.userId;
+      const userData = await this.userService.fetchUserData(userId);
+      res.status(200).json(userData);
     } catch (error) {
-      console.log('Error getting user data');
-      res.status(500).json({message: 'Failed to fetch user data'})
-      
+      console.log("Error getting user data");
+      res.status(500).json({ message: "Failed to fetch user data" });
     }
   }
 
   async updateUserData(req: Request, res: Response) {
     try {
-      const userData = req.body
-      const userId = req.body._id
-      await this.userService.updateUser(userData, userId)
-      res.status(200).json({message: 'User Updated Successfully'})
+      const userData = req.body;
+      const userId = req.body._id;
+      await this.userService.updateUser(userData, userId);
+      res.status(200).json({ message: "User Updated Successfully" });
     } catch (error) {
       console.error("Error updating user data:", error);
-      res.status(500).json({ message: 'Error updating user data' });
+      res.status(500).json({ message: "Error updating user data" });
     }
   }
 
+  async uploadProfileImage(req: Request, res: Response) {
+    try {
+      const user_id = req.params.userId
+      console.log('hjjjj',user_id);
+      
+      if (req.file) {
+        const profileImageUrl = await uploadToCloudinary(req.file.buffer, 'user_profileImage')  
+        const imgUrl = await this.userService.uploadProfileImage(profileImageUrl.secure_url, user_id)
+              
+        res.status(200).json({ message: "Image uploaded successfully", imgUrl } );
+      } else {
+        res.status(400).json({ message: "No file provided" });
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error uploading image" });
+    }
+  }
 }
 
 export default UserController;

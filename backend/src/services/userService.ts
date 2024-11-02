@@ -374,7 +374,16 @@ class UserService {
   async updateUser(userdata: User, userId: string) {
     try {
      return await this.userRepository.updateUser(userdata, userId)
+    } catch (error: any) {
+      console.log(error)
+      throw new Error(error)
+    }
+  }
+  async uploadProfileImage(imagUrl: string, user_id: string) {
+    try {
+      return await this.userRepository.uploadPfileImage(imagUrl, user_id)
     } catch (error) {
+      console.log(error);
       
     }
   }
