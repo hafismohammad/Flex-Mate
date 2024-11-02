@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 function UserProfileSideBar() {
   return (
-    <div className="w-[20%]">
+    <div className="w-[20%] bg-blue-500">
       <nav className="flex flex-col space-y-4">
         <div className="flex justify-center">
           <img

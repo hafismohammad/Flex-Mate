@@ -9,7 +9,6 @@ function Footer() {
             <div className="mr-12 hidden lg:block">
               <span>Get connected with us on social networks:</span>
             </div>
-            {/* <!-- Social network icons container --> */}
             <div className="flex justify-center">
               <a className="mr-6 text-neutral-600 dark:text-neutral-200">
                 <svg
@@ -76,10 +75,8 @@ function Footer() {
             </div>
           </div>
     
-          {/* <!-- Main container div: holds the entire content of the footer, including four sections (TW Elements, Products, Useful links, and Contact), with responsive styling and appropriate padding/margins. --> */}
           <div className="mx-6 py-10 text-center md:text-left">
             <div className="grid-1 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-              {/* <!-- TW Elements section --> */}
               <div className="">
                 <h6
                   className="mb-4 flex items-center justify-center font-semibold uppercase md:justify-start">
@@ -89,7 +86,6 @@ function Footer() {
                 Your online platform for virtual fitness coaching. Access personalized sessions, track your progress, and connect with expert trainers to achieve your fitness goals
                 </p>
               </div>
-              {/* <!-- Products section --> */}
               <div className="">
                 <h6
                   className="mb-4 flex justify-center font-semibold uppercase md:justify-start">
@@ -112,7 +108,6 @@ function Footer() {
                   >Meditation</a>
                 </p>
               </div>
-              {/* <!-- Useful links section --> */}
               <div className="">
                 <h6
                   className="mb-4 flex justify-center font-semibold uppercase md:justify-start">
@@ -135,7 +130,6 @@ function Footer() {
                   >Help</a>
                 </p>
               </div>
-              {/* <!-- Contact section --> */}
               <div>
                 <h6
                   className="mb-4 flex justify-center font-semibold uppercase md:justify-start">
@@ -197,9 +191,8 @@ function Footer() {
             </div>
           </div>
     
-          {/* <!--Copyright section--> */}
           <div className="bg-neutral-200 p-6 text-center dark:bg-gray-950">
-            <span>© 2023 Copyright:</span>
+            <span>© 2024 Copyright:</span>
             <a
               className="font-semibold text-neutral-600 dark:text-neutral-400"
               href="https://tw-elements.com/"

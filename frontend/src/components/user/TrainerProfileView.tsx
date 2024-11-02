@@ -15,7 +15,8 @@ import { RootState } from "../../app/store";
 
 function TrainerProfileView() {
   const [trainer, setTrainer] = useState<TrainerProfile | null>(null);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date()); 
+  const [filteredSessions, setFilteredSessions] = useState<ISessionSchedule[]>([]); 
   const [isSingleSession, setIsSingleSession] = useState(true);
   const [sessionSchedules, setSessionSchedules] = useState<ISessionSchedule[]>(
     []
@@ -88,7 +89,19 @@ const handlePayment = async (sessionId: string) => {
     fetchSeessionSchedules();
   }, []);
 
-  console.log(sessionSchedules);
+
+  useEffect(() => {
+    if (!selectedDate) return; 
+  
+    const filtered = sessionSchedules.filter(
+      (session) =>
+        session.trainerId === trainerId &&
+        session.isSingleSession === isSingleSession &&
+        new Date(session.startDate).toLocaleDateString() === selectedDate.toLocaleDateString()
+    );
+    setFilteredSessions(filtered);
+  }, [selectedDate, isSingleSession, sessionSchedules, trainerId]);
+  
 
   const sessionDates = Array.from(
     new Set(
@@ -96,7 +109,7 @@ const handlePayment = async (sessionId: string) => {
         .filter(
           (session) =>
             session.trainerId === trainerId &&
-            session.isSingleSession === isSingleSession
+            session.isSingleSession === isSingleSession 
         )
         .map((session) => new Date(session.startDate).toDateString())
     )
@@ -221,7 +234,8 @@ const handlePayment = async (sessionId: string) => {
                 (session) =>
                   session.isSingleSession === isSingleSession &&
                   session.trainerId === trainerId &&
-                  (!selectedDate || new Date(session.startDate).toLocaleDateString() === selectedDate.toLocaleDateString())
+                  (!selectedDate || new Date(session.startDate).toLocaleDateString() === selectedDate.toLocaleDateString()
+                )
               ).length === 0 ? (
                 <div className="flex justify-center">
                   <h1 className="text-black">
