@@ -74,6 +74,8 @@ function TrainerSidebar() {
             Bookings 
           </span>
         </Link>
+
+  
         
         <Link
           to="/trainer/profile"

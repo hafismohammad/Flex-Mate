@@ -311,9 +311,11 @@ class UserService {
   async findBookingDetails(session_id: string, user_id: string) {
     try {
       const session = await this.userRepository.findSessionDetails(session_id);
-
+      if (session) {
+        session.status = 'Confirmed'; 
+        await session.save();
+      }
       const trainerId = session?.trainerId;
-
       if (!trainerId) {
         throw new Error("Trainer ID is not available in the session.");
       }

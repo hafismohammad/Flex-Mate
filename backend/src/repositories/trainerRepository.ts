@@ -361,36 +361,55 @@ class TrainerRepository {
             as: 'sessionDetails',
           },
         },
-        { $unwind: "$userDetails" },
-        { $unwind: "$trainerDetails" },
-        { $unwind: "$sessionDetails" },
+        {
+          $unwind: {
+            path: "$userDetails",
+            preserveNullAndEmptyArrays: true, // Preserve if user details are not found
+          },
+        },
+        {
+          $unwind: {
+            path: "$trainerDetails",
+            preserveNullAndEmptyArrays: true, // Preserve if trainer details are not found
+          },
+        },
+        {
+          $unwind: {
+            path: "$sessionDetails",
+            preserveNullAndEmptyArrays: true, // Preserve if session details are not found
+          },
+        },
         {
           $project: {
             bookingId: "$_id",
             userName: "$userDetails.name",
             trainerName: "$trainerDetails.name",
-            sessionDate: "$sessionDetails.startDate",
+            sessionDate: {
+              $ifNull: ["$sessionDetails.startDate", null], // If session is deleted, show as null
+            },
             sessionType: "$sessionType",
             sessionStartTime: "$startTime",
             sessionEndTime: "$endTime",
             bookingDate: "$bookingDate",
             sessionDates: {
               $cond: {
-                if: "$sessionDetails.isSingleSession",
-                then: { startDate: "$sessionDetails.startDate" },
+                if: { $eq: ["$sessionDetails.isSingleSession", true] },
+                then: {
+                  startDate: { $ifNull: ["$sessionDetails.startDate", null] },
+                },
                 else: {
-                  startDate: "$sessionDetails.startDate",
-                  endDate: "$sessionDetails.endDate"
-                }
+                  startDate: { $ifNull: ["$sessionDetails.startDate", null] },
+                  endDate: { $ifNull: ["$sessionDetails.endDate", null] },
+                },
               },
             },
             amount: "$amount",
             paymentStatus: "$paymentStatus",
-          }
-        }
+          },
+        },
       ]);
   
-      console.log('bookingDetails', bookingDetails);
+      console.log("bookingDetails", bookingDetails);
   
       return bookingDetails;
     } catch (error) {
@@ -398,6 +417,7 @@ class TrainerRepository {
     }
   }
   
+
   static async getIsBlockedTrainer(trainer_id: string): Promise<boolean> {
     try {
        const trainer = await TrainerModel.findById(trainer_id);
