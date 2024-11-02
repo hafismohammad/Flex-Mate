@@ -86,32 +86,30 @@ function Footer() {
                   <img className='h-10' src={Logo} alt="logo" />
                 </h6>
                 <p>
-                  Here you can use rows and columns to organize your footer
-                  content. Lorem ipsum dolor sit amet, consectetur adipisicing
-                  elit.
+                Your online platform for virtual fitness coaching. Access personalized sessions, track your progress, and connect with expert trainers to achieve your fitness goals
                 </p>
               </div>
               {/* <!-- Products section --> */}
               <div className="">
                 <h6
                   className="mb-4 flex justify-center font-semibold uppercase md:justify-start">
-                  Products
+                  specialization
                 </h6>
                 <p className="mb-4">
                   <a className="text-neutral-600 dark:text-neutral-200"
-                  >Angular</a>
+                  >Strength Training</a>
                 </p>
                 <p className="mb-4">
                   <a className="text-neutral-600 dark:text-neutral-200"
-                  >React</a>
+                  >Weight Training</a>
                 </p>
                 <p className="mb-4">
                   <a className="text-neutral-600 dark:text-neutral-200"
-                  >Vue</a>
+                  >Injury Recovary</a>
                 </p>
                 <p>
                   <a className="text-neutral-600 dark:text-neutral-200"
-                  >Laravel</a>
+                  >Meditation</a>
                 </p>
               </div>
               {/* <!-- Useful links section --> */}
@@ -122,15 +120,15 @@ function Footer() {
                 </h6>
                 <p className="mb-4">
                   <a className="text-neutral-600 dark:text-neutral-200"
-                  >Pricing</a>
+                  >Service</a>
                 </p>
                 <p className="mb-4">
                   <a className="text-neutral-600 dark:text-neutral-200"
-                  >Settings</a>
+                  >Wrokflow</a>
                 </p>
                 <p className="mb-4">
                   <a className="text-neutral-600 dark:text-neutral-200"
-                  >Orders</a>
+                  >About us</a>
                 </p>
                 <p>
                   <a className="text-neutral-600 dark:text-neutral-200"
