@@ -36,7 +36,7 @@ export const addSpecialization = createAsyncThunk(
   "admin/addSpecialization",
   async ({ formData }: { formData: FormData }, thunkAPI) => {
     try {
-      const response = await AdminService.addSpecialization(formData);
+      const response = await AdminService.addSpecialization(formData);            
       return response.data;
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.response?.data || "Failed to add specialization");

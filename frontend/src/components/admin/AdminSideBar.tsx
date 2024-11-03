@@ -13,6 +13,7 @@ import {
   FaUserCircle,
   FaSignOutAlt,
   FaCheckCircle,
+  FaUsers,
 } from "react-icons/fa";
 import { AppDispatch } from "../../app/store";
 
@@ -87,14 +88,14 @@ const navigate = useNavigate()
             to="/admin/userListing"
             className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
           >
-            <FaUser size={20} />
+            <FaUsers size={20} />
             <span className={`ml-2 ${!isSidebarOpen && "hidden"}`}>Users</span>
           </Link>
           <Link
             to="/admin/trainerListing"
             className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
           >
-            <FaUserCircle size={20} />
+            <FaUsers size={20} />
             <span className={`ml-2 ${!isSidebarOpen && "hidden"}`}>
               Trainers
             </span>

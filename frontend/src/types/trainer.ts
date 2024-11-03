@@ -39,15 +39,17 @@ export interface KycDocument {
   }
   
   export interface Trainer {
-    _id: string;
-    name: string;
-    email: string;
-    phone: number;
-    profileImage: string;
-    specialization: Specialization;
-    imageUrl?: string;
-    isBlocked: boolean;
-    kycStatus: string;
+    _id: string; 
+    profileImage: string
+    name: string; 
+    email: string; 
+    phone: number; 
+    gender: string;
+    language: string
+    yearsOfExperience: string
+    specialization: Specialization
+    dailySessionLimit: number
+    isBlocked: boolean; 
   }
 
   export interface TrainerProfile {

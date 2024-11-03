@@ -59,7 +59,7 @@ const adminSlice = createSlice({
         .addCase(fetchAllSpecializations.fulfilled, (state, action: PayloadAction<any>) => {
           state.loading = false;
           state.specializations.push(action.payload); 
-          console.log('action payload', action.payload);
+          // console.log('action payload', action.payload);
           
         })
         .addCase(fetchAllSpecializations.rejected, (state, action) => {

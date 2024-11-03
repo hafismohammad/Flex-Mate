@@ -149,9 +149,7 @@ const Specializations = () => {
 };
 
 
-  useEffect(() => {
-    console.log("wdw", specializations);
-  }, [specializations]);
+
 
   const handleChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;

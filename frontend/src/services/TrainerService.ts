@@ -1,11 +1,11 @@
 import axiosInstance from "../../axios/trainerAxiosInstance";
-import { ITrainerKycData } from "../types/trainer";
 
 const getAllSpecializations = async () => {
   try {
     const response = await axiosInstance.get(`/api/trainer/getSpecializations`);
     console.log("All data from backend", response.data);
     return response.data;
+    
   } catch (error: any) {
     console.error(
       "Error fetching specializations:",

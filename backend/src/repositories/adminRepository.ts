@@ -150,7 +150,7 @@ class AdminRepository {
     return await this.userModel.find()
   }
   async fetchAllTrainer() {
-    return await this.trainerModel.find()
+    return await this.trainerModel.find().populate('specialization')
   }
   async updateUserStatus(user_id: string, userStatus: boolean) {
     // console.log(user_id, userStatus);

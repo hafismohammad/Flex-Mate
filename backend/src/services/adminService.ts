@@ -70,7 +70,7 @@ class AdminService {
   async TraienrsKycData() {
     try {
       const allTrainersKycDatas = await this.adminRepository.getAllTrainersKycDatas();
-      console.log('allTrainersKycDatas',allTrainersKycDatas);
+      // console.log('allTrainersKycDatas',allTrainersKycDatas);
       
       return allTrainersKycDatas; 
     } catch (error) {

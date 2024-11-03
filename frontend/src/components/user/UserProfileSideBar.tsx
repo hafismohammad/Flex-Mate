@@ -76,7 +76,7 @@ function UserProfileSideBar() {
   };
 
   return (
-    <div className="w-[17%] bg-blue-500 h-[75vh] mt-10 ml-10 flex flex-col items-center ">
+    <div className="w-[17%] bg-blue-500 h-[65vh] mt-10 ml-10 flex flex-col items-center ">
       <nav className="flex flex-col space-y-4 w-full ">
         <div className="flex justify-center ">
           <img
@@ -120,12 +120,7 @@ function UserProfileSideBar() {
           >
             <span>Profile</span>
           </Link>
-          <Link
-            to="#"
-            className="flex items-center pl-8 p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
-          >
-            <span>Edit Profile</span>
-          </Link>
+         
           <Link
             to="#"
             className="flex items-center pl-8 p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"

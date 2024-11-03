@@ -1,16 +1,11 @@
 
-export interface IUser {
-    id?: string;
-    name: string;
-    email: string;
-    phone: string;
-    password: string;
-    dob?: string;
-    image?: string;
-    gender?: string;
-    address?: {
-      street: string;
-      city: string;
-    };
-    isBlocked: boolean;
-  }
+export interface User {
+  _id: string;
+  image: string
+  name: string;
+  email: string;
+  phone: number;
+  dob: string,
+  gender: string
+  isBlocked: boolean;
+}
