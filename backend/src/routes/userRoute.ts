@@ -3,9 +3,7 @@ import UserRepository from "../repositories/userRepository";
 import UserService from "../services/userService";
 import UserController from "../controllers/userController";
 import authMiddleware from "../middlewares/authMiddlewares";
-import bodyParser from 'body-parser';
 import upload from "../utils/multer";
-
 
 
 const router = express.Router();
@@ -14,7 +12,7 @@ const router = express.Router();
 const userRepository = new UserRepository();
 const userService = new UserService(userRepository);
 const userController = new UserController(userService);
-
+    
 router.post("/signup", userController.register.bind(userController));
 router.post("/otp", userController.verifyOtp.bind(userController));
 router.post("/resend-otp", userController.resendOtp.bind(userController));

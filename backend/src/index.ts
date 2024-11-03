@@ -5,6 +5,8 @@ import cookieParser from "cookie-parser";
 import userRoute from "../src/routes/userRoute";
 import AdminRoute from "../src/routes/adminRoute";
 import TrainerRoute from "../src/routes/trainerRoute";
+import MessagesRoute from "../src/routes/messagesRoute"
+
 import path from "path";
 import {startDeleteExpiredSessionsCron } from './corn/deleteExpiredSessions'
 
@@ -35,6 +37,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/api/user/", userRoute);
 app.use("/api/admin/", AdminRoute);
 app.use("/api/trainer/", TrainerRoute);
+app.use("/api/messages/", MessagesRoute)
 
 // Server running
 app.listen(process.env.PORT || 3000, () => {
