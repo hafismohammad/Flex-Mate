@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../app/store";
 import { submitKyc } from "../../actions/trainerAction";
 import { useNavigate } from "react-router-dom";
+import Loading from "../spinner/Loading";
 
 const TrainerKyc: React.FC = () => {
   const [name, setName] = useState<string>("");
@@ -16,7 +17,7 @@ const TrainerKyc: React.FC = () => {
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [submissionError, setSubmissionError] = useState<string>("");
 
-  const { trainerToken, trainerInfo } = useSelector(
+  const { trainerToken, trainerInfo , loading} = useSelector(
     (state: RootState) => state.trainer
   );
   const token = trainerToken;
@@ -24,7 +25,6 @@ const TrainerKyc: React.FC = () => {
   const specialization = trainerInfo?.specialization;
 
   const dispatch = useDispatch<AppDispatch>();
-  const navigate = useNavigate();
 
   // Validate form
   const validateForm = (): boolean => {
@@ -85,6 +85,7 @@ const TrainerKyc: React.FC = () => {
   
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
+      {loading && <Loading />}
       <h1 className="text-3xl font-bold mb-6 text-center">KYC Submission</h1>
       <p className="mb-6 text-center text-gray-600">
         Please fill in the details below to complete your KYC submission.

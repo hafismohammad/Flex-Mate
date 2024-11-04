@@ -409,7 +409,7 @@ class TrainerRepository {
         },
       ]);
   
-      console.log("bookingDetails", bookingDetails);
+      // console.log("bookingDetails", bookingDetails);
   
       return bookingDetails;
     } catch (error) {

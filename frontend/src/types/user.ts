@@ -9,3 +9,17 @@ export interface User {
   gender: string
   isBlocked: boolean;
 }
+
+export interface IBookedSession {
+  bookingId: string
+  trainerImage: string;
+  trainerName: string;
+  specialization: string;
+  sessionDates: {
+    startDate: string; 
+    endDate?: string;  
+  };
+  startTime: string;
+  endTime: string;
+  sessionType: string;
+}

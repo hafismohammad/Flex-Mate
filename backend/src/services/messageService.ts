@@ -69,6 +69,38 @@ class MessageService {
 
         return savedMessage; 
     }
+
+
+    async getMessage(senderId: string, userToChatId: string) {
+        const senderObjectId = new mongoose.Types.ObjectId(senderId);
+        const receiverObjectId = new mongoose.Types.ObjectId(userToChatId);
+    
+        // Identify the model type for the sender
+        const senderModel = (await UserModel.exists({ _id: senderObjectId })) ? 'User' :
+                            (await TrainerModel.exists({ _id: senderObjectId })) ? 'Trainer' : null;
+        const receiverModel = (await UserModel.exists({ _id: receiverObjectId })) ? 'User' :
+                              (await TrainerModel.exists({ _id: receiverObjectId })) ? 'Trainer' : null;
+    
+        if (!senderModel || !receiverModel) {
+            throw new Error('Invalid sender or receiver ID');
+        }
+    
+        const conversations = await ConversationModel.find({
+            participants: {
+                $all: [
+                    { $elemMatch: { participantId: senderObjectId, participantModel: senderModel } },
+                    { $elemMatch: { participantId: receiverObjectId, participantModel: receiverModel } }
+                ]
+            }
+        }).populate('messages');
+
+        const allConversations = conversations.flatMap(conversation => conversation.messages)
+        
+    
+        return allConversations
+    }
+    
+    
 }
 
 export default new MessageService();

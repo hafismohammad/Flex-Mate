@@ -1,21 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { logoutUser } from "../../actions/userAction";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../app/store";
 import userAxiosInstance from "../../../axios/userAxionInstance";
 import toast from "react-hot-toast";
-import { useSelector } from "react-redux";
-import profileDummy from '../../assets/profile-dummy.webp'
+import profileDummy from '../../assets/profile-dummy.webp';
 import Loading from "../spinner/Loading";
 
-
 function UserProfileSideBar() {
-  const [selectImage, setSelectedImage] = useState<File | null>(null);
-  const [preview , setPreview] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const {userInfo} = useSelector((state: RootState) => state.user)
+  const { userInfo } = useSelector((state: RootState) => state.user);
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
 
@@ -29,41 +27,39 @@ function UserProfileSideBar() {
 
     const fetchUserDetails = async () => {
       try {
-        const response = await userAxiosInstance.get(`/api/user/getUser/${userInfo?.id}`);
-        // console.log(response);
-        
+        const response = await userAxiosInstance.get(`/api/user/getUser/${userInfo.id}`);
         setPreview(response.data.image);
       } catch (error) {
         console.error("Failed to fetch user details", error);
       }
     };
+
     fetchUserDetails();
   }, [userInfo?.id]);
 
   const handleImageUpdate = async () => {
-    if (!selectImage) {
+    if (!selectedImage) {
       toast.error("Please select an image first");
       return;
     }
-    setLoading(true)
+    setLoading(true);
     const formData = new FormData();
-    formData.append("profileImage", selectImage);
+    formData.append("profileImage", selectedImage);
 
     try {
       const response = await userAxiosInstance.patch(
-       `/api/user/uploadProfileImage/${userInfo?.id}`,
+        `/api/user/uploadProfileImage/${userInfo?.id}`,
         formData
       );
-      if(response.status === 200) {
-        toast.success('Profile uploaded successfully')
-        setSelectedImage(null)
-        // setPreview(null)
-      } 
+      if (response.status === 200) {
+        toast.success("Profile uploaded successfully");
+        setSelectedImage(null);
+      }
     } catch (error) {
       console.error("Image upload failed", error);
       toast.error("Failed to upload profile image");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   };
 
@@ -71,23 +67,23 @@ function UserProfileSideBar() {
     const file = event.target.files?.[0];
     if (file) {
       setSelectedImage(file);
-      setPreview(URL.createObjectURL(file))
+      setPreview(URL.createObjectURL(file));
     }
   };
 
   return (
-    <div className="w-[17%] bg-blue-500 h-[65vh] mt-10 ml-10 flex flex-col items-center ">
-      <nav className="flex flex-col space-y-4 w-full ">
-        <div className="flex justify-center ">
+    <div className="w-[17%] bg-blue-500 h-[65vh] mt-10 ml-10 flex flex-col items-center">
+      <nav className="flex flex-col space-y-4 w-full">
+        <div className="flex justify-center">
           <img
             src={preview || profileDummy}
             alt="profile"
             className="bg-black mt-9 h-40 w-40 object-cover rounded-full"
           />
-         {loading && <Loading />}
+          {loading && <Loading />}
         </div>
         <div className="flex justify-center mt-4">
-          {!selectImage ? (
+          {!selectedImage ? (
             <>
               <label
                 htmlFor="profileImage"
@@ -115,14 +111,13 @@ function UserProfileSideBar() {
         </div>
         <div className="w-full flex flex-col space-y-2 mt-6">
           <Link
-            to="#"
+            to="/profile"
             className="flex items-center pl-8 p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
           >
             <span>Profile</span>
           </Link>
-         
           <Link
-            to="#"
+            to="/profile/sessions"
             className="flex items-center pl-8 p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
           >
             <span>Sessions</span>
@@ -136,8 +131,9 @@ function UserProfileSideBar() {
           <Link
             to="#"
             className="flex items-center pl-8 p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
+            onClick={handleLogout}
           >
-            <span onClick={handleLogout}>Logout</span>
+            <span>Logout</span>
           </Link>
         </div>
       </nav>

@@ -389,6 +389,15 @@ class UserService {
       
     }
   }
+  
+  async getAllBookings(user_id: string) {
+    try {
+      return await this.userRepository.fetchBookings(user_id)
+    } catch (error) {
+      console.log(error);
+      
+    }
+  }
 }
 
 export default UserService;

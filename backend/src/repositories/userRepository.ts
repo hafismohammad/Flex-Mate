@@ -255,6 +255,81 @@ class UserRepository {
       
     }
   }
+
+  async fetchBookings(user_id: string) {
+    const allBookings = await this.bookingModel.aggregate([
+      { $match: { userId: new mongoose.Types.ObjectId(user_id) } },
+      {
+        $lookup: {
+          from: 'trainers',
+          localField: 'trainerId',
+          foreignField: '_id',
+          as: 'trainerDetails',
+        },
+      },
+      {
+        $lookup: {
+          from: 'sessions',
+          localField: 'sessionId',
+          foreignField: '_id',
+          as: 'sessionDetails',
+        },
+      },
+      {
+        $unwind: {
+          path: '$trainerDetails',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $unwind: {
+          path: '$sessionDetails',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'specializations',
+          localField: 'trainerDetails.specialization', 
+          foreignField: '_id', 
+          as: 'specializationDetails',
+        },
+      },
+      {
+        $unwind: {
+          path: '$specializationDetails',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $project: {
+          trainerImage: '$trainerDetails.profileImage',
+          trainerName: '$trainerDetails.name',
+          specialization: '$specializationDetails.name', 
+          sessionDates: {
+            $cond: {
+              if: { $eq: ["$sessionDetails.isSingleSession", true] },
+              then: {
+                startDate: { $ifNull: ["$sessionDetails.startDate", null] },
+              },
+              else: {
+                startDate: { $ifNull: ["$sessionDetails.startDate", null] },
+                endDate: { $ifNull: ["$sessionDetails.endDate", null] },
+              },
+            },
+          },
+          startTime: '$startTime',
+          endTime: '$endTime',
+          sessionType: '$sessionType',
+        },
+      },
+    ]);
+    
+    
+    console.log(allBookings);
+    
+    return allBookings
+  }
 }
 
 export default UserRepository;

@@ -28,6 +28,7 @@ router.post("/createBooking", authMiddleware, userController.createBooking.bind(
 router.get('/getUser/:userId', authMiddleware, userController.getUser.bind(userController))
 router.patch('/updateUser', authMiddleware, userController.updateUserData.bind(userController))
 router.patch('/uploadProfileImage/:userId', authMiddleware, upload.single('profileImage'), userController.uploadProfileImage.bind(userController))
+router.get('/bookings/:userId', authMiddleware, userController.getAllBookings.bind(userController))
 
 
 export default router;

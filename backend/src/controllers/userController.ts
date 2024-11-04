@@ -284,6 +284,17 @@ class UserController {
       res.status(500).json({ message: "Error uploading image" });
     }
   }
+
+  async getAllBookings(req: Request, res: Response) {
+    try {
+      const user_id = req.params.userId
+
+      const bookings = await this.userService.getAllBookings(user_id)
+      res.status(200).json(bookings)
+    } catch (error) {
+      res.status(500).json({message: 'Error fetching bookings'})
+    }
+  }
 }
 
 export default UserController;

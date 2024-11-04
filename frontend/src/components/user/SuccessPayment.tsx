@@ -55,7 +55,7 @@ function SuccessPayment() {
             Go to Homepage
           </button>
           <button
-            onClick={() => navigate('#')}
+            onClick={() => navigate('/profile/sessions')}
             className="ml-4 bg-gray-600 text-white px-6 py-2 rounded-md hover:bg-gray-700 transition"
           >
             View Orders
