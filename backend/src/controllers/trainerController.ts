@@ -328,6 +328,19 @@ class TrainerController {
     }
   }
 
+  async fetchSpecialization(req: Request, res: Response) {
+    try {
+      const trainer_id = req.params.trainerId
+      const specializations = await this.trainerService.fetchSpec(trainer_id)  
+      console.log(specializations);
+      
+      res.status(200).json({specializations})    
+    } catch (error) {
+      console.error("Error fetchin trainer specializations:", error);
+      res.status(500).json({ message: "Failed to fetch trainer specializations" });
+    }
+  }
+
   async fetchRejectionReason(req: Request, res: Response) {
     try {
       const trainer_id = req.params.trainerId;
@@ -350,6 +363,7 @@ class TrainerController {
   async storeSessionData(req: Request, res: Response): Promise<void> {
     try {
       const {
+        specId,
         isSingleSession,
         selectedDate,
         startTime,
@@ -359,11 +373,13 @@ class TrainerController {
         price,
       } = req.body;
       const trainerId = req.params.tranerId;
-      // console.log('trainerId',trainerId);
+ 
+      
 
       const sessionData: any = {};
 
       if (isSingleSession) {
+        sessionData.specializationId = specId;
         sessionData.isSingleSession = isSingleSession;
         sessionData.trainerId = trainerId;
         sessionData.startDate = selectedDate;
@@ -371,6 +387,7 @@ class TrainerController {
         sessionData.endTime = endTime;
         sessionData.price = price;
       } else {
+        sessionData.specializationId = specId;
         sessionData.isSingleSession = isSingleSession;
         sessionData.trainerId = trainerId;
         sessionData.startDate = startDate;

@@ -250,6 +250,17 @@ class TrainerRepository {
     }
   }
 
+  async fetchSpec(traienr_id: string) {
+    try {
+      const specializations = await this.trainerModel.findById({_id: traienr_id}).populate('specializations')
+      // console.log('specializations', specializations);
+      return specializations?.specializations
+      
+    } catch (error) {
+      
+    }
+  }
+
   async fetchRejectionData(trainerId: string) {
     try {
       const rejectionData = await this.kycRejectionModel.findOne({
@@ -266,12 +277,13 @@ class TrainerRepository {
 
   async createNewSession(sessionData: ISession) {
     try {
+      // Ensure the trainer exists
       const trainer = await this.trainerModel.findById(sessionData.trainerId);
-      if (!trainer) {
-        throw new Error("Trainer not found.");
-      }
+      if (!trainer) throw new Error("Trainer not found.");
+      
       const dailySessionLimit = trainer.dailySessionLimit;
   
+      // Check daily session limit
       const allSessions = await this.sessionModel.find({
         trainerId: sessionData.trainerId,
       });
@@ -280,14 +292,13 @@ class TrainerRepository {
         throw new Error(`Daily session limit of ${dailySessionLimit} reached.`);
       }
   
+      // Check for date and time conflicts
       const existingSessions = await this.sessionModel.find({
         trainerId: sessionData.trainerId,
         $or: [
-     
           {
             startDate: { $gte: sessionData.startDate, $lte: sessionData.endDate },
           },
-        
           {
             startDate: sessionData.startDate,
             endDate: null,
@@ -300,45 +311,44 @@ class TrainerRepository {
         const existingEndDate = existingSession.endDate
           ? moment(existingSession.endDate)
           : existingStartDate;
+  
         const existingStartTime = moment(existingSession.startTime, "HH:mm");
         const existingEndTime = moment(existingSession.endTime, "HH:mm");
-      
+  
         const newStartDate = moment(sessionData.startDate);
-        const newEndDate = sessionData.endDate
-          ? moment(sessionData.endDate)
-          : newStartDate;
+        const newEndDate = sessionData.endDate ? moment(sessionData.endDate) : newStartDate;
+  
         const newStartTime = moment(sessionData.startTime, "HH:mm");
         const newEndTime = moment(sessionData.endTime, "HH:mm");
-      
+  
+        // Check date and time overlap
         const dateRangeOverlaps =
           newStartDate.isSameOrBefore(existingEndDate) &&
           newEndDate.isSameOrAfter(existingStartDate);
-      
+  
         const timeRangeOverlaps =
           newStartTime.isBefore(existingEndTime) && newEndTime.isAfter(existingStartTime);
-      
-    
+  
         return dateRangeOverlaps && timeRangeOverlaps;
       });
-
-      
-      
-      if (hasConflict) {
-        throw new Error("Time conflict with an existing session.");
-      }
-      
-      
+  
+      if (hasConflict) throw new Error("Time conflict with an existing session.");
+  
+     
   
       sessionData.price = Number(sessionData.price);
-  
+      
+      // Create the session with multiple specializations
       const createdSessionData = await this.sessionModel.create(sessionData);
   
       return createdSessionData;
-    } catch (error: any) {
-      console.error("Detailed error:", error);
+    } catch (error) {
+      console.error("Detailed error in createNewSession:", error);
       throw error;
     }
   }
+  
+  
   
   
 

@@ -81,3 +81,11 @@ export interface KycDocument {
     trainerId: string;
   }
   
+
+  export interface ISpec  {
+    _id: string;
+    name: string;
+    description: string;
+    image: string;
+    isListed: boolean;
+  }

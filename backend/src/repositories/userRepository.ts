@@ -127,7 +127,9 @@ class UserRepository {
 
   async fetchAllSessionSchedules() {
     try {
-      const schedules = await this.sessionModel.find({});
+      const schedules = await this.sessionModel.find({}).populate('specializationId')
+      console.log('specId', schedules);
+      
       return schedules;
     } catch (error) {}
   }

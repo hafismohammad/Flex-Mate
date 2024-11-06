@@ -53,6 +53,7 @@ export interface ISpecialization {
 
 export interface ISession {
   trainerId: Types.ObjectId;
+  specializationId: Types.ObjectId;
   startDate: Date;
   endDate: Date;
   selectedDate: Date;

@@ -7,7 +7,7 @@ import API_URL from "../../../axios/API_URL";
 import axiosInstance from "../../../axios/trainerAxiosInstance";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
-import { ISessionSchedule } from "../../types/trainer";
+import { ISessionSchedule, ISpec } from "../../types/trainer";
 import {
   formatTime,
   calculateDuration,
@@ -26,6 +26,9 @@ function CurrentSchedules() {
   const [startTime, setStartTime] = useState<string>("");
   const [endTime, setEndTime] = useState<string>("");
   const [price, setPrice] = useState<string>("");
+  const [specModal, setSpecModal] = useState(false);
+  const [specId, setSpecId] = useState<string | null>(null);
+  const [spec, setSpec] = useState<ISpec[]>([]);
   const [sessionSchedules, setSessionSchedules] = useState<ISessionSchedule[]>(
     []
   );
@@ -81,35 +84,37 @@ function CurrentSchedules() {
       }
     }
 
-    try {
-      const sessionData = isSingleSession
-        ? {
-            isSingleSession,
-            selectedDate: selectedDate?.toISOString(),
-            startTime,
-            endTime,
-            price,
-          }
-        : {
-            isSingleSession,
-            startDate: startDate?.toISOString(),
-            endDate: endDate?.toISOString(),
-            startTime,
-            endTime,
-            price,
-          };
+      try {
+        const sessionData = isSingleSession
+          ? {
+              specId,
+              isSingleSession,
+              selectedDate: selectedDate?.toISOString(),
+              startTime,
+              endTime,
+              price,
+            }
+          : {
+              specId,
+              isSingleSession,
+              startDate: startDate?.toISOString(),
+              endDate: endDate?.toISOString(),
+              startTime,
+              endTime,
+              price,
+            };
 
-      const response = await axiosInstance.post(
-        `${API_URL}/api/trainer/session/${trainerId}`,
-        sessionData
-      );
-      const newSchedule = response.data.createdSessionData;
-      setSessionSchedules((schedule) => [...schedule, newSchedule]);
+        const response = await axiosInstance.post(
+          `${API_URL}/api/trainer/session/${trainerId}`,
+          sessionData
+        );
+        const newSchedule = response.data.createdSessionData;
+        setSessionSchedules((schedule) => [...schedule, newSchedule]);
 
-      if (response.status === 201) {
-        toast.success("Session created successfully");
-      }
-    } catch (error: any) {
+        if (response.status === 201) {
+          toast.success("Session created successfully");
+        }
+      } catch (error: any) {
       if (error.response?.status === 400) {
         const errorMessage =
           error.response.data.message ||
@@ -127,12 +132,24 @@ function CurrentSchedules() {
     }
 
     handleCloseModal();
+    setModalOpen(false)
     clearSessionData();
   };
 
-  const handleOpenModal = () => {
-    setModalOpen(true);
+  const handleOpenModal = async () => {
+    setSpecModal(true);
+
+    const response = await axiosInstance.get(
+      `/api/trainer/fetchSecializations/${trainerInfo.id}`
+    );
+    setSpec(response.data.specializations);
   };
+
+  const handleSpecClick = (specId: string) => {
+    setSpecId(specId)
+    setModalOpen(true);
+
+  }
 
   const handleCloseModal = () => {
     setModalOpen(false);
@@ -194,6 +211,35 @@ function CurrentSchedules() {
           <span>Add Schedule</span>
         </button>
       </div>
+
+      {specModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg p-6 h-[65vh] w-full max-w-lg shadow-lg">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+              Select Specialization
+            </h2>
+
+            <div className="flex flex-col gap-3 max-h-[50vh] overflow-y-auto">
+              {spec.map((specialization) => (
+                <button
+                  key={specialization._id}
+                  onClick={() => handleSpecClick(specialization._id)} // Replace with your desired function
+                  className="p-4 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-lg shadow-sm text-left"
+                >
+                  {specialization.name}
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={() => setSpecModal(false)}
+              className="mt-6 bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
 
       <SessionModal
         isOpen={modalOpen}

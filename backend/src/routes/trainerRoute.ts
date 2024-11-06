@@ -35,6 +35,7 @@ router.get('/kycStatus/:trainerId', authMiddlewares, trainerController.trainerKy
 router.put('/resubmitKyc/:trainerId', authMiddlewares, trainerController.resubmitkyc.bind(trainerController))
 router.get('/getTrainer/:trainerId', authMiddlewares, trainerController.getTrainer.bind(trainerController))
 router.patch(`/updateTrainerData/:trainerId`, authMiddlewares, upload.single('profileImage'),  trainerController.updateTrainer.bind(trainerController))
+router.get('/fetchSecializations/:trainerId', authMiddlewares, trainerController.fetchSpecialization.bind(trainerController))
 router.get('/rejectionReason/:trainerId', authMiddlewares, trainerController.fetchRejectionReason.bind(trainerController))
 router.post('/session/:tranerId', authMiddlewares, trainerController.storeSessionData.bind(trainerController))
 router.get('/sessiosShedules/:trainerId', authMiddlewares, trainerController.getSessionSchedules.bind(trainerController))

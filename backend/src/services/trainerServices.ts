@@ -313,6 +313,10 @@ class TrainerService {
     }
   }
 
+  async fetchSpec(trainer_id: string) {
+    return this.trainerRepository.fetchSpec(trainer_id)
+  }
+
   async fetchRejectionData(trainer_id: string) {
     try {
       return await this.trainerRepository.fetchRejectionData(trainer_id);
