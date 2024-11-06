@@ -47,40 +47,40 @@ function Features() {
 
   return (
     <div className="bg-slate-100 rounded-md p-4 flex flex-col items-center">
-      <h1 className="text-4xl font-bold mb-14 mt-20 text-center">Services</h1>
+    <h1 className="text-4xl font-bold mb-10 mt-16 text-center">Services</h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-14">
-        {specializations.length > 0 &&
-          specializations.map((feature) => (
-            <div
-              key={feature._id}
-               className="flex flex-col justify-between h-full bg-white w-full max-w-sm mx-auto rounded-md shadow-md hover:shadow-lg transition-shadow duration-300"
-              data-aos="fade-up"
-               data-aos-offset="200"
-            >
-              <div className="overflow-hidden rounded-t-md">
-                <img
-                  className="w-full h-48 object-cover"
-                  src={feature.image}
-                  alt={feature.title}
-                   loading="lazy"
-                />
-              </div>
-              <div className="p-4 flex-grow">
-                <h2 className="text-xl font-semibold mb-2 text-gray-900">
-                  {feature.name}
-                </h2>
-                <p className="text-gray-700 text-sm">{feature.description}</p>
-              </div>
-              <div className="p-4">
-                <button onClick={() => handleClick(feature._id)} className="w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200">
-                  View {feature.name} Trainers
-                </button>
-              </div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+      {specializations.length > 0 &&
+        specializations.map((feature) => (
+          <div
+            key={feature._id}
+            className="flex flex-col justify-between h-full bg-white w-full max-w-xs mx-auto rounded-md shadow-md hover:shadow-lg transition-shadow duration-300"
+            data-aos="fade-up"
+            data-aos-offset="200"
+          >
+            <div className="overflow-hidden rounded-t-md">
+              <img
+                className="w-full h-40 object-cover"
+                src={feature.image}
+                alt={feature.title}
+                loading="lazy"
+              />
             </div>
-          ))}
-      </div>
+            <div className="p-3 flex-grow">
+              <h2 className="text-lg font-semibold mb-1 text-gray-900">
+                {feature.name}
+              </h2>
+              <p className="text-gray-700 text-sm">{feature.description}</p>
+            </div>
+            <div className="p-3">
+              <button onClick={() => handleClick(feature._id)} className="w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200">
+                View {feature.name} Trainers
+              </button>
+            </div>
+          </div>
+        ))}
     </div>
+  </div>
   );
 }
 

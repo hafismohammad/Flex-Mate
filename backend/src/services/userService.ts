@@ -312,7 +312,7 @@ class UserService {
     try {
       const session = await this.userRepository.findSessionDetails(session_id);
       if (session) {
-        session.status = 'Confirmed'; 
+        session.status = "Confirmed";
         await session.save();
       }
       const trainerId = session?.trainerId;
@@ -367,35 +367,33 @@ class UserService {
 
   async fetchUserData(userId: string) {
     try {
-      return await this.userRepository.fetchUser(userId)
+      return await this.userRepository.fetchUser(userId);
     } catch (error) {
-      throw new Error('Error fetching user')
+      throw new Error("Error fetching user");
     }
   }
 
   async updateUser(userdata: User, userId: string) {
     try {
-     return await this.userRepository.updateUser(userdata, userId)
+      return await this.userRepository.updateUser(userdata, userId);
     } catch (error: any) {
-      console.log(error)
-      throw new Error(error)
+      console.log(error);
+      throw new Error(error);
     }
   }
   async uploadProfileImage(imagUrl: string, user_id: string) {
     try {
-      return await this.userRepository.uploadPfileImage(imagUrl, user_id)
+      return await this.userRepository.uploadPfileImage(imagUrl, user_id);
     } catch (error) {
       console.log(error);
-      
     }
   }
-  
+
   async getAllBookings(user_id: string) {
     try {
-      return await this.userRepository.fetchBookings(user_id)
+      return await this.userRepository.fetchBookings(user_id);
     } catch (error) {
       console.log(error);
-      
     }
   }
 }

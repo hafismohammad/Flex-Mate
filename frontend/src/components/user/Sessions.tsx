@@ -4,6 +4,7 @@ import userAxiosInstance from "../../../axios/userAxionInstance";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 import { IBookedSession } from "../../types/user";
+import { formatTime } from "../../utils/timeAndPriceUtils";
 
 function Sessions() {
   const [sessions, setSessions] = useState<IBookedSession[]>([]);
@@ -90,7 +91,7 @@ function Sessions() {
                     )}
                     <p className="text-sm text-gray-500">
                       <span className="font-semibold">Time: </span>
-                      {session.startTime} - {session.endTime}
+                      {formatTime(session.startTime)} - {formatTime(session.endTime)}
                     </p>
                     <p className="text-sm text-gray-500">
                       <span className="font-semibold">Session Type: </span>

@@ -1,6 +1,5 @@
 import express from 'express'
 import MessageController from '../controllers/messageController'
-import MessageSevice from '../services/messageService'
 
 const router = express.Router()
 

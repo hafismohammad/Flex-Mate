@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { FaUser, FaFileAlt, FaCheck, FaTimes } from "react-icons/fa";
-import API_URL from "../../../axios/API_URL";
+
 import { useParams } from "react-router-dom";
 import adminAxiosInstance from "../../../axios/adminAxiosInstance";
 
@@ -38,14 +38,17 @@ function TrainerView() {
         );
         const trainerData = response.data.kycData;
         const kycData = trainerData._doc;
-
+  
         if (trainerData) {
-          // Extract the required data
+          const specializations = kycData.specializationId
+            .map((spec: { name: string }) => spec.name)
+            .join(", "); 
+  
           const data: Trainer = {
             trainerName: kycData.trainerId.name,
             trainerEmail: kycData.trainerId.email,
             trainerPhone: kycData.trainerId.phone,
-            specialization: kycData.specializationId.name,
+            specialization: specializations, 
             profileImage: kycData.profileImage,
             aadhaarFrontImage: kycData.aadhaarFrontImage,
             aadhaarBackImage: kycData.aadhaarBackImage,
@@ -53,7 +56,7 @@ function TrainerView() {
             kycStatus: kycData.kycStatus,
             kycSubmissionDate: new Date(kycData.createdAt).toLocaleDateString(),
           };
-
+  
           setTrainer(data);
         } else {
           console.warn("No trainer data found");
@@ -62,9 +65,10 @@ function TrainerView() {
         console.error("Error fetching trainer data:", error);
       }
     };
-
+  
     fetchTrainerDetails();
   }, [trainerId]);
+  
 
   const handleApproveStatusChange = async (newStatus: string) => {
     try {

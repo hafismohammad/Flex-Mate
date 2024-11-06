@@ -42,24 +42,27 @@ const EditTrainerProfile: React.FC = () => {
         const response = await axiosInstance.get(
           `/api/trainer/getTrainer/${trainerId}`
         );
+        console.log("Trainer Data Response:", response.data);
         const trainerData = response.data.trainerData;
-
+  
         setFormData({
-          profileImage: trainerData.profileImage || "",
-          name: trainerData.name || "",
-          email: trainerData.email || "",
-          phoneNumber: trainerData.phone || "",
-          yearsOfExperience: trainerData.yearsOfExperience || 0,
-          gender: trainerData.gender || "",
-          language: trainerData.language || "",
-          dailySessionLimit: trainerData.dailySessionLimit || "",
+          profileImage: trainerData[0].profileImage || "",
+          name: trainerData[0].name || "",
+          email: trainerData[0].email || "",
+          phoneNumber: trainerData[0].phone || "",
+          yearsOfExperience: trainerData[0].yearsOfExperience || 0,
+          gender: trainerData[0].gender || "",
+          language: trainerData[0].language || "",
+          dailySessionLimit: trainerData[0].dailySessionLimit || 0,
         });
       } catch (err) {
         setError("Failed to load trainer data");
+        console.error("Error fetching trainer data:", err);
       }
     };
     fetchTrainer();
   }, [trainerId]);
+  
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -78,14 +81,10 @@ const EditTrainerProfile: React.FC = () => {
         ...prevData,
         profileImage: file,
       }));
-      // For image preview
-      const imageUrl = URL.createObjectURL(file);
-
     } else {
       console.log('File not received');
     }
   };
-  
 
   const handleProfileUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -99,12 +98,11 @@ const EditTrainerProfile: React.FC = () => {
     updatedData.append("language", formData.language);
     updatedData.append("dailySessionLimit", formData.dailySessionLimit.toString());
 
+    // Append profile image only if it's a file
     if (formData.profileImage instanceof File) {
-        updatedData.append("profileImage", formData.profileImage);
-      }
+      updatedData.append("profileImage", formData.profileImage);
+    }
 
-      
-      
     try {
       const response = await axiosInstance.patch(
         `/api/trainer/updateTrainerData/${trainerId}`,
@@ -144,11 +142,10 @@ const EditTrainerProfile: React.FC = () => {
             alt="Background"
             className="w-full h-64 object-cover rounded-t-md"
           />
-
-
-            <div className="absolute top-36 md:top-44 left-8 md:left-12 flex items-center justify-center">
+          
+          <div className="absolute top-36 md:top-44 left-8 md:left-12 flex items-center justify-center">
             <img
-            src={
+              src={
                 typeof formData.profileImage === "string"
                   ? formData.profileImage
                   : URL.createObjectURL(formData.profileImage)
@@ -157,20 +154,19 @@ const EditTrainerProfile: React.FC = () => {
               className="w-40 h-40 rounded-full bg-slate-500 object-cover border-4 border-white shadow-lg"
             />
           </div>
-          <div className="absolute top-36 md:top-80 left-8 md:left-48 flex items-center justify-center">
-          <label htmlFor="profileImageInput">
-                <FaCamera className="text-gray-600" size={18} />
-              </label>
-              <input
-                type="file"
-                id="profileImageInput"
-                style={{ display: "none" }}
-                accept="image/*"
-                onChange={handleImageChange}
-              />
-          </div>
 
-         
+          <div className="absolute top-36 md:top-80 left-8 md:left-48 flex items-center justify-center">
+            <label htmlFor="profileImageInput">
+              <FaCamera className="text-gray-600" size={18} />
+            </label>
+            <input
+              type="file"
+              id="profileImageInput"
+              style={{ display: "none" }}
+              accept="image/*"
+              onChange={handleImageChange}
+            />
+          </div>
 
           <div className="mt-32 w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
             <input
@@ -210,9 +206,7 @@ const EditTrainerProfile: React.FC = () => {
               onChange={handleChange}
               className="p-3 border border-gray-300 bg-slate-100 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="" disabled>
-                Select Gender
-              </option>
+              <option value="" disabled>Select Gender</option>
               <option value="male">Male</option>
               <option value="female">Female</option>
               <option value="other">Other</option>
@@ -223,17 +217,16 @@ const EditTrainerProfile: React.FC = () => {
               onChange={handleChange}
               className="p-3 border border-gray-300 bg-slate-100 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="" disabled>
-                Select Language
-              </option>
+              <option value="" disabled>Select Language</option>
               <option value="english">English</option>
               <option value="spanish">Spanish</option>
               <option value="french">French</option>
               <option value="german">German</option>
-              <option value="mandarin">Arab</option>
+              <option value="mandarin">Mandarin</option>
             </select>
             <input
               name="dailySessionLimit"
+              type="number"
               value={formData.dailySessionLimit}
               onChange={handleChange}
               placeholder="Daily Session Limit"
@@ -243,9 +236,9 @@ const EditTrainerProfile: React.FC = () => {
 
           <button
             type="submit"
-            className="mt-4 mb-8 px-4 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full bg-blue-600 text-white py-3 rounded-lg shadow-md hover:bg-blue-700 transition"
           >
-            Save Changes
+            Update Profile
           </button>
         </div>
       </form>

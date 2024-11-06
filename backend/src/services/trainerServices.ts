@@ -76,37 +76,37 @@ class TrainerService {
       const validOtps = await this.trainerRepository.getOtpsByEmail(
         trainerData.email
       );
-
+  
       if (validOtps.length === 0) {
         console.log("No OTP found for this email");
         throw new Error("No OTP found for this email");
       }
-
+  
       const latestOtp = validOtps.sort(
         (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
       )[0];
-
+  
       if (latestOtp.otp === otp) {
         if (latestOtp.expiresAt > new Date()) {
           console.log("OTP is valid and verified", latestOtp.expiresAt);
-
-          const specialization =
-            await this.trainerRepository.findTrainerSpecialization(
-              trainerData.specialization
-            );
-
-          if (!specialization) {
-            throw new Error("Specialization not found");
+  
+          // Get ObjectIds for the specializations
+          const specializationIds = await this.trainerRepository.findTrainerSpecializations(
+            trainerData.specializations // Pass the ObjectId array
+          );
+  
+          if (!specializationIds || specializationIds.length !== trainerData.specializations.length) {
+            throw new Error("One or more specializations not found");
           }
-
+  
           const hashedPassword = await bcrypt.hash(trainerData.password, 10);
-
+  
           const newTrainerData: ITrainer = {
             ...trainerData,
             password: hashedPassword,
-            specialization: specialization._id,
+            specializations: specializationIds, 
           };
-
+  
           // Create new trainer
           await this.trainerRepository.createNewTrainer(newTrainerData);
           await this.trainerRepository.deleteOtpById(latestOtp._id);
@@ -126,6 +126,10 @@ class TrainerService {
       throw error;
     }
   }
+  
+  
+  
+  
 
   async resendOTP(email: string): Promise<void> {
     try {
@@ -157,49 +161,50 @@ class TrainerService {
 
   // login trainer
 
-async trainerLogin({ email, password }: { email: string; password: string }) {
-  try {
-    const trainerData = await this.trainerRepository.findTrainer(email);
+  async trainerLogin({ email, password }: { email: string; password: string }) {
+    try {
+      const trainerData = await this.trainerRepository.findTrainer(email);
 
-    
-    if (trainerData && trainerData._id) {
-      const isPasswordValid = await bcrypt.compare(password, trainerData.password);
-      
-      if (!isPasswordValid) {
-        throw new Error("Invalid email or password");
-      }
-      
-      if (trainerData?.isBlocked) {
-        throw new Error("Trainer is blocked");
-      }
-      const accessToken = generateAccessToken({
-        id: trainerData._id.toString(),
-        email: trainerData.email,
-      });
-      const refreshToken = generateRefreshToken({
-        id: trainerData._id.toString(),
-        email: trainerData.email,
-      });
+      if (trainerData && trainerData._id) {
+        const isPasswordValid = await bcrypt.compare(
+          password,
+          trainerData.password
+        );
 
-      return {
-        accessToken,
-        refreshToken,
-        trainer: {
+        if (!isPasswordValid) {
+          throw new Error("Invalid email or password");
+        }
+
+        if (trainerData?.isBlocked) {
+          throw new Error("Trainer is blocked");
+        }
+        const accessToken = generateAccessToken({
           id: trainerData._id.toString(),
           email: trainerData.email,
-          phone: trainerData.phone,
-          specialization: trainerData.specialization,
-        },
-      };
-    } else {
-      throw new Error("Trainer not exists");
-    }
-  } catch (error) {
-    console.error("Error in trainer login:", error);
-    throw error;
-  }
-}
+        });
+        const refreshToken = generateRefreshToken({
+          id: trainerData._id.toString(),
+          email: trainerData.email,
+        });
 
+        return {
+          accessToken,
+          refreshToken,
+          trainer: {
+            id: trainerData._id.toString(),
+            email: trainerData.email,
+            phone: trainerData.phone,
+            specialization: trainerData.specializations,
+          },
+        };
+      } else {
+        throw new Error("Trainer not exists");
+      }
+    } catch (error) {
+      console.error("Error in trainer login:", error);
+      throw error;
+    }
+  }
 
   async generateTokn(trainer_refresh_token: string) {
     try {
@@ -277,18 +282,18 @@ async trainerLogin({ email, password }: { email: string; password: string }) {
         dailySessionLimit,
       } = trainerData;
       // console.log('trainerData', trainerData);
-      
-console.log('profileimage', profileImage);
+
+      console.log("profileimage", profileImage);
 
       const existingTrainer = await this.trainerRepository.updateTrainerData(
         trainer_id
       );
       // console.log(existingTrainer);
-      
+
       if (!existingTrainer) {
         throw new Error("Trainer not found");
       }
-      if (profileImage) existingTrainer.profileImage = profileImage
+      if (profileImage) existingTrainer.profileImage = profileImage;
       if (name) existingTrainer.name = name;
       if (email) existingTrainer.email = email;
       if (phone) existingTrainer.phone = phone;
@@ -365,15 +370,15 @@ console.log('profileimage', profileImage);
     try {
       return await this.trainerRepository.deleteSession(session_id);
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 
   async getBookingDetails(trainer_id: string) {
     try {
-      return await this.trainerRepository.fetchBookingDetails(trainer_id)
+      return await this.trainerRepository.fetchBookingDetails(trainer_id);
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 }

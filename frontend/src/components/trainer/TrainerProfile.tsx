@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import bgImage from "../../assets/trainers-tablet.jpg";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -15,7 +15,7 @@ interface TrainerProfileData {
   email: string;
   phone: string;
   profileImage: string;
-  specialization: Specialization;
+  specializationDetails: Specialization[];
   gender: string;
   yearsOfExperience: string;
   language: string;
@@ -23,13 +23,11 @@ interface TrainerProfileData {
 }
 
 function TrainerProfile() {
-  const [trainer, setTrainer] = useState<TrainerProfileData | null>(null);
+  const [trainer, setTrainer] = useState<TrainerProfileData[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const { trainerInfo } = useSelector((state: RootState) => state.trainer);
   const trainerId = trainerInfo.id;
-
-
 
   useEffect(() => {
     const fetchTrainer = async () => {
@@ -40,15 +38,15 @@ function TrainerProfile() {
         setTrainer(response.data.trainerData);
       } catch (err) {
         setError("Failed to load trainer data");
-      } 
+      }
     };
     fetchTrainer();
   }, [trainerId]);
+  console.log("trainer", trainer);
 
   const handleEditClick = () => {
     console.log("Edit button clicked!");
   };
-
 
   if (error) {
     return <div>{error}</div>;
@@ -75,7 +73,7 @@ function TrainerProfile() {
 
         <div className="absolute top-36 md:top-44 left-8 md:left-12 flex items-center justify-center">
           <img
-            src={trainer.profileImage}
+            src={trainer[0].profileImage}
             alt="Profile"
             className="w-40 h-40 rounded-full bg-slate-500 object-cover border-4 border-white shadow-lg"
           />
@@ -86,29 +84,39 @@ function TrainerProfile() {
             <span className="block text-sm font-semibold text-gray-500">
               Full Name
             </span>
-            <span className="text-lg text-gray-800">{trainer.name}</span>
+            <span className="text-lg text-gray-800">{trainer[0].name}</span>
           </div>
 
           <div className="bg-slate-100 p-4 rounded-lg shadow-sm transition-transform transform hover:scale-105">
             <span className="block text-sm font-semibold text-gray-500">
               Email Address
             </span>
-            <span className="text-lg text-gray-800">{trainer.email}</span>
+            <span className="text-lg text-gray-800">{trainer[0].email}</span>
           </div>
 
           <div className="bg-slate-100 p-4 rounded-lg shadow-sm transition-transform transform hover:scale-105">
             <span className="block text-sm font-semibold text-gray-500">
               Phone Number
             </span>
-            <span className="text-lg text-gray-800">{trainer.phone}</span>
+            <span className="text-lg text-gray-800">{trainer[0].phone}</span>
           </div>
 
           <div className="bg-slate-100 p-4 rounded-lg shadow-sm transition-transform transform hover:scale-105">
             <span className="block text-sm font-semibold text-gray-500">
-              Specialization
+              Specializations
             </span>
             <span className="text-lg text-gray-800">
-              {trainer.specialization?.name}
+              {trainer[0].specializationDetails &&
+              trainer[0].specializationDetails.length > 0
+                ? trainer[0].specializationDetails.map((spec, index) => (
+                    <span key={index}>
+                      {spec.name}
+                      {index < trainer[0].specializationDetails.length - 1
+                        ? ", "
+                        : ""}
+                    </span>
+                  ))
+                : "Not specified"}
             </span>
           </div>
 
@@ -117,7 +125,7 @@ function TrainerProfile() {
               Gender
             </span>
             <span className="text-lg text-gray-800">
-              {trainer.gender || "Not specified"}
+              {trainer[0].gender || "Not specified"}
             </span>
           </div>
 
@@ -126,7 +134,7 @@ function TrainerProfile() {
               Years of Experience
             </span>
             <span className="text-lg text-gray-800">
-              {trainer.yearsOfExperience || "Not specified"}
+              {trainer[0].yearsOfExperience || "Not specified"}
             </span>
           </div>
 
@@ -135,15 +143,16 @@ function TrainerProfile() {
               Language
             </span>
             <span className="text-lg text-gray-800">
-              {trainer.language || "Not specified"}
+              {trainer[0].language || "Not specified"}
             </span>
           </div>
+
           <div className="bg-slate-100 p-4 rounded-lg shadow-sm transition-transform transform hover:scale-105">
             <span className="block text-sm font-semibold text-gray-500">
-              dailySessionLimit
+              Daily Session Limit
             </span>
             <span className="text-lg text-gray-800">
-              {trainer.dailySessionLimit || "Not specified"}
+              {trainer[0].dailySessionLimit || "Not specified"}
             </span>
           </div>
         </div>

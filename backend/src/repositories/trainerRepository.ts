@@ -13,6 +13,7 @@ import mongoose, { Types } from "mongoose";
 import moment from "moment";
 import BookingModel from "../models/booking";
 
+
 class TrainerRepository {
   private specializationModel = SpecializationModel;
   private trainerModel = TrainerModel;
@@ -65,16 +66,26 @@ class TrainerRepository {
     }
   }
 
-  async findTrainerSpecialization(
-    specialization: Types.ObjectId
-  ): Promise<ISpecialization | null> {
+  async findTrainerSpecializations(
+    specializationNames:any
+  ): Promise<Types.ObjectId[]> {
     try {
-      return await this.specializationModel.findOne({ name: specialization });
+      // console.log('specialization names in repo', specializationNames);
+  
+      // Find all specializations by name and return their ObjectIds
+      const specializations = await this.specializationModel.find({
+        name: { $in: specializationNames }
+      });
+  
+      // If no specializations found, return an empty array
+      return specializations.map(spec => spec._id);
     } catch (error) {
-      console.log("Error in finding trainer specialization:", error);
-      return null;
+      console.log("Error in finding trainer specializations:", error);
+      return [];
     }
   }
+  
+  
 
   async createNewTrainer(trainerData: ITrainer): Promise<void> {
     try {
@@ -116,11 +127,14 @@ class TrainerRepository {
 
   async saveKyc(formData: any, documents: any): Promise<any> {
     try {
-      // console.log("KYC Data to save:", { ...formData, ...documents });
-
+      // Convert each specialization ID to an ObjectId instance
+      const specializationIds = Array.isArray(formData.specialization)
+        ? formData.specialization.map((id: string) => new Types.ObjectId(id))
+        : [new Types.ObjectId(formData.specialization)];
+  
       const kycData = {
-        trainerId: formData.trainer_id,
-        specializationId: formData.specialization,
+        trainerId: new Types.ObjectId(formData.trainer_id), 
+        specializationId: specializationIds, 
         profileImage: documents.profileImageUrl,
         aadhaarFrontImage: documents.aadhaarFrontSideUrl,
         aadhaarBackImage: documents.aadhaarBackSideUrl,
@@ -128,7 +142,7 @@ class TrainerRepository {
         kycStatus: "pending",
         kycSubmissionDate: new Date(),
       };
-
+  
       const savedKyc = await this.kycModel.create(kycData);
       console.log("KYC Data saved successfully:", savedKyc);
       return savedKyc;
@@ -198,13 +212,29 @@ class TrainerRepository {
 
   async fetchTrainer(trainer_id: string) {
     try {
-      return this.trainerModel
-        .findOne({ _id: trainer_id })
-        .populate("specialization");
+      const trainerData = await this.trainerModel.aggregate([
+        {
+          $match: { _id: new mongoose.Types.ObjectId(trainer_id) } 
+        },
+        {
+          $lookup: {
+            from: 'specializations', 
+            localField: 'specializations',
+            foreignField: '_id', 
+            as: 'specializationDetails' 
+          }
+        }
+      
+      ]);
+  
+      console.log('trainerData', trainerData);
+      return trainerData;
     } catch (error: any) {
-      throw Error(error);
+      throw new Error(error);
     }
   }
+  
+  
 
   // Repository Method
   async updateTrainerData(trainer_id: string) {

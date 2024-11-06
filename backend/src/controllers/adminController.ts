@@ -114,7 +114,7 @@ class AdminController {
     try {
 
       const allTrainersKycData = await this.adminService.TraienrsKycData();
-      console.log(allTrainersKycData);
+      // console.log(allTrainersKycData);
 
       res.status(200).json({ message: "Trainers KYC data fetched successfully", data: allTrainersKycData });
     } catch (error) {

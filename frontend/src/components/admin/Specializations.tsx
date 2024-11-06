@@ -3,9 +3,8 @@ import { FaPlus } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../app/store";
 import { addSpecialization } from "../../actions/adminAction";
-import axios from "axios";
-import API_URL from "../../../axios/API_URL";
 import adminAxiosInstance from "../../../axios/adminAxiosInstance";
+import Loading from "../spinner/Loading";
 
 interface Errors {
   name?: string;
@@ -29,11 +28,12 @@ const Specializations = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
   const [specializations, setSpecializations] = useState<Specialization[]>([]);
-  // console.log('spec state', specializations);
+  const [loading, setLoading] = useState(false);
 
   const dispatch = useDispatch<AppDispatch>();
 
   const getAllSpecializations = async () => {
+    setLoading(true); // Start loading
     try {
       const response = await adminAxiosInstance.get(
         `/api/admin/allSpecializations`
@@ -41,12 +41,14 @@ const Specializations = () => {
       setSpecializations(response.data);
     } catch (error) {
       console.error("Error fetching specializations:", error);
+    } finally {
+      setLoading(false); // End loading
     }
   };
 
   useEffect(() => {
     getAllSpecializations();
-  }, [setSpecializations]);
+  }, []);
 
   const filteredSpecializations = specializations.filter((spec) =>
     spec.name.toLowerCase().includes(searchTerm.trim().toLowerCase())
@@ -62,7 +64,7 @@ const Specializations = () => {
     setName("");
     setDescription("");
     setImage(null);
-    setImagePreview(null)
+    setImagePreview(null);
   };
 
   const validate = (): boolean => {
@@ -99,7 +101,6 @@ const Specializations = () => {
         }
       );
 
-
       if (response.status === 200 && response.data && response.data.data) {
         const updatedSpec = response.data.data;
         setSpecializations((prevSpecializations) =>
@@ -117,39 +118,39 @@ const Specializations = () => {
     }
   };
 
-  const handleAddSpecialization = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleAddSpecialization = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
 
     if (!validate()) {
-        return;
+      return;
     }
-
     const formData = new FormData();
     formData.append("name", name);
-    formData.append("description", description); 
+    formData.append("description", description);
     if (image) {
-        formData.append("image", image);
+      formData.append("image", image);
     }
-
 
     try {
-        const response = await dispatch(addSpecialization({formData}));
-        if (response.payload && response.payload.specialization) {
-            const newSpecialization = response.payload.specialization;
-            setSpecializations((prevSpecializations) => [
-                ...prevSpecializations,
-                newSpecialization,
-            ]);
-        }
+      setLoading(true); // Start loading
+      const response = await dispatch(addSpecialization({ formData }));
+      if (response.payload && response.payload.specialization) {
+        const newSpecialization = response.payload.specialization;
+        setSpecializations((prevSpecializations) => [
+          ...prevSpecializations,
+          newSpecialization,
+        ]);
+      }
 
-        closeModal();
+      closeModal();
     } catch (error) {
-        console.error("Error adding specialization:", error);
+      console.error("Error adding specialization:", error);
+    } finally {
+      setLoading(false); // End loading
     }
-};
-
-
-
+  };
 
   const handleChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
@@ -179,7 +180,7 @@ const Specializations = () => {
             onClick={openModal}
             className="flex items-center space-x-2 text-white bg-blue-600 hover:bg-blue-700 py-2 px-4 rounded-lg font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-             <FaPlus />
+            <FaPlus />
             <span>Add Specialization</span>
           </button>
         </div>
@@ -235,7 +236,9 @@ const Specializations = () => {
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-lg shadow-lg">
+
             <h3 className="text-2xl font-bold mb-4">Add New Specialization</h3>
+            {loading && <Loading />}
             <form onSubmit={handleAddSpecialization}>
               <input
                 type="text"

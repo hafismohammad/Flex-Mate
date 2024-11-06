@@ -62,16 +62,16 @@ class AdminRepository {
 
   async fetchKycData(trainerId: string) {
     try {
-      return await KYCModel.findOne({ trainerId }).populate('specializationId').populate('trainerId')
+      const kycData = await KYCModel.findOne({ trainerId }).populate('specializationId').populate('trainerId')
+      console.log('kycData', kycData);
+      
+      return kycData
        
     } catch (error) {
       console.error('Error fetching KYC data:', error);
       throw new Error('Failed to fetch KYC data');
     }
   }
-  
-  
-  
   
 
   async updateKycStatus(status: string, trainer_id: string, rejectionReason: string | null): Promise<any> {

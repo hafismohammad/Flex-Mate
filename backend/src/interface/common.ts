@@ -41,3 +41,10 @@ export interface IBooking {
     createdAt: Date; 
     updatedAt: Date; 
   }
+
+  export interface ICategory {
+    specializationId:mongoose.Types.ObjectId;
+    name: string;
+    createdAt: Date;
+    isListed: boolean; 
+}

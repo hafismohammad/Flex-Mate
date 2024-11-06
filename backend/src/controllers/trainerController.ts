@@ -58,6 +58,7 @@ class TrainerController {
   async verifyOtp(req: Request, res: Response) {
     try {
       const { trainerData, otp } = req.body;
+// console.log('trainerData', trainerData.specializations);
 
       await this.trainerService.verifyOTP(trainerData, otp);
       res
@@ -173,6 +174,8 @@ class TrainerController {
     try {
       const { trainer_id, specialization, name, email, phone } = req.body;
 
+      // console.log('specialization', specialization);
+      
       const files = req.files as {
         [fieldname: string]: Express.Multer.File[];
       };
@@ -283,7 +286,6 @@ class TrainerController {
       const trainer_id = req.params.trainerId;
       const trainerData = await this.trainerService.findTrainer(trainer_id);
       res.status(200).json({
-        message: "Trainer data fetch succeffully",
         trainerData: trainerData,
       });
     } catch (error: any) {

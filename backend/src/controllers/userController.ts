@@ -165,7 +165,7 @@ class UserController {
   async getAllTrainers(req: Request, res: Response) {
     try {
       const allTrainers = await this.userService.fetchAllTrainers();
-      console.log(allTrainers);
+      // console.log(allTrainers);
 
       res.status(200).json(allTrainers);
     } catch (error) {
@@ -268,14 +268,22 @@ class UserController {
 
   async uploadProfileImage(req: Request, res: Response) {
     try {
-      const user_id = req.params.userId
-      console.log('hjjjj',user_id);
-      
+      const user_id = req.params.userId;
+      console.log("hjjjj", user_id);
+
       if (req.file) {
-        const profileImageUrl = await uploadToCloudinary(req.file.buffer, 'user_profileImage')  
-        const imgUrl = await this.userService.uploadProfileImage(profileImageUrl.secure_url, user_id)
-              
-        res.status(200).json({ message: "Image uploaded successfully", imgUrl } );
+        const profileImageUrl = await uploadToCloudinary(
+          req.file.buffer,
+          "user_profileImage"
+        );
+        const imgUrl = await this.userService.uploadProfileImage(
+          profileImageUrl.secure_url,
+          user_id
+        );
+
+        res
+          .status(200)
+          .json({ message: "Image uploaded successfully", imgUrl });
       } else {
         res.status(400).json({ message: "No file provided" });
       }
@@ -287,12 +295,12 @@ class UserController {
 
   async getAllBookings(req: Request, res: Response) {
     try {
-      const user_id = req.params.userId
+      const user_id = req.params.userId;
 
-      const bookings = await this.userService.getAllBookings(user_id)
-      res.status(200).json(bookings)
+      const bookings = await this.userService.getAllBookings(user_id);
+      res.status(200).json(bookings);
     } catch (error) {
-      res.status(500).json({message: 'Error fetching bookings'})
+      res.status(500).json({ message: "Error fetching bookings" });
     }
   }
 }

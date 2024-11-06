@@ -21,7 +21,7 @@ export interface ITrainer {
   phone: string;
   email: string;
   password: string;
-  specialization: string;
+  specializations: string[];
   isBlocked?: boolean;
 }
 

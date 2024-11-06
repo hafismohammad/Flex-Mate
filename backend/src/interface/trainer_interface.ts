@@ -14,7 +14,7 @@ export interface ITrainer {
   gender?: 'male' | 'female' | 'other' | ''; 
   yearsOfExperience?: number;
   language?: string;
-  specialization: Types.ObjectId;  
+  specializations: Types.ObjectId[];
   dailySessionLimit: number 
   kycStatus: 'pending' | 'approved' | 'submitted' | 'rejected';
   isBlocked?: boolean;
@@ -32,7 +32,7 @@ export interface ISpecialization {
 
   export interface IKYC extends Document {
     trainerId: Types.ObjectId;
-    specializationId: Types.ObjectId;
+    specializationId: Types.ObjectId[];
     profileImage: string,
     certificate: string
     aadhaarFrontImage: string,

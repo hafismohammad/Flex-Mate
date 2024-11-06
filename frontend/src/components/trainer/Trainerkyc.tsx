@@ -24,6 +24,9 @@ const TrainerKyc: React.FC = () => {
   const trainer_id = trainerInfo?.id;
   const specialization = trainerInfo?.specialization;
 
+  // console.log('specialization', specialization);
+  
+
   const dispatch = useDispatch<AppDispatch>();
 
   // Validate form
@@ -44,19 +47,26 @@ const TrainerKyc: React.FC = () => {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
   
- 
     if (!validateForm()) {
       return;
     }
   
-    
     const formData = new FormData();
     formData.append('trainer_id', trainer_id!);
-    formData.append('specialization', specialization!); 
+    
+    // Append multiple specializations
+    if (Array.isArray(specialization)) {
+      specialization.forEach((spec) => {
+        formData.append('specialization[]', spec); 
+      });
+    } else {
+      formData.append('specialization', specialization!);
+    }
+  
     formData.append('name', name);
     formData.append('email', email);
     formData.append('phone', phone);
-    
+  
     // Append files only if they exist
     if (profileImage) formData.append('profileImage', profileImage);
     if (aadhaarFrontSide) formData.append('aadhaarFrontSide', aadhaarFrontSide);
@@ -74,6 +84,7 @@ const TrainerKyc: React.FC = () => {
       setSubmissionError("Failed to submit KYC. Please try again.");
     }
   };
+  
 
   const handleFileChange = (
     event: ChangeEvent<HTMLInputElement>,
