@@ -164,6 +164,8 @@ class UserController {
 
   async getAllTrainers(req: Request, res: Response) {
     try {
+      console.log('trainer hit');
+      
       const allTrainers = await this.userService.fetchAllTrainers();
       // console.log(allTrainers);
 

@@ -150,7 +150,11 @@ class AdminRepository {
     return await this.userModel.find()
   }
   async fetchAllTrainer() {
-    return await this.trainerModel.find().populate('specialization')
+    
+    const trainers =  await this.trainerModel.find().populate('specializations')
+    console.log('trainers', trainers);
+    
+    return trainers
   }
   async updateUserStatus(user_id: string, userStatus: boolean) {
     // console.log(user_id, userStatus);

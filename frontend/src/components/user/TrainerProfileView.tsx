@@ -12,6 +12,8 @@ import {loadStripe} from '@stripe/stripe-js'
 import Loading from "../spinner/Loading";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
+import axios from "axios";
+import API_URL from "../../../axios/API_URL";
 
 function TrainerProfileView() {
   const [trainer, setTrainer] = useState<TrainerProfile | null>(null);
@@ -28,12 +30,13 @@ function TrainerProfileView() {
 
   const {userInfo} = useSelector((state: RootState)  => state.user)
   const { trainerId } = useParams();
+console.log('trainer', trainer);
 
   useEffect(() => {
     const fetchTrainer = async () => {
       try {
-        const response = await userAxiosInstance.get(
-          `/api/user/getTrainer/${trainerId}`
+        const response = await axios.get(
+          `${API_URL}/api/user/getTrainer/${trainerId}`
         );
         setTrainer(response.data[0]);
       } catch (error) {
@@ -137,7 +140,7 @@ const handlePayment = async (sessionId: string) => {
             {trainer?.name}
           </h1>
           <h2 className="text-xl font-medium text-gray-700 mt-2">
-            {trainer?.specialization.name}
+            {trainer?.specializations.map((spec) => spec.name).join(", ")}
           </h2>
         </div>
       </div>

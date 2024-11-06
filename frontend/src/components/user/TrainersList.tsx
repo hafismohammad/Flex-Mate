@@ -1,9 +1,9 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
-import API_URL from "../../../axios/API_URL";
 import { useNavigate, useParams } from "react-router-dom";
 import { Trainer } from "../../types/trainer";
 import userAxiosInstance from "../../../axios/userAxionInstance";
+import axios from "axios";
+import API_URL from "../../../axios/API_URL";
 
 function TrainersList() {
   const [trainersData, setTrainersData] = useState<Trainer[]>([]);
@@ -15,31 +15,22 @@ function TrainersList() {
   useEffect(() => {
     const fetchAllTrainers = async () => {
       try {
-        console.log('dfdfd');
-        
-        const response = await userAxiosInstance.get<Trainer[]>(
-          `/api/user/allTrainers`
-        );
+        const response = await axios.get<Trainer[]>(`${API_URL}/api/user/allTrainers`);
         const trainers = response.data;
 
         if (specId) {
-          const filteredTrainers = trainers.filter(
-            (trainer) =>
-              trainer.specialization._id === specId &&
-              trainer.specialization.isListed 
-          );
-          const otherTrainers = trainers.filter(
-            (trainer) =>
-              trainer.specialization._id !== specId &&
-              trainer.specialization.isListed 
+          
+          const filteredTrainers = trainers.filter((trainer) =>
+            !trainer.specializations.some((spec) => spec._id === specId)
           );
 
-          setTrainersData([...filteredTrainers, ...otherTrainers]);
-        } else {
-          const listedTrainers = trainers.filter(
-            (trainer) => trainer.specialization.isListed
+          const otherTrainers = trainers.filter((trainer) =>
+            trainer.specializations.some((spec) => spec._id === specId)
           );
-          setTrainersData(listedTrainers);
+
+          setTrainersData([...otherTrainers, ...filteredTrainers ]);
+        } else {
+          setTrainersData(trainers);
         }
       } catch (error) {
         console.error("Error fetching trainers:", error);
@@ -49,10 +40,11 @@ function TrainersList() {
     fetchAllTrainers();
   }, [specId]);
 
-  const filteredTrainers = trainersData.filter(
-    (trainer) =>
-      trainer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      trainer.specialization.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredTrainers = trainersData.filter((trainer) =>
+    trainer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    trainer.specializations.some((spec) =>
+      spec.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
   );
 
   const handleTrainerProfileView = (trainerId: string) => {
@@ -82,18 +74,17 @@ function TrainersList() {
               className="w-full h-48 object-cover"
             />
             <div className="p-4 flex-grow flex flex-col">
-              <div className="flex-grow">
-                <h3 className="text-xl font-semibold text-gray-800">
-                  {trainer.name}
-                </h3>
-                <p className="text-gray-600">{trainer.specialization.name}</p>
-                <p className="text-gray-600">
-                  {trainer.specialization.description}
-                </p>
+              <h3 className="text-xl font-semibold text-gray-800">
+                {trainer.name}
+              </h3>
+              <div className="text-gray-600 flex justify-start mt-3 space-x-2">
+                {trainer.specializations.map((spec) => (
+                  <p className="bg-blue-100 rounded-xl  text-sm  " key={spec._id}>{spec.name}</p>
+                ))}
               </div>
               <button
                 onClick={() => handleTrainerProfileView(trainer._id)}
-                className="mt-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded self-start"
+                className=" bg-blue-500 mt-5 hover:bg-blue-600 text-white py-2 px-4 rounded self-start"
               >
                 View Profile
               </button>

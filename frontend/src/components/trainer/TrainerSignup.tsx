@@ -107,9 +107,9 @@ function TrainerSignup() {
     className="w-full flex flex-col items-center justify-center min-h-screen bg-cover bg-center"
     style={{ backgroundImage: `url(${BG_IMG})` }}
   >
-    <div className="bg-white h-[90vh] w-[90%] md:w-[75%] max-w-4xl shadow-lg rounded-md overflow-y-auto relative">
+    <div className="bg-white h-[95vh] w-[90%] md:w-[75%] max-w-4xl shadow-lg rounded-md overflow-y-auto relative">
       <div className="flex items-center justify-center space-x-4 p-5">
-        <img className="w-24 h-14" src={LOGO} alt="logo" />
+        <img className="w-32 h-14" src={LOGO} alt="logo" />
         <h1 className="font-bold text-3xl text-gray-800">Register Trainer</h1>
       </div>
       <form onSubmit={handleSubmit} className="mt-5 w-full gap-6 p-8">

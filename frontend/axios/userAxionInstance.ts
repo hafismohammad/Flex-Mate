@@ -48,7 +48,7 @@ userAxiosInstance.interceptors.response.use(
                 return userAxiosInstance(originalRequest);
             } catch (refreshError) {
                 console.error('Error refreshing user token:', refreshError);
-                window.location.href = '/login';
+                // window.location.href = '/login';
                 return Promise.reject(refreshError);
             }
         }
@@ -58,7 +58,7 @@ userAxiosInstance.interceptors.response.use(
             
             // Clear the token and redirect to login
             localStorage.removeItem("access_token");
-            window.location.href = '/login';
+            // window.location.href = '/login';
         }
         
 

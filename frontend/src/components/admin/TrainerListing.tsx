@@ -23,6 +23,7 @@ function TrainerListing() {
     };
     fetchData();
   }, []);
+// console.log('trainers', trainers);
 
   const filteredTrainers = trainers.filter((trainer) =>
     trainer._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -66,7 +67,7 @@ function TrainerListing() {
   const closeModal = () => {
     setIsModalOpen(false)
   }
-console.log('trainer', trainers);
+console.log('trainer', selectedTrainer);
 
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
@@ -171,9 +172,12 @@ console.log('trainer', trainers);
         </div>
        </div> <div>
        <label className="block mb-1 font-medium text-gray-700">Specialization</label>
-        <div className="border border-gray-500 p-2 rounded-md">
-          <h1>{selectedTrainer.specialization.name }</h1>
-        </div>
+<div className="border border-gray-500 p-2 rounded-md">
+  {selectedTrainer.specializations?.map((spec, index) => (
+    <h1 key={index}>{spec.name}</h1>
+  ))}
+</div>
+
        </div> <div>
        <label className="block mb-1 font-medium text-gray-700">Daily session limit</label>
         <div className="border border-gray-500 p-2 rounded-md">

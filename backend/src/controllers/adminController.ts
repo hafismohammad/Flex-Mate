@@ -215,6 +215,7 @@ class AdminController {
   }
   async getAllTrainer(req: Request, res: Response) {
     try {
+      
       const allTrainer = await this.adminService.fetchAllTrainer()
       res.status(200).json({ message: 'Fetch all trainer successfully', trainer: allTrainer })
     } catch (error) {

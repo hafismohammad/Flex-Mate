@@ -47,7 +47,7 @@ export interface KycDocument {
     gender: string;
     language: string
     yearsOfExperience: string
-    specialization: Specialization
+    specializations: Specialization[]
     dailySessionLimit: number
     isBlocked: boolean; 
   }
@@ -58,7 +58,7 @@ export interface KycDocument {
     email: string;
     phone: number;
     profileImage: string;
-    specialization: Specialization;
+    specializations: Specialization[];
     imageUrl?: string;
     yearsOfExperience?: string | null
     language?: string | null
