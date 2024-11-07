@@ -30,6 +30,7 @@ export interface IBooking {
     sessionId: mongoose.Types.ObjectId;
     trainerId: mongoose.Types.ObjectId;
     userId: mongoose.Types.ObjectId | undefined; 
+    specializationId?: mongoose.Types.ObjectId;
     sessionType: string;
     bookingDate: Date;
     startDate: Date;

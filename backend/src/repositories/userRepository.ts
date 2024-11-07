@@ -128,7 +128,7 @@ class UserRepository {
   async fetchAllSessionSchedules() {
     try {
       const schedules = await this.sessionModel.find({}).populate('specializationId')
-      console.log('specId', schedules);
+      // console.log('specId', schedules);
       
       return schedules;
     } catch (error) {}
@@ -144,7 +144,7 @@ class UserRepository {
   }
 
   async findSessionDetails(session_id: string) {
-    return await this.sessionModel.findById(session_id);
+    return await this.sessionModel.findById(session_id).populate('specializationId')
   }
 
   async findTrainerDetails(trainer_id: string) {
@@ -153,7 +153,7 @@ class UserRepository {
       {
         $lookup: {
           from: "specializations",
-          localField: "specialization",
+          localField: "specializations",
           foreignField: "_id",
           as: "specializationData",
         },
@@ -168,7 +168,7 @@ class UserRepository {
         $project: {
           name: 1,
           email: 1,
-          specialization: "$specializationData",
+          specialization: "$specializationData.name",
           kycStatus: 1,
           isBlocked: 1,
           createdAt: 1,
@@ -181,6 +181,7 @@ class UserRepository {
         },
       },
     ]);
+// console.log("trainerData", trainerData);
 
     return trainerData[0];
   }
@@ -293,7 +294,7 @@ class UserRepository {
       {
         $lookup: {
           from: 'specializations',
-          localField: 'trainerDetails.specialization', 
+          localField: 'sessionDetails.specializationId', 
           foreignField: '_id', 
           as: 'specializationDetails',
         },
@@ -329,7 +330,7 @@ class UserRepository {
     ]);
     
     
-    console.log(allBookings);
+    // console.log(allBookings);
     
     return allBookings
   }

@@ -5,6 +5,7 @@ const bookingSchema = new Schema<IBooking>({
   sessionId: { type: Schema.Types.ObjectId, ref: "Session", required: true },
   trainerId: { type: Schema.Types.ObjectId, ref: "Trainer", required: true },
   userId: { type: Schema.Types.ObjectId, ref: "User", required: true }, 
+  specializationId: { type: Schema.Types.ObjectId, ref: "Specialization", required: true },
   sessionType: { type: String, required: true },
   bookingDate: { type: Date, default: Date.now }, 
   startDate: { type: Date, required: true }, 

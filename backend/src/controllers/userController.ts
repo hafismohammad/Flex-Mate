@@ -221,6 +221,7 @@ class UserController {
     try {
       const userId = req.body.userData.id;
       const session_id = req.params.sessionId;
+      
       const paymentResponse = await this.userService.checkoutPayment(
         session_id,
         userId

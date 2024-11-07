@@ -270,14 +270,14 @@ class UserService {
       if (!trainerData) {
         throw new Error("Trainer data not found");
       }
-
+// console.log('trainerData', trainerData)
       const lineItems = [
         {
           price_data: {
             currency: "inr",
             unit_amount: sessionData.price * 100,
             product_data: {
-              name: `Trainer Name: ${trainerData.name} - (${trainerData.specialization.name})`,
+              name: `Trainer Name: ${trainerData.name} - (${trainerData.specialization})`,
               description: sessionData.isSingleSession
                 ? `Description: Session from ${sessionData.startTime} to ${
                     sessionData.endTime
@@ -331,6 +331,7 @@ class UserService {
         sessionId: new mongoose.Types.ObjectId(session._id),
         trainerId: new mongoose.Types.ObjectId(trainer[0]._id),
         userId: new mongoose.Types.ObjectId(user_id),
+        specializationId: new mongoose.Types.ObjectId(session.specializationId._id),
         sessionType: session.isSingleSession
           ? "Single Session"
           : "Package Session",

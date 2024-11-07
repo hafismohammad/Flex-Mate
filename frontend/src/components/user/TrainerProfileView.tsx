@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import profileBG from "../../assets/trainer-profile-view-img.jpg";
 import { useEffect, useState } from "react";
 import { TrainerProfile } from "../../types/trainer";
@@ -37,6 +37,7 @@ function TrainerProfileView() {
 
   const { userInfo } = useSelector((state: RootState) => state.user);
   const { trainerId } = useParams();
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchTrainer = async () => {
@@ -61,18 +62,25 @@ function TrainerProfileView() {
 
   const handlePayment = async (sessionId: string) => {
     try {
-      setLoading(true);
-      const response = await userAxiosInstance.post(
-        `/api/user/makePayment/${sessionId}`,
-        { userData: userInfo }
-      );
-      const stripe = await loadStripe(
-        "pk_test_51QFSikP9mn4OerLiFUemMPfvrAmFDjKKizT0flSQdVK36hHsqyjqwvTT00hrd3RLAzl9cqtWSWnOn2gd7ITftQTU00Lrwxv4SX"
-      );
-
-      if (stripe) {
-        await stripe.redirectToCheckout({ sessionId: response.data.id });
+      if(userInfo) {
+        setLoading(true);
+        const response = await userAxiosInstance.post(
+          `/api/user/makePayment/${sessionId}`,
+          { userData: userInfo }
+        );
+        const stripe = await loadStripe(
+          "pk_test_51QFSikP9mn4OerLiFUemMPfvrAmFDjKKizT0flSQdVK36hHsqyjqwvTT00hrd3RLAzl9cqtWSWnOn2gd7ITftQTU00Lrwxv4SX"
+        );
+  
+        if (stripe) {
+          await stripe.redirectToCheckout({ sessionId: response.data.id });
+        }
+      } else {
+        navigate('/login')
       }
+     
+
+   
     } catch (error) {
       console.error("Error initiating payment:", error);
     }
@@ -92,8 +100,8 @@ function TrainerProfileView() {
 
   useEffect(() => {
     const fetchSeessionSchedules = async () => {
-      const response = await userAxiosInstance.get(
-        `/api/user/sessionSchedules`
+      const response = await axios.get(
+        `${API_URL}/api/user/sessionSchedules`
       );
       // console.log(response.data);
       setSessionSchedules(response.data);

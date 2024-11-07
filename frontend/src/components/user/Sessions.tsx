@@ -22,6 +22,7 @@ function Sessions() {
     };
     fetchBookingDetails();
   }, [userInfo?.id]);
+console.log('sessions', sessions);
 
   // Calculate the index of the first and last session for the current page
   const indexOfLastSession = currentPage * sessionsPerPage;
