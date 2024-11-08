@@ -8,7 +8,7 @@ class MessageController {
   async sendMessage(req: Request, res: Response) {
     try {
       const { token, receiverId, message } = req.body;
-console.log('server', token,'---------', receiverId);
+// console.log('server', token,'---------', receiverId);
 
       if (!token) {
         res.status(400).json({ error: "Token is required" });
@@ -39,20 +39,20 @@ console.log('server', token,'---------', receiverId);
 
   async getMessage(req: Request, res: Response) {
     try {
-      const { token, userToChatId } = req.body;
-
+      const {token, id} = req.params
+      
       const decoded = jwt.verify(
         token,
         process.env.ACCESS_TOKEN_SECRET as string
       ) as { id: string };
       const senderId = decoded.id;
-
-      console.log("get message", senderId, userToChatId);
-
+   
+      
       const getMessages = await messageService.getMessage(
         senderId,
-        userToChatId
+        id
       );
+// console.log(getMessages);
 
       res.status(200).json(getMessages);
     } catch (error) {

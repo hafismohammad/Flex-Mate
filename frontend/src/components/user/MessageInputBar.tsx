@@ -6,9 +6,10 @@ import { RootState } from "../../app/store";
 
 interface MessageInputBarProps {
   trainerId?: string; 
+  onNewMessage: (message: any) => void;
 }
 
-function MessageInputBar({ trainerId }: MessageInputBarProps) {
+function MessageInputBar({ trainerId, onNewMessage }: MessageInputBarProps) {
   const [message, setMessage] = useState('');
   const { sendMessage } = useSendMessage();
   const { token } = useSelector((state: RootState) => state.user);
@@ -18,10 +19,18 @@ function MessageInputBar({ trainerId }: MessageInputBarProps) {
   const handleSendMessage = async (e: React.FormEvent<HTMLElement>) => {
     e.preventDefault();
     if (!message) return;
-    
+
     const receiverId = trainerId ?? "defaultTrainerId"; 
-    // console.log('working', message, receiverId,'----', token);
+    const newMessage = {
+      message,
+      receiverId,
+      senderModel: "User", 
+      createdAt: new Date().toISOString()
+    };
+
     await sendMessage({ message, receiverId, token: validToken });
+
+    onNewMessage(newMessage);
     setMessage("");
   };
 

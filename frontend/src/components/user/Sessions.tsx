@@ -108,8 +108,8 @@ const handleChatButton = (trainerId: string) => {
                 </div>
               </div>
 
-              <button className="flex items-center bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600">
-                <IoChatbubbleEllipsesSharp onClick={() => handleChatButton(session.trainerId)} className="mr-2" /> Chat
+              <button onClick={() => handleChatButton(session.trainerId)} className="flex items-center bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600">
+                <IoChatbubbleEllipsesSharp  className="mr-2" /> Chat
               </button>
             </div>
           ))

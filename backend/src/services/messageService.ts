@@ -74,6 +74,8 @@ class MessageService {
     async getMessage(senderId: string, userToChatId: string) {
         const senderObjectId = new mongoose.Types.ObjectId(senderId);
         const receiverObjectId = new mongoose.Types.ObjectId(userToChatId);
+
+
     
         // Identify the model type for the sender
         const senderModel = (await UserModel.exists({ _id: senderObjectId })) ? 'User' :
@@ -84,6 +86,8 @@ class MessageService {
         if (!senderModel || !receiverModel) {
             throw new Error('Invalid sender or receiver ID');
         }
+
+
     
         const conversations = await ConversationModel.find({
             participants: {
@@ -93,8 +97,10 @@ class MessageService {
                 ]
             }
         }).populate('messages');
+// console.log('conversatiosn', conversations);
 
         const allConversations = conversations.flatMap(conversation => conversation.messages)
+        // console.log('allConversations', allConversations);
         
     
         return allConversations
