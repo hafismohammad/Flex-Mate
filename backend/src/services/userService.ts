@@ -156,7 +156,7 @@ class UserService {
           if (!userData._id) {
             throw new Error("User ID is missing");
           }
-
+          
           // Generate access and refresh tokens
           const accessToken = generateAccessToken({
             id: userData._id.toString(),

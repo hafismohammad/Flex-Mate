@@ -266,7 +266,7 @@ class TrainerRepository {
       const rejectionData = await this.kycRejectionModel.findOne({
         trainerId: trainerId,
       });
-      console.log("rejectionData:", rejectionData);
+      // console.log("rejectionData:", rejectionData);
 
       return rejectionData;
     } catch (error) {
@@ -275,22 +275,67 @@ class TrainerRepository {
     }
   }
 
+  async createMultipleSessions(sessions: ISession[]) {
+    try {
+      // Ensure all sessions pass validation checks before inserting
+      for (const session of sessions) {
+        // Validate each session (like checking time conflicts)
+        const allSessions = await this.sessionModel.find({ trainerId: session.trainerId });
+  
+        // Check for time conflicts with each session
+        const hasConflict = allSessions.some((existingSession) => {
+          const existingStartDate = moment(existingSession.startDate);
+          const existingEndDate = existingSession.endDate ? moment(existingSession.endDate) : existingStartDate;
+  
+          const existingStartTime = moment(existingSession.startTime, "HH:mm");
+          const existingEndTime = moment(existingSession.endTime, "HH:mm");
+  
+          const newStartDate = moment(session.startDate);
+          const newEndDate = session.endDate ? moment(session.endDate) : newStartDate;
+  
+          const newStartTime = moment(session.startTime, "HH:mm");
+          const newEndTime = moment(session.endTime, "HH:mm");
+  
+          const dateRangeOverlaps = newStartDate.isSameOrBefore(existingEndDate) && newEndDate.isSameOrAfter(existingStartDate);
+          const timeRangeOverlaps = newStartTime.isBefore(existingEndTime) && newEndTime.isAfter(existingStartTime);
+  
+          return dateRangeOverlaps && timeRangeOverlaps;
+        });
+  
+        if (hasConflict) throw new Error(`Time conflict detected for session on ${session.startDate}`);
+  
+        // Validate price as a number
+        session.price = Number(session.price);
+        if (isNaN(session.price)) throw new Error("Invalid session price.");
+      }
+  
+      // Insert sessions in batch and retrieve the inserted documents
+      const createdSessions = await this.sessionModel.insertMany(sessions, { ordered: true });
+      return createdSessions;
+  
+    } catch (error) {
+      console.error("Error creating multiple sessions:", error);
+      throw error;
+    }
+  }
+  
+  
+  
+
   async createNewSession(sessionData: ISession) {
     try {
-      // Ensure the trainer exists
       const trainer = await this.trainerModel.findById(sessionData.trainerId);
       if (!trainer) throw new Error("Trainer not found.");
       
       const dailySessionLimit = trainer.dailySessionLimit;
   
-      // Check daily session limit
       const allSessions = await this.sessionModel.find({
         trainerId: sessionData.trainerId,
       });
   
-      if (allSessions.length >= dailySessionLimit) {
-        throw new Error(`Daily session limit of ${dailySessionLimit} reached.`);
-      }
+      // if (allSessions.length >= dailySessionLimit) {
+      //   throw new Error(`Daily session limit of ${dailySessionLimit} reached.`);
+      // }
   
       // Check for date and time conflicts
       const existingSessions = await this.sessionModel.find({
@@ -357,7 +402,7 @@ class TrainerRepository {
       const sesseionData = await this.sessionModel.find({
         trainerId: trainer_id,
       });
-      // console.log(sesseionData);
+      console.log(sesseionData);
       return sesseionData;
     } catch (error) {
       throw error

@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 import { IBookedSession } from "../../types/user";
 import { formatTime } from "../../utils/timeAndPriceUtils";
+import { useNavigate } from "react-router-dom";
 
 function Sessions() {
   const [sessions, setSessions] = useState<IBookedSession[]>([]);
@@ -12,6 +13,7 @@ function Sessions() {
   const sessionsPerPage = 3;
 
   const { userInfo } = useSelector((state: RootState) => state.user);
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchBookingDetails = async () => {
@@ -22,7 +24,7 @@ function Sessions() {
     };
     fetchBookingDetails();
   }, [userInfo?.id]);
-console.log('sessions', sessions);
+// console.log('sessions', sessions);
 
   // Calculate the index of the first and last session for the current page
   const indexOfLastSession = currentPage * sessionsPerPage;
@@ -42,6 +44,10 @@ console.log('sessions', sessions);
       setCurrentPage(currentPage - 1);
     }
   };
+
+const handleChatButton = (trainerId: string) => {
+  navigate(`/userChat/${trainerId}`)
+}
 
   return (
     <div>
@@ -103,7 +109,7 @@ console.log('sessions', sessions);
               </div>
 
               <button className="flex items-center bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600">
-                <IoChatbubbleEllipsesSharp className="mr-2" /> Chat
+                <IoChatbubbleEllipsesSharp onClick={() => handleChatButton(session.trainerId)} className="mr-2" /> Chat
               </button>
             </div>
           ))

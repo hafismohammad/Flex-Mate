@@ -15,7 +15,7 @@ interface FormData {
   yearsOfExperience: number;
   gender: string;
   language: string;
-  dailySessionLimit: number;
+  // dailySessionLimit: number;
 }
 
 const EditTrainerProfile: React.FC = () => {
@@ -29,7 +29,7 @@ const EditTrainerProfile: React.FC = () => {
     yearsOfExperience: 0,
     gender: "",
     language: "",
-    dailySessionLimit: 0,
+    // dailySessionLimit: 0,
   });
 
   const navigate = useNavigate();
@@ -53,7 +53,7 @@ const EditTrainerProfile: React.FC = () => {
           yearsOfExperience: trainerData[0].yearsOfExperience || 0,
           gender: trainerData[0].gender || "",
           language: trainerData[0].language || "",
-          dailySessionLimit: trainerData[0].dailySessionLimit || 0,
+          // dailySessionLimit: trainerData[0].dailySessionLimit || 0,
         });
       } catch (err) {
         setError("Failed to load trainer data");
@@ -96,7 +96,7 @@ const EditTrainerProfile: React.FC = () => {
     updatedData.append("yearsOfExperience", formData.yearsOfExperience.toString());
     updatedData.append("gender", formData.gender);
     updatedData.append("language", formData.language);
-    updatedData.append("dailySessionLimit", formData.dailySessionLimit.toString());
+    // updatedData.append("dailySessionLimit", formData.dailySessionLimit.toString());
 
     // Append profile image only if it's a file
     if (formData.profileImage instanceof File) {
@@ -224,19 +224,19 @@ const EditTrainerProfile: React.FC = () => {
               <option value="german">German</option>
               <option value="mandarin">Mandarin</option>
             </select>
-            <input
+            {/* <input
               name="dailySessionLimit"
               type="number"
               value={formData.dailySessionLimit}
               onChange={handleChange}
               placeholder="Daily Session Limit"
               className="p-3 border border-gray-300 bg-slate-100 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            /> */}
           </div>
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-3 rounded-lg shadow-md hover:bg-blue-700 transition"
+            className="w-32 h-10  mt-5 mb-5 bg-blue-600 text-white  rounded-lg shadow-md hover:bg-blue-700 transition"
           >
             Update Profile
           </button>

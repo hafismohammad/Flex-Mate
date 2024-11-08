@@ -363,6 +363,7 @@ class TrainerController {
   async storeSessionData(req: Request, res: Response): Promise<void> {
     try {
       const {
+        recurrenceOption,
         specId,
         isSingleSession,
         selectedDate,
@@ -398,8 +399,11 @@ class TrainerController {
       }
 
       const createdSessionData = await this.trainerService.AddNewSession(
-        sessionData
+        sessionData,
+        recurrenceOption
       );
+      console.log('createdSessionData----', createdSessionData);
+      
       res
         .status(201)
         .json({ message: "Session created successfully.", createdSessionData });

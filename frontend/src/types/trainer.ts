@@ -89,3 +89,4 @@ export interface KycDocument {
     image: string;
     isListed: boolean;
   }
+

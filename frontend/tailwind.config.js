@@ -8,6 +8,7 @@ module.exports = {
     extend: {},
   },
   plugins: [
-    require('tailwindcss-animated') 
+    require('tailwindcss-animated'),
+    // require('daisyui'),
   ],
 };

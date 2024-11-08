@@ -19,7 +19,7 @@ interface TrainerProfileData {
   gender: string;
   yearsOfExperience: string;
   language: string;
-  dailySessionLimit?: number;
+  // dailySessionLimit?: number;
 }
 
 function TrainerProfile() {
@@ -147,14 +147,14 @@ function TrainerProfile() {
             </span>
           </div>
 
-          <div className="bg-slate-100 p-4 rounded-lg shadow-sm transition-transform transform hover:scale-105">
+          {/* <div className="bg-slate-100 p-4 rounded-lg shadow-sm transition-transform transform hover:scale-105">
             <span className="block text-sm font-semibold text-gray-500">
               Daily Session Limit
             </span>
             <span className="text-lg text-gray-800">
               {trainer[0].dailySessionLimit || "Not specified"}
             </span>
-          </div>
+          </div> */}
         </div>
 
         <button

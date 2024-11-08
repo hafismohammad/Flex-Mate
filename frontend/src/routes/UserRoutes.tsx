@@ -9,7 +9,8 @@ import SuccessPaymentPage from '../pages/user/SuccessPaymentPage';
 import FailedPaymentPage from '../pages/user/FailedPaymentPage';
 import UserProfilePage from '../pages/user/UserProfilePage';
 import UserLayout from '../components/user/UserLayout';
-import Sessions from '../components/user/sessions';
+import Sessions from '../components/user/Sessions';
+import UserChatPage from '../pages/user/UserChatPage';
 
 function UserRoutes() {
   return (
@@ -23,6 +24,7 @@ function UserRoutes() {
       <Route path='/trainerProfileView/:trainerId' element={<TrainerProfileViewPage />} />
       <Route path='/paymentSuccess' element={<SuccessPaymentPage />} />
       <Route path='/paymentFailed' element={<FailedPaymentPage />} />
+      <Route path='/userChat/:trainerId' element={<UserChatPage />} />
       <Route path='/profile' element={<UserLayout />}>
         <Route index element={<UserProfilePage />} />
         <Route path='sessions' element={<Sessions />} />

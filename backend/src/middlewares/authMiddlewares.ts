@@ -19,6 +19,7 @@ const authMiddleware = async (req: CustomRequest, res: Response, next: NextFunct
 
   try {
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET as string) as { id: string };
+    
     req.user = decoded;
 
     const isBlockedTraienr = await TrainerRepository.getIsBlockedTrainer(decoded.id);

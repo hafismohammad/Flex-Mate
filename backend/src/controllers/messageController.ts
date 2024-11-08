@@ -7,7 +7,8 @@ import ConversationModel from "../models/ConversationModel";
 class MessageController {
   async sendMessage(req: Request, res: Response) {
     try {
-      const { token, recieverId, message } = req.body;
+      const { token, receiverId, message } = req.body;
+console.log('server', token,'---------', receiverId);
 
       if (!token) {
         res.status(400).json({ error: "Token is required" });
@@ -22,7 +23,7 @@ class MessageController {
 
       const sendMessage = await messageService.sendMessage(
         senderId,
-        recieverId,
+        receiverId,
         message
       );
       if (!sendMessage) {

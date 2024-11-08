@@ -1,4 +1,4 @@
-import WorkFlowImg from "../../assets/website-workflow.png";
+import WorkFlowImg from "../../assets/works-flow.jpg";
 import BottomBanner from "../../assets/Bottom-banner-2.jpg";
 import LOGO from '../../assets/LOGO-3 (2).png'
 

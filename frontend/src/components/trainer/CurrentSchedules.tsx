@@ -14,6 +14,7 @@ import {
   formatPriceToINR,
 } from "../../utils/timeAndPriceUtils";
 import Swal from "sweetalert2";
+import Loading from "../spinner/Loading";
 
 function CurrentSchedules() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -29,6 +30,8 @@ function CurrentSchedules() {
   const [specModal, setSpecModal] = useState(false);
   const [specId, setSpecId] = useState<string | null>(null);
   const [spec, setSpec] = useState<ISpec[]>([]);
+  const [recurrenceOption, setRecurrenceOption] = useState("oneDay"); 
+  const [loading, setLoading] = useState(true);
   const [sessionSchedules, setSessionSchedules] = useState<ISessionSchedule[]>(
     []
   );
@@ -38,11 +41,11 @@ function CurrentSchedules() {
 
   const handleAdd = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+  
     const today = new Date();
     const maxDate = new Date(today);
     maxDate.setDate(today.getDate() + 20);
-
+  
     const clearSessionData = () => {
       setSelectedDate(null);
       setStartDate(null);
@@ -51,13 +54,13 @@ function CurrentSchedules() {
       setEndTime("");
       setPrice("");
     };
-
+  
     if (isSingleSession) {
       if (!selectedDate || !startTime || !price) {
         toast.error("Please fill in all fields for the single session.");
         return;
       }
-
+  
       if (new Date(selectedDate) > maxDate) {
         toast.error("The session date must be within the next 20 days.");
         return;
@@ -67,54 +70,58 @@ function CurrentSchedules() {
         toast.error("Please fill in all fields for the package session.");
         return;
       }
-
+  
       if (startTime >= endTime) {
         toast.error("End time must be after start time");
         return;
       }
-
+  
       if (new Date(startDate) > maxDate) {
         toast.error("The package start date must be within the next 20 days.");
         return;
       }
-
+  
       if (new Date(startDate) >= new Date(endDate)) {
         toast.error("Start date must be before end date.");
         return;
       }
     }
-
-      try {
-        const sessionData = isSingleSession
-          ? {
-              specId,
-              isSingleSession,
-              selectedDate: selectedDate?.toISOString(),
-              startTime,
-              endTime,
-              price,
-            }
-          : {
-              specId,
-              isSingleSession,
-              startDate: startDate?.toISOString(),
-              endDate: endDate?.toISOString(),
-              startTime,
-              endTime,
-              price,
-            };
-
-        const response = await axiosInstance.post(
-          `${API_URL}/api/trainer/session/${trainerId}`,
-          sessionData
-        );
-        const newSchedule = response.data.createdSessionData;
-        setSessionSchedules((schedule) => [...schedule, newSchedule]);
-
-        if (response.status === 201) {
-          toast.success("Session created successfully");
+  
+    const sessionData = isSingleSession
+      ? {
+          recurrenceOption,
+          specId,
+          isSingleSession,
+          selectedDate: selectedDate?.toISOString(),
+          startTime,
+          endTime,
+          price,
         }
-      } catch (error: any) {
+      : {
+          specId,
+          isSingleSession,
+          startDate: startDate?.toISOString(),
+          endDate: endDate?.toISOString(),
+          startTime,
+          endTime,
+          price,
+        };
+  
+    try {
+      const response = await axiosInstance.post(
+        `${API_URL}/api/trainer/session/${trainerId}`,
+        sessionData
+      );
+      const newSchedule = response.data.createdSessionData;
+  console.log('newSchedule', newSchedule);
+  
+      // Ensure the sessionSchedules are updated with the new session
+      setSessionSchedules((prevSchedules) => [...prevSchedules, newSchedule]);
+  
+      if (response.status === 201) {
+        toast.success("Session created successfully");
+      }
+    } catch (error: any) {
       if (error.response?.status === 400) {
         const errorMessage =
           error.response.data.message ||
@@ -130,11 +137,12 @@ function CurrentSchedules() {
         toast.error(generalErrorMessage);
       }
     }
-
+  
     handleCloseModal();
-    setModalOpen(false)
+    setModalOpen(false);
     clearSessionData();
   };
+  
 
   const handleOpenModal = async () => {
     setSpecModal(true);
@@ -157,11 +165,21 @@ function CurrentSchedules() {
 
   useEffect(() => {
     const fetchSessionData = async () => {
-      const response = await axiosInstance.get(
-        `${API_URL}/api/trainer/sessiosShedules/${trainerId}`
-      );
-      const schedules = response.data.sheduleData;
-      setSessionSchedules(schedules);
+      setLoading(true); // Start loading
+      try {
+        const response = await axiosInstance.get(
+          `${API_URL}/api/trainer/sessiosShedules/${trainerId}`
+        );
+        const schedules = response.data.sheduleData;
+        console.log('schedules', schedules);
+        
+        setSessionSchedules(schedules);
+      } catch (error) {
+        console.error("Failed to fetch schedules:", error);
+        toast.error("Failed to fetch schedules");
+      } finally {
+        setLoading(false); // End loading
+      }
     };
     fetchSessionData();
   }, [trainerId]);
@@ -185,11 +203,7 @@ function CurrentSchedules() {
           setSessionSchedules((schedule) =>
             schedule.filter((schedule) => schedule._id != sessionId)
           );
-          // Swal.fire(
-          //   "Deleted!",
-          //   "The session has been deleted.",
-          //   "success"
-          // );
+         
           return toast.success("Session deleted successfully");
         } catch (error) {
           Swal.fire("Error", "Failed to delete the session.", "error");
@@ -197,10 +211,12 @@ function CurrentSchedules() {
       }
     });
   };
+console.log('sessionSchedules',sessionSchedules );
 
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
       <Toaster />
+      {!sessionSchedules && <Loading />}
       <div className="mb-8 flex flex-col md:flex-row items-center justify-between gap-4">
         <h2 className="text-4xl font-bold text-gray-800">Current Schedules</h2>
         <button
@@ -259,6 +275,8 @@ function CurrentSchedules() {
         price={price}
         setPrice={setPrice}
         handleAdd={handleAdd}
+        setRecurrenceOption={setRecurrenceOption}
+        
       />
 
       <div className="bg-white shadow-lg rounded-lg p-6">

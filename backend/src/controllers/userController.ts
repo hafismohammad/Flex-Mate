@@ -40,7 +40,6 @@ class UserController {
       const user = await this.userService.login({ email, password });
 
       if (user) {
-        console.log("user", user);
 
         const { accessToken, refreshToken } = user;
 

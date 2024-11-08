@@ -10,6 +10,7 @@ import {
 import sendOTPmail from "../config/email_config";
 import bcrypt from "bcryptjs";
 import { ISession } from "../interface/trainer_interface";
+import { createRecurringSessions } from "../utils/slotHelper";
 
 class TrainerService {
   private trainerRepository: TrainerRepository;
@@ -325,7 +326,7 @@ class TrainerService {
     }
   }
 
-  async AddNewSession(sessionData: ISession) {
+  async AddNewSession(sessionData: ISession, recurrenceOption: string) {
     try {
       const startTimeInput = sessionData.startTime;
       const endTimeInput = sessionData.endTime;
@@ -344,7 +345,18 @@ class TrainerService {
         throw new Error("Session duration must be at least 30 minutes");
       }
 
-      return await this.trainerRepository.createNewSession(sessionData);
+      if (recurrenceOption === 'oneWeek' || recurrenceOption === 'twoWeeks') {
+        // Generate recurring sessions for either one week or two weeks
+        const recurringSessions = await createRecurringSessions(sessionData.startDate, recurrenceOption, sessionData);
+      
+        // Create all recurring sessions at once in the repository
+        return await this.trainerRepository.createMultipleSessions(recurringSessions);
+      } else {
+        // Handle single session creation
+        return await this.trainerRepository.createNewSession(sessionData);
+      }
+      
+
     } catch (error: any) {
       if (error.message.includes("Daily session limit")) {
         throw new Error(error.message);

@@ -11,6 +11,7 @@ export interface User {
 }
 
 export interface IBookedSession {
+  trainerId: string
   bookingId: string
   trainerImage: string;
   trainerName: string;

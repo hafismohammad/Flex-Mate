@@ -207,146 +207,145 @@ function TrainerProfileView() {
         </div>
       </div>
       <div className="bg-blue-500 h-[150vh] mt-20">
-        <div className="flex justify-between items-center p-10">
-          <img src={LOGO} alt="logo" className="w-80 h-20" />
+  <div className="flex justify-between items-center p-10">
+    <img src={LOGO} alt="logo" className="w-80 h-20" />
 
-          <DatePicker
-            minDate={new Date()}
-            selected={selectedDate}
-            inline
-            highlightDates={sessionDates}
-            onChange={(date) => setSelectedDate(date)}
-            className="h-80 w-80 border border-gray-300 rounded-lg shadow-lg p-2"
-          />
-        </div>
-        <div className="flex justify-center">
-          <div className=" border-b-2 border-b-black w-96 mr-10"></div>
-          <h1 className="font-semibold">
-            {selectedDate
-              ? selectedDate?.toDateString()
-              : new Date().toDateString()}
-          </h1>
-          <div className=" border-b-2 border-b-black w-96 ml-10"></div>
-        </div>
-        <div className="flex justify-center mt-20">
-          <div className="bg-blue-50 rounded-md shadow-lg p-6 w-[80%] h-[75vh]">
-            <div className="mt-5 space-x-4 flex justify-center">
-              <button
-                onClick={handleSingleSession}
-                className={`${
-                  isSingleSession
-                    ? "bg-blue-500 hover:bg-blue-600"
-                    : "bg-gray-500 hover:bg-gray-600"
-                } text-white px-4 py-3 shadow-md`}
-              >
-                Single Session
-              </button>
-              <button
-                onClick={handlePackageSession}
-                className={`${
-                  isSingleSession
-                    ? "bg-gray-500 hover:bg-gray-600"
-                    : "bg-blue-500 hover:bg-blue-600"
-                } text-white px-4 py-3 shadow-md`}
-              >
-                Package Sessions
-              </button>
-            </div>
-
-            <div className="p-5 mt-8">
-              {sessionSchedules.filter(
-                (session) =>
-                  session.isSingleSession === isSingleSession &&
-                  session.trainerId === trainerId &&
-                  (!selectedDate ||
-                    (new Date(session.startDate).toLocaleDateString() ===
-                      selectedDate.toLocaleDateString() &&
-                      session.isBooked == false))
-              ).length === 0 ? (
-                <div className="flex justify-center">
-                  <h1 className="text-black">
-                    {isSingleSession
-                      ? "No Single Sessions available."
-                      : "No Packages available."}
-                  </h1>
-                </div>
-              ) : (
-                sessionSchedules
-                  .filter(
-                    (session) =>
-                      session.isSingleSession === isSingleSession &&
-                      session.trainerId === trainerId &&
-                      (!selectedDate ||
-                        new Date(session.startDate).toLocaleDateString() ===
-                          selectedDate.toLocaleDateString()) &&
-                      session.isBooked == false
-                  )
-                  .map((session) => (
-                    <div key={session._id} className="mb-8">
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <h1 className="text-3xl font-bold text-blue-600 mb-2">
-                            {session.specializationId.name}
-                          </h1>
-
-                          <h1 className="font-medium text-2xl">
-                            Time: {formatTime(session.startTime)} -{" "}
-                            {formatTime(session.endTime)}
-                          </h1>
-                          <p>
-                            Duration: (
-                            {calculateDuration(
-                              session.startTime,
-                              session.endTime
-                            )}
-                            )
-                          </p>
-                          {!isSingleSession && (
-                            <h1 className="font-medium text-2xl mt-2">
-                              Number of Sessions:{" "}
-                              {numberOfSessions(
-                                session.startDate,
-                                session.endDate
-                              )}
-                            </h1>
-                          )}
-                        </div>
-
-                        <div className="h-10 w-px bg-gray-300 mx-5"></div>
-
-                        <div className="flex items-center space-x-4">
-                          <div>
-                            <h1 className="font-medium text-2xl">
-                              Price: {formatPriceToINR(session.price)}
-                            </h1>
-                            {!isSingleSession && (
-                              <h1 className="text-gray-600">
-                                {new Date(
-                                  session.startDate
-                                ).toLocaleDateString()}{" "}
-                                -{" "}
-                                {new Date(session.endDate).toLocaleDateString()}
-                              </h1>
-                            )}
-                          </div>
-                          <button
-                            onClick={() => handleBooking(session)}
-                            className="bg-blue-500 hover:bg-blue-600 px-4 py-3 text-white"
-                          >
-                            Book Now
-                          </button>
-                        </div>
-                      </div>
-                      <div className="flex justify-center mt-4">
-                        <div className="border-b-2 border-b-gray-300 w-full"></div>
-                      </div>
-                    </div>
-                  ))
-              )}
-            </div>
-          </div>
-        </div>
+    <DatePicker
+      minDate={new Date()}
+      selected={selectedDate}
+      inline
+      highlightDates={sessionDates}
+      onChange={(date) => setSelectedDate(date)}
+      className="h-80 w-80 border border-gray-300 rounded-lg shadow-lg p-2"
+    />
+  </div>
+  <div className="flex justify-center">
+    <div className="border-b-2 border-b-black w-96 mr-10"></div>
+    <h1 className="font-semibold">
+      {selectedDate ? selectedDate.toDateString() : new Date().toDateString()}
+    </h1>
+    <div className="border-b-2 border-b-black w-96 ml-10"></div>
+  </div>
+  <div className="flex justify-center mt-20">
+    <div className="bg-blue-50 rounded-md shadow-lg p-6 w-[80%] h-[75vh] overflow-y-auto">
+      {/* Button section */}
+      <div className="mt-5 space-x-4 flex justify-center">
+        <button
+          onClick={handleSingleSession}
+          className={`${
+            isSingleSession
+              ? "bg-blue-500 hover:bg-blue-600"
+              : "bg-gray-500 hover:bg-gray-600"
+          } text-white px-4 py-3 shadow-md`}
+        >
+          Single Session
+        </button>
+        <button
+          onClick={handlePackageSession}
+          className={`${
+            isSingleSession
+              ? "bg-gray-500 hover:bg-gray-600"
+              : "bg-blue-500 hover:bg-blue-600"
+          } text-white px-4 py-3 shadow-md`}
+        >
+          Package Sessions
+        </button>
       </div>
+
+      {/* Scrollable session list */}
+      <div className="p-5 mt-8 max-h-[50vh] overflow-y-auto">
+        {sessionSchedules.filter(
+          (session) =>
+            session.isSingleSession === isSingleSession &&
+            session.trainerId === trainerId &&
+            (!selectedDate ||
+              new Date(session.startDate).toLocaleDateString() ===
+                selectedDate.toLocaleDateString() &&
+                session.isBooked === false)
+        ).length === 0 ? (
+          <div className="flex justify-center">
+            <h1 className="text-black">
+              {isSingleSession
+                ? "No Single Sessions available."
+                : "No Packages available."}
+            </h1>
+          </div>
+        ) : (
+          sessionSchedules
+            .filter(
+              (session) =>
+                session.isSingleSession === isSingleSession &&
+                session.trainerId === trainerId &&
+                (!selectedDate ||
+                  new Date(session.startDate).toLocaleDateString() ===
+                    selectedDate.toLocaleDateString()) &&
+                session.isBooked === false
+            )
+            .map((session) => (
+              <div key={session._id} className="mb-8">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h1 className="text-2xl font-bold text-blue-600 mb-2">
+                      {session.specializationId.name}
+                    </h1>
+
+                    <h1 className="font-medium text-2xl">
+                      Time: {formatTime(session.startTime)} -{" "}
+                      {formatTime(session.endTime)}
+                    </h1>
+                    <p>
+                      Duration: (
+                      {calculateDuration(
+                        session.startTime,
+                        session.endTime
+                      )}
+                      )
+                    </p>
+                    {!isSingleSession && (
+                      <h1 className="font-medium text-2xl mt-2">
+                        Number of Sessions:{" "}
+                        {numberOfSessions(
+                          session.startDate,
+                          session.endDate
+                        )}
+                      </h1>
+                    )}
+                  </div>
+
+                  <div className="h-10 w-px bg-gray-300 mx-5"></div>
+
+                  <div className="flex items-center space-x-4">
+                    <div>
+                      <h1 className="font-medium text-2xl">
+                        Price: {formatPriceToINR(session.price)}
+                      </h1>
+                      {!isSingleSession && (
+                        <h1 className="text-gray-600">
+                          {new Date(session.startDate).toLocaleDateString()}{" "}
+                          -{" "}
+                          {new Date(session.endDate).toLocaleDateString()}
+                        </h1>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => handleBooking(session)}
+                      className="bg-blue-500 hover:bg-blue-600 px-4 py-3 text-white"
+                    >
+                      Book Now
+                    </button>
+                  </div>
+                </div>
+                <div className="flex justify-center mt-4">
+                  <div className="border-b-2 border-b-gray-300 w-full"></div>
+                </div>
+              </div>
+            ))
+        )}
+      </div>
+    </div>
+  </div>
+</div>
+
 
       {/* Checkout modal  */}
 

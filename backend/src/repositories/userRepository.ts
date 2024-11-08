@@ -80,14 +80,14 @@ class UserRepository {
   }
 
   // Find user for login
-  async findUser(email: string): Promise<IUser | null> {
-    try {
-      return await this.userModel.findOne({ email });
-    } catch (error) {
-      console.log("Error finding user:", error);
-      return null;
+    async findUser(email: string): Promise<IUser | null> {
+      try {
+        return await this.userModel.findOne({ email });
+      } catch (error) {
+        console.log("Error finding user:", error);
+        return null;
+      }
     }
-  }
 
   async fetchAllTrainers() {
     try {
@@ -307,6 +307,7 @@ class UserRepository {
       },
       {
         $project: {
+          trainerId: '$trainerDetails._id',
           trainerImage: '$trainerDetails.profileImage',
           trainerName: '$trainerDetails.name',
           specialization: '$specializationDetails.name', 
