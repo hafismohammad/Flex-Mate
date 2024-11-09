@@ -13,17 +13,17 @@ const adminController = new AdminController(adminService);
 
 router.post('/adminLogin', adminController.adminLogin.bind(adminController));
 router.post('/refresh-token', adminController.refreshToken.bind(adminController))
-router.post('/logout', authMiddleware, adminController.adminLogout.bind(adminController))
-router.post('/addSpecialization', authMiddleware, upload.single('image'), adminController.addSpecialization.bind(adminController))
-router.get('/allTrainerKyc', authMiddleware, adminController.getAllTrainersKycDatas.bind(adminController))
-router.get('/trainerKycDetails/:trainer_id', authMiddleware, adminController.trainersKycData.bind(adminController));
-router.patch('/updateKycStatus/:trainer_id', authMiddleware, adminController.changeKycStatus.bind(adminController));
-router.get('/allSpecializations', authMiddleware, adminController.getAllSpecializations.bind(adminController))
-router.patch('/toggle-status/:spec_id', authMiddleware, adminController.updateStatus.bind(adminController))
-router.get('/allUsers', authMiddleware, adminController.getAllUsers.bind(adminController))
-router.get('/allTrainer', authMiddleware, adminController.getAllTrainer.bind(adminController))
-router.patch('/user-block-unblock/:user_id', authMiddleware, adminController.blockUnblockUser.bind(adminController))
-router.patch('/trainer-block-unblock/:trainer_id', authMiddleware, adminController.blockUnblockTrainer.bind(adminController))
+router.post('/logout',  authMiddleware(['admin']), adminController.adminLogout.bind(adminController))
+router.post('/addSpecialization', authMiddleware(['admin']), upload.single('image'), adminController.addSpecialization.bind(adminController))
+router.get('/allTrainerKyc', authMiddleware(['admin']), adminController.getAllTrainersKycDatas.bind(adminController))
+router.get('/trainerKycDetails/:trainer_id', authMiddleware(['admin']), adminController.trainersKycData.bind(adminController));
+router.patch('/updateKycStatus/:trainer_id', authMiddleware(['admin']), adminController.changeKycStatus.bind(adminController));
+router.get('/allSpecializations', authMiddleware(['admin']), adminController.getAllSpecializations.bind(adminController))
+router.patch('/toggle-status/:spec_id', authMiddleware(['admin']), adminController.updateStatus.bind(adminController))
+router.get('/allUsers', authMiddleware(['admin']), adminController.getAllUsers.bind(adminController))
+router.get('/allTrainer', authMiddleware(['admin']), adminController.getAllTrainer.bind(adminController))
+router.patch('/user-block-unblock/:user_id', authMiddleware(['admin']), adminController.blockUnblockUser.bind(adminController))
+router.patch('/trainer-block-unblock/:trainer_id', authMiddleware(['admin']), adminController.blockUnblockTrainer.bind(adminController))
 
 
 

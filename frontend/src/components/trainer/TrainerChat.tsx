@@ -25,8 +25,8 @@ console.log('messages', messages);
 
   return (
 <div className="w-full lg:max-w-full md:max-w-[450px] flex flex-col h-screen">
-      <div className="bg-blue-800 px-4 py-2 mb-2">
-        <span className="label-text">To:</span> <span className="text-gray-900 font-bold">John Doe</span>
+      <div className="bg-blue-800 px-4 py-2 mb-2 h-7">
+        {/* <span className="label-text">To:</span> <span className="text-gray-900 font-bold">John Doe</span> */}
       </div>
 
       <div className="px-4 flex-1 overflow-auto">

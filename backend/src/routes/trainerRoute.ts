@@ -28,19 +28,19 @@ router.post('/otp', trainerController.verifyOtp.bind(trainerController))
 router.post('/resend-otp', trainerController.resendOtp.bind(trainerController))
 router.post('/login', trainerController.trainerLogin.bind(trainerController))
 router.post('/refresh-token', trainerController.refreshToken.bind(trainerController))
-router.post('/kyc', authMiddlewares, uploadTrainerDataFiles, trainerController.kycSubmission.bind(trainerController));
-router.post('/logout', authMiddlewares, trainerController.logoutTrainer.bind(trainerController))
-router.get('/getKycStatus', trainerController.getAllKycStatus.bind(trainerController))
-router.get('/kycStatus/:trainerId', authMiddlewares, trainerController.trainerKycStatus.bind(trainerController));
-router.put('/resubmitKyc/:trainerId', authMiddlewares, trainerController.resubmitkyc.bind(trainerController))
-router.get('/getTrainer/:trainerId', authMiddlewares, trainerController.getTrainer.bind(trainerController))
-router.patch(`/updateTrainerData/:trainerId`, authMiddlewares, upload.single('profileImage'),  trainerController.updateTrainer.bind(trainerController))
-router.get('/fetchSecializations/:trainerId', authMiddlewares, trainerController.fetchSpecialization.bind(trainerController))
-router.get('/rejectionReason/:trainerId', authMiddlewares, trainerController.fetchRejectionReason.bind(trainerController))
-router.post('/session/:tranerId', authMiddlewares, trainerController.storeSessionData.bind(trainerController))
-router.get('/sessiosShedules/:trainerId', authMiddlewares, trainerController.getSessionSchedules.bind(trainerController))
-router.delete('/deleteSessionSchedule/:sessionId', authMiddlewares, trainerController.deleteSessionSchedule.bind(trainerController))
-router.get('/bookingDetails/:trainerId', authMiddlewares, trainerController.fetchBookingDetails.bind(trainerController))
+router.post('/kyc', authMiddlewares(['trainer']), uploadTrainerDataFiles, trainerController.kycSubmission.bind(trainerController));
+router.post('/logout',  authMiddlewares(['trainer']), trainerController.logoutTrainer.bind(trainerController))
+// router.get('/getKycStatus', trainerController.getAllKycStatus.bind(trainerController))
+router.get('/kycStatus/:trainerId',  authMiddlewares(['trainer']), trainerController.trainerKycStatus.bind(trainerController));
+router.put('/resubmitKyc/:trainerId',  authMiddlewares(['trainer']), trainerController.resubmitkyc.bind(trainerController))
+router.get('/getTrainer/:trainerId',  authMiddlewares(['trainer']), trainerController.getTrainer.bind(trainerController))
+router.patch(`/updateTrainerData/:trainerId`,  authMiddlewares(['trainer']), upload.single('profileImage'),  trainerController.updateTrainer.bind(trainerController))
+router.get('/fetchSecializations/:trainerId',  authMiddlewares(['trainer']), trainerController.fetchSpecialization.bind(trainerController))
+router.get('/rejectionReason/:trainerId',  authMiddlewares(['trainer']), trainerController.fetchRejectionReason.bind(trainerController))
+router.post('/session/:tranerId',  authMiddlewares(['trainer']), trainerController.storeSessionData.bind(trainerController))
+router.get('/sessiosShedules/:trainerId',  authMiddlewares(['trainer']), trainerController.getSessionSchedules.bind(trainerController))
+router.delete('/deleteSessionSchedule/:sessionId',  authMiddlewares(['trainer']), trainerController.deleteSessionSchedule.bind(trainerController))
+router.get('/bookingDetails/:trainerId',  authMiddlewares(['trainer']), trainerController.fetchBookingDetails.bind(trainerController))
 
 
 

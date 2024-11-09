@@ -467,6 +467,7 @@ class TrainerRepository {
         {
           $project: {
             bookingId: "$_id",
+            userId: "$userDetails._id",
             userName: "$userDetails.name",
             trainerName: "$trainerDetails.name",
             sessionDate: {

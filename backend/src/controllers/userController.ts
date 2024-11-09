@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction  } from "express";
 import UserService from "../services/userService";
 import { IUser, ILoginUser } from "../interface/common";
 import { uploadToCloudinary } from "../config/cloudinary";
@@ -11,7 +11,7 @@ class UserController {
   }
 
   // Register user and send OTP to email
-  async register(req: Request, res: Response) {
+  async register(req: Request, res: Response , next: NextFunction ) {
     try {
       const userData: IUser = req.body;
 
@@ -31,7 +31,7 @@ class UserController {
   }
 
   // Login user
-  async login(req: Request, res: Response): Promise<void> {
+  async login(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       console.log("login route hit");
 
@@ -64,12 +64,12 @@ class UserController {
       } else if (error.message === "Invalid email or password") {
         res.status(401).json({ message: "Invalid email or password" });
       } else {
-        res.status(500).json({ message: "An unexpected error occurred" });
+        next(error)
       }
     }
   }
 
-  async refreshToken(req: Request, res: Response) {
+  async refreshToken(req: Request, res: Response, next: NextFunction) {
     const refresh_token = req.cookies?.refresh_token;
 
     if (!refresh_token) {
@@ -90,12 +90,12 @@ class UserController {
       res.status(200).json({ accessToken: newAccessToken });
     } catch (error) {
       console.error("Error generating new access token:", error);
-      res.status(500).json({ message: "Failed to refresh token" });
+      next(error)
     }
   }
 
   // Verify OTP
-  async verifyOtp(req: Request, res: Response) {
+  async verifyOtp(req: Request, res: Response, next: NextFunction) {
     try {
       // console.log("verify otp controller");
 
@@ -116,18 +116,14 @@ class UserController {
       } else if ((error as Error).message === "No OTP found for this email") {
         res.status(404).json({ message: "No OTP found for this email" });
       } else {
-        res
-          .status(500)
-          .json({ message: "Something went wrong, please try again later" });
+       next(error)
       }
     }
   }
 
   // Resend OTP
   async resendOtp(
-    req: Request<{ email: string }>,
-    res: Response
-  ): Promise<void> {
+    req: Request<{ email: string }>, res: Response, next: NextFunction): Promise<void> {
     try {
       const { email } = req.body;
 
@@ -139,8 +135,7 @@ class UserController {
         res.status(404).json({ message: "User not found" });
       } else {
         res
-          .status(500)
-          .json({ message: "Failed to resend OTP. Please try again later." });
+         next(error)
       }
     }
   }
@@ -161,7 +156,7 @@ class UserController {
     }
   };
 
-  async getAllTrainers(req: Request, res: Response) {
+  async getAllTrainers(req: Request, res: Response, next: NextFunction) {
     try {
       console.log('trainer hit');
       
@@ -171,11 +166,11 @@ class UserController {
       res.status(200).json(allTrainers);
     } catch (error) {
       console.error("Error fetching trainers:", error);
-      res.status(500).json({ message: "Error fetching trainers" });
+      next(error)
     }
   }
 
-  async getAllspecializations(req: Request, res: Response) {
+  async getAllspecializations(req: Request, res: Response, next: NextFunction) {
     try {
       const allSpecializations = await this.userService.specializations();
       // console.log(allSpecializations);
@@ -183,11 +178,11 @@ class UserController {
       res.status(200).json(allSpecializations);
     } catch (error) {
       console.error("Error fetching trainers:", error);
-      res.status(500).json({ message: "Error fetching trainers" });
+      next(error)
     }
   }
 
-  async getTrainer(req: Request, res: Response) {
+  async getTrainer(req: Request, res: Response, next: NextFunction) {
     try {
       const trainerId = req.params.trainerId;
 
@@ -205,18 +200,20 @@ class UserController {
       res.status(200).json(trainer);
     } catch (error) {
       console.error("Error in getTrainer controller:", error);
-      res.status(500).json({ message: "Server error" });
+     next(error)
     }
   }
 
-  async getSessionSchedules(req: Request, res: Response) {
+  async getSessionSchedules(req: Request, res: Response, next: NextFunction) {
     try {
       const sessionSchedules = await this.userService.getSessionSchedules();
       res.status(200).json(sessionSchedules);
-    } catch (error) {}
+    } catch (error) {
+      next(error)
+    }
   }
 
-  async checkoutPayment(req: Request, res: Response) {
+  async checkoutPayment(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = req.body.userData.id;
       const session_id = req.params.sessionId;
@@ -228,11 +225,11 @@ class UserController {
       res.status(200).json({ id: paymentResponse.id });
     } catch (error) {
       console.error("Error in checkoutPayment:", error);
-      res.status(500).json({ message: "Failed to create checkout session" });
+      next(error)
     }
   }
 
-  async createBooking(req: Request, res: Response) {
+  async createBooking(req: Request, res: Response, next: NextFunction) {
     try {
       const { sessionId, userId } = req.body;
       const bookingDetails = await this.userService.findBookingDetails(
@@ -241,22 +238,22 @@ class UserController {
       );
     } catch (error) {
       console.log("Error in create booking");
-      res.status(500).json({ message: "Failed to create bookin" });
+      next(error)
     }
   }
 
-  async getUser(req: Request, res: Response) {
+  async getUser(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = req.params.userId;
       const userData = await this.userService.fetchUserData(userId);
       res.status(200).json(userData);
     } catch (error) {
       console.log("Error getting user data");
-      res.status(500).json({ message: "Failed to fetch user data" });
+      next(error)
     }
   }
 
-  async updateUserData(req: Request, res: Response) {
+  async updateUserData(req: Request, res: Response, next: NextFunction) {
     try {
       const userData = req.body;
       const userId = req.body._id;
@@ -264,11 +261,11 @@ class UserController {
       res.status(200).json({ message: "User Updated Successfully" });
     } catch (error) {
       console.error("Error updating user data:", error);
-      res.status(500).json({ message: "Error updating user data" });
+      next(error)
     }
   }
 
-  async uploadProfileImage(req: Request, res: Response) {
+  async uploadProfileImage(req: Request, res: Response, next: NextFunction) {
     try {
       const user_id = req.params.userId;
       console.log("hjjjj", user_id);
@@ -291,18 +288,18 @@ class UserController {
       }
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: "Error uploading image" });
+      next(error)
     }
   }
 
-  async getAllBookings(req: Request, res: Response) {
+  async getAllBookings(req: Request, res: Response, next: NextFunction) {
     try {
       const user_id = req.params.userId;
 
       const bookings = await this.userService.getAllBookings(user_id);
       res.status(200).json(bookings);
     } catch (error) {
-      res.status(500).json({ message: "Error fetching bookings" });
+      next(error)
     }
   }
 }

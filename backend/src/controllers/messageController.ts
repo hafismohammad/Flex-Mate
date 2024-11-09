@@ -3,12 +3,13 @@ import jwt from "jsonwebtoken";
 
 import messageService from "../services/messageService";
 import ConversationModel from "../models/ConversationModel";
+import BookingModel from "../models/booking";
 
 class MessageController {
   async sendMessage(req: Request, res: Response) {
     try {
       const { token, receiverId, message } = req.body;
-// console.log('server', token,'---------', receiverId);
+console.log('server', token,'---------', receiverId);
 
       if (!token) {
         res.status(400).json({ error: "Token is required" });
@@ -42,6 +43,7 @@ class MessageController {
       console.log('get message');
       
       const {token, id} = req.params
+      console.log(token,'==========', id);
       
       const decoded = jwt.verify(
         token,
@@ -67,9 +69,10 @@ async getUsers(req: Request, res: Response) {
 
         const { trainerId } = req.params;
 
-      const allUsers = await messageService.getUsersForTrainer(trainerId)
+      const bookekUsers = await messageService.getUsersForTrainer(trainerId)
+      console.log('bookekUsers',bookekUsers);
       
-        res.status(200).json(allUsers);
+        res.status(200).json(bookekUsers);
     } catch (error) {
         console.log("Error in fetching users:", error);
         res.status(500).json({ error: "Internal server error" });

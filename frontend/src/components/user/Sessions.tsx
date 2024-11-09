@@ -26,19 +26,16 @@ function Sessions() {
   }, [userInfo?.id]);
 // console.log('sessions', sessions);
 
-  // Calculate the index of the first and last session for the current page
   const indexOfLastSession = currentPage * sessionsPerPage;
   const indexOfFirstSession = indexOfLastSession - sessionsPerPage;
   const currentSessions = sessions.slice(indexOfFirstSession, indexOfLastSession);
 
-  // Navigate to the next page
   const nextPage = () => {
     if (currentPage < Math.ceil(sessions.length / sessionsPerPage)) {
       setCurrentPage(currentPage + 1);
     }
   };
 
-  // Navigate to the previous page
   const prevPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
@@ -53,7 +50,7 @@ const handleChatButton = (trainerId: string) => {
     <div>
         <div className="flex justify-center mt-5">
         <div className="h-[80vh] bg-white w-[75%] shadow-md rounded-md overflow-y-auto p-3">
-        <h1 className="p-2 font-bold text-2xl">Booked Sessions</h1>
+        <h1 className="p-2 font-bold text-2xl">Sessions</h1>
 
         {currentSessions.length > 0 ? (
           currentSessions.map((session) => (

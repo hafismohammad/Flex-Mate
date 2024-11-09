@@ -4,6 +4,7 @@ import UserModel from '../models/userModel';
 import TrainerModel from '../models/trainerModel';
 import ConversationModel from '../models/ConversationModel';
 import mongoose from 'mongoose';
+import BookingModel from '../models/booking';
 
 class MessageService {
     async sendMessage(
@@ -106,19 +107,19 @@ class MessageService {
     }
     
     async getUsersForTrainer(trainerId: string) {
-        const trainerObjectId = new mongoose.Types.ObjectId(trainerId);
-    // console.log('trainerObjectId', trainerObjectId);
+        
+        // const trainerObjectId = new mongoose.Types.ObjectId(trainerId);
+        const bookedUsers = await BookingModel.find({ trainerId }).populate('userId');
 
-        const messages = await MessageModel.find({
-          $or: [
-            { senderId: trainerObjectId, receiverModel: 'User' },
-            { receiverId: trainerObjectId, senderModel: 'User' }
-          ]
-        }).populate('receiverId').populate('senderId')
+    //     const messages = await MessageModel.find({
+    //       $or: [
+    //         { senderId: trainerObjectId, receiverModel: 'User' },
+    //         { receiverId: trainerObjectId, senderModel: 'User' }
+    //       ]
+    //     }).populate('receiverId').populate('senderId')
 
         
-       return messages
-        // console.log('messages', messages);
+       return bookedUsers
 
       }
 

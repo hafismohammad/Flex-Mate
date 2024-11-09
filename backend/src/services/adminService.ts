@@ -17,7 +17,7 @@ class AdminService {
          throw Error('Password is wrong')    
         }
             // Generate access and refresh tokens
-            const accessToken = generateAccessToken({ id: adminData._id.toString(), email: adminData.email });
+            const accessToken = generateAccessToken({ id: adminData._id.toString(), email: adminData.email, role: 'admin' });
             const refreshToken = generateRefreshToken({ id: adminData._id.toString(), email: adminData.email });
             return {
                 accessToken,
@@ -50,7 +50,8 @@ class AdminService {
       }
 
       if (id && email) {
-        const AdminNewAccessToken = generateAccessToken({ id, email });
+        const role = 'admin'
+        const AdminNewAccessToken = generateAccessToken({ id, email , role});
         return AdminNewAccessToken;
       } else {
         throw new Error("Invalid token payload structure");

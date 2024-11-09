@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import AdminService from "../services/adminService";
 import { ILoginAdmin } from "../interface/admin_interface";
 import { uploadToCloudinary } from '../config/cloudinary'
@@ -10,7 +10,7 @@ class AdminController {
     this.adminService = adminService;
   }
 
-  async adminLogin(req: Request, res: Response) {
+  async adminLogin(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, password }: ILoginAdmin = req.body;
       // console.log("admin data", email, password);
@@ -39,13 +39,13 @@ class AdminController {
       }
     } catch (error) {
       console.error("Error during admin login:", error);
-      res.status(500).json({ message: "Internal server error" });
+      next(error)
     }
   }
 
 
 
-  async adminLogout(req: Request, res: Response) {
+  async adminLogout(req: Request, res: Response, next: NextFunction) {
     try {
       res.clearCookie("admin_refresh_token", {
         httpOnly: true,
@@ -59,7 +59,7 @@ class AdminController {
     }
   }
 
-  async addSpecialization(req: Request, res: Response) {
+  async addSpecialization(req: Request, res: Response, next: NextFunction) {
     try {
       const specializationData = req.body;
       const imageFile = req.file;
@@ -76,12 +76,12 @@ class AdminController {
       res.status(201).json({ message: "Specialization added successfully", specialization });
     } catch (error) {
       console.error('Adding specialization error', error);
-      res.status(500).json({ message: "Failed to add specialization", error });
+      next(error)
     }
   }
 
 
-  async refreshToken(req: Request, res: Response) {
+  async refreshToken(req: Request, res: Response, next: NextFunction) {
     
     const admin_refresh_token = req.cookies?.admin_refresh_token;
 
@@ -105,12 +105,12 @@ class AdminController {
       res.status(200).json({ accessToken: newAccessToken });
     } catch (error) {
       console.error("Error generating new access token:", error);
-      res.status(500).json({ message: "Failed to refresh token" });
+      next(error)
     }
   }
 
 
-  async getAllTrainersKycDatas(req: Request, res: Response) {
+  async getAllTrainersKycDatas(req: Request, res: Response, next: NextFunction) {
     try {
 
       const allTrainersKycData = await this.adminService.TraienrsKycData();
@@ -119,11 +119,11 @@ class AdminController {
       res.status(200).json({ message: "Trainers KYC data fetched successfully", data: allTrainersKycData });
     } catch (error) {
       console.error("Error fetching KYC data:", error);
-      res.status(500).json({ message: "Failed to fetch KYC data", error });
+      next(error)
     }
   }
 
-  async trainersKycData(req: Request, res: Response): Promise<void> {
+  async trainersKycData(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const trainerId = req.params.trainer_id;
       const trainerKycDetails = await this.adminService.fetchKycData(trainerId);
@@ -135,12 +135,6 @@ class AdminController {
       }
 
 
-      // const profileImageUrl = trainerKycDetails.profileImage
-      // const aadhaarFrontImageUrl = trainerKycDetails.aadhaarFrontImage
-      // const aadhaarBackImageUrl = trainerKycDetails.aadhaarBackImage
-      // const certificateUrl = trainerKycDetails.certificate
-
-
       res.status(200).json({
         message: 'Trainer KYC data fetched successfully',
         kycData: {
@@ -149,7 +143,7 @@ class AdminController {
       });
     } catch (error) {
       console.error("Error fetching KYC data:", error);
-      res.status(500).json({ message: "Failed to fetch KYC data", error });
+      next(error)
     }
   }
 
@@ -157,7 +151,7 @@ class AdminController {
 
 
 
-  async changeKycStatus(req: Request, res: Response) {
+  async changeKycStatus(req: Request, res: Response, next: NextFunction) {
     try {
       const status = String(req.body.status);
       const trainer_id = req.params.trainer_id;
@@ -172,22 +166,22 @@ class AdminController {
       res.status(200).json({ message: 'Trainer status updated successfully', status });
     } catch (error) {
       console.error('Error updating trainer status:', error);
-      res.status(500).json({ message: 'Failed to update trainer status' });
+      next(error)
     }
   }
 
-  async getAllSpecializations(req: Request, res: Response) {
+  async getAllSpecializations(req: Request, res: Response, next: NextFunction) {
     try {
       const allSpecializations = await this.adminService.getAllSpecializations();
 
       res.status(200).json(allSpecializations);
     } catch (error) {
       console.error('Error fetching specializations:', error);
-      res.status(500).json({ message: 'An error occurred while fetching specializations.' });
+      next(error)
     }
   }
 
-  async updateStatus(req: Request, res: Response) {
+  async updateStatus(req: Request, res: Response, next: NextFunction) {
     try {
       const spec_id = req.params.spec_id;
       const status = req.body.isListed;
@@ -200,30 +194,29 @@ class AdminController {
       });
     } catch (error) {
       console.error('Error updating specializations status:', error);
-
-      res.status(500).json({ message: 'An error occurred while updating specializations status.' });
+      next(error)
     }
   }
 
-  async getAllUsers(req: Request, res: Response) {
+  async getAllUsers(req: Request, res: Response, next: NextFunction) {
     try {
       const allUsers = await this.adminService.fetchAllUsers()
       res.status(200).json({ message: 'Fetch all users successfully', users: allUsers })
     } catch (error) {
-
+      next(error)
     }
   }
-  async getAllTrainer(req: Request, res: Response) {
+  async getAllTrainer(req: Request, res: Response, next: NextFunction) {
     try {
       
       const allTrainer = await this.adminService.fetchAllTrainer()
       res.status(200).json({ message: 'Fetch all trainer successfully', trainer: allTrainer })
     } catch (error) {
-
+      next(error)
     }
   }
 
-  async blockUnblockUser(req: Request, res: Response) {
+  async blockUnblockUser(req: Request, res: Response, next: NextFunction) {
     try {
       const user_id = req.params.user_id
       const userStatus = req.body.status
@@ -235,11 +228,11 @@ class AdminController {
         data: status,
       });
     } catch (error) {
-
+        next(error)
     }
   }
 
-  async blockUnblockTrainer(req: Request, res: Response) {
+  async blockUnblockTrainer(req: Request, res: Response, next: NextFunction) {
     try {
 
       const trainer_id = req.params.trainer_id
@@ -253,7 +246,7 @@ class AdminController {
         data: status,
       });
     } catch (error) {
-
+      next(error)
     }
   }
 

@@ -161,6 +161,7 @@ class UserService {
           const accessToken = generateAccessToken({
             id: userData._id.toString(),
             email: userData.email,
+            role: 'user'
           });
           const refreshToken = generateRefreshToken({
             id: userData._id.toString(),
@@ -202,7 +203,8 @@ class UserService {
       }
 
       if (id && email) {
-        const userNewAccessToken = generateAccessToken({ id, email });
+        const role = 'user'
+        const userNewAccessToken = generateAccessToken({ id, email,role });
         return userNewAccessToken;
       } else {
         throw new Error("Invalid token payload structure");

@@ -16,7 +16,7 @@ interface Message {
   }
 
     const useGetMessage = (token: string, id: string) => {
-        // console.log('get data', token, trainerId);
+        console.log('get data', token, '=====',id);
         
     const [loading, setLoading] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);

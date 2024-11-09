@@ -182,6 +182,7 @@ class TrainerService {
         const accessToken = generateAccessToken({
           id: trainerData._id.toString(),
           email: trainerData.email,
+          role: 'trainer'
         });
         const refreshToken = generateRefreshToken({
           id: trainerData._id.toString(),
@@ -221,7 +222,8 @@ class TrainerService {
       }
 
       if (id && email) {
-        const TrainerNewAccessToken = generateAccessToken({ id, email });
+        const role = 'trainer'
+        const TrainerNewAccessToken = generateAccessToken({ id, email, role });
         return TrainerNewAccessToken;
       } else {
         throw new Error("Invalid token payload structure");
@@ -345,7 +347,8 @@ class TrainerService {
         throw new Error("Session duration must be at least 30 minutes");
       }
 
-      if (recurrenceOption === 'oneWeek' || recurrenceOption === 'twoWeeks') {
+      if (recurrenceOption === 'oneWeek' || recurrenceOption === 'twoWeek') {
+        
         // Generate recurring sessions for either one week or two weeks
         const recurringSessions = await createRecurringSessions(sessionData.startDate, recurrenceOption, sessionData);
       

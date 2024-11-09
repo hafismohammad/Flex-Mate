@@ -6,6 +6,7 @@ import userRoute from "../src/routes/userRoute";
 import AdminRoute from "../src/routes/adminRoute";
 import TrainerRoute from "../src/routes/trainerRoute";
 import MessagesRoute from "../src/routes/messagesRoute"
+import errorMiddleware from "./middlewares/errorMiddleware";
 import dotenv from 'dotenv';
 import path from "path";
 import {startDeleteExpiredSessionsCron } from './corn/deleteExpiredSessions'
@@ -40,6 +41,9 @@ app.use("/api/user/", userRoute);
 app.use("/api/admin/", AdminRoute);
 app.use("/api/trainer/", TrainerRoute);
 app.use("/api/messages/", MessagesRoute)
+
+// Error handling middlewaere
+app.use(errorMiddleware);
 
 // Server running
 app.listen(process.env.PORT || 3000, () => {

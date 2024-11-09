@@ -5,7 +5,7 @@ dotenv.config();
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET as string
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET as string
 
-export const generateAccessToken = (user: { id: string, email: string }) => {
+export const generateAccessToken = (user: { id: string, email: string, role: string }) => {
   return jwt.sign(user, ACCESS_TOKEN_SECRET, { expiresIn: '5h' });
 };
 
