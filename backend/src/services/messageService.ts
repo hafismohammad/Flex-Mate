@@ -48,7 +48,7 @@ class MessageService {
                     { participantId: new mongoose.Types.ObjectId(senderId), participantModel: senderModel },
                     { participantId: new mongoose.Types.ObjectId(receiverId), participantModel: receiverModel }
                 ],
-                messages: [] 
+                messages: []
             });
             await existingConversation.save();
         }
@@ -59,7 +59,7 @@ class MessageService {
             message,
             senderModel,
             receiverModel,
-            conversationId: existingConversation._id, 
+            conversationId: existingConversation._id,
         });
 
         const savedMessage: IMessage = await newMessage.save();
@@ -67,7 +67,7 @@ class MessageService {
         existingConversation.messages.push(savedMessage._id as mongoose.Types.ObjectId);
         await existingConversation.save();
 
-        return savedMessage; 
+        return savedMessage;
     }
 
 
@@ -76,19 +76,19 @@ class MessageService {
         const receiverObjectId = new mongoose.Types.ObjectId(userToChatId);
 
 
-    
+
         // Identify the model type for the sender
         const senderModel = (await UserModel.exists({ _id: senderObjectId })) ? 'User' :
-                            (await TrainerModel.exists({ _id: senderObjectId })) ? 'Trainer' : null;
+            (await TrainerModel.exists({ _id: senderObjectId })) ? 'Trainer' : null;
         const receiverModel = (await UserModel.exists({ _id: receiverObjectId })) ? 'User' :
-                              (await TrainerModel.exists({ _id: receiverObjectId })) ? 'Trainer' : null;
-    
+            (await TrainerModel.exists({ _id: receiverObjectId })) ? 'Trainer' : null;
+
         if (!senderModel || !receiverModel) {
             throw new Error('Invalid sender or receiver ID');
         }
 
 
-    
+
         const conversations = await ConversationModel.find({
             participants: {
                 $all: [
@@ -97,16 +97,33 @@ class MessageService {
                 ]
             }
         }).populate('messages');
-// console.log('conversatiosn', conversations);
+        // console.log('conversatiosn', conversations);
 
         const allConversations = conversations.flatMap(conversation => conversation.messages)
-        // console.log('allConversations', allConversations);
-        
-    
+
+
         return allConversations
     }
     
-    
+    async getUsersForTrainer(trainerId: string) {
+        const trainerObjectId = new mongoose.Types.ObjectId(trainerId);
+    // console.log('trainerObjectId', trainerObjectId);
+
+        const messages = await MessageModel.find({
+          $or: [
+            { senderId: trainerObjectId, receiverModel: 'User' },
+            { receiverId: trainerObjectId, senderModel: 'User' }
+          ]
+        }).populate('receiverId').populate('senderId')
+
+        
+       return messages
+        // console.log('messages', messages);
+
+      }
+
+      
+
 }
 
 export default new MessageService();

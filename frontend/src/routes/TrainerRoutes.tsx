@@ -9,6 +9,8 @@ import TrainerProfilePage from "../pages/trainer/TrainerProfilePage";
 import BookingsPage from "../pages/trainer/BookingsPage";
 import TrainerProfileEditPage from "../pages/trainer/TrainerProfileEditPage";
 import CurrentSchedulesPage from "../pages/trainer/CurrentSchedulesPage";
+import ChatSideBar from "../components/trainer/ChatSideBar";
+import TrainerChat from "../components/trainer/TrainerChat";
 
 function TrainerRoutes() {
   return (
@@ -16,15 +18,17 @@ function TrainerRoutes() {
       <Route path="/login" element={<TrainerLoginPage />} />
       <Route path="/signup" element={<TrainerSignupPage />} />
       <Route path="/otp" element={<TrainerOtpPage />} />
-
+      
       <Route path="/" element={<TrainerLayout />}>
-        <Route path="/" element={<ProtectRoute><TrainerDashboard /></ProtectRoute>} />
-        <Route path="/profile" element={<ProtectRoute><TrainerProfilePage /></ProtectRoute>} />
-        <Route path="/editProfile" element={<ProtectRoute><TrainerProfileEditPage /></ProtectRoute>} />
-        <Route path="/bookings" element={<ProtectRoute><BookingsPage /></ProtectRoute>} />
-        <Route path="/currentSchedules" element={<ProtectRoute><CurrentSchedulesPage /></ProtectRoute>} />
-
+        <Route index element={<ProtectRoute><TrainerDashboard /></ProtectRoute>} />
+        <Route path="profile" element={<ProtectRoute><TrainerProfilePage /></ProtectRoute>} />
+        <Route path="editProfile" element={<ProtectRoute><TrainerProfileEditPage /></ProtectRoute>} />
+        <Route path="bookings" element={<ProtectRoute><BookingsPage /></ProtectRoute>} />
+        <Route path="currentSchedules" element={<ProtectRoute><CurrentSchedulesPage /></ProtectRoute>} />
+        <Route path="chatSidebar" element={<ChatSideBar />} />
       </Route>
+
+      <Route path="/trainerChat/:userId" element={<TrainerChat />} />
     </Routes>
   );
 }

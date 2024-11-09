@@ -39,6 +39,8 @@ class MessageController {
 
   async getMessage(req: Request, res: Response) {
     try {
+      console.log('get message');
+      
       const {token, id} = req.params
       
       const decoded = jwt.verify(
@@ -52,7 +54,6 @@ class MessageController {
         senderId,
         id
       );
-// console.log(getMessages);
 
       res.status(200).json(getMessages);
     } catch (error) {
@@ -60,6 +61,21 @@ class MessageController {
       res.status(500).json({ error: "Internal server error" });
     }
   }
+
+async getUsers(req: Request, res: Response) {
+    try {
+
+        const { trainerId } = req.params;
+
+      const allUsers = await messageService.getUsersForTrainer(trainerId)
+      
+        res.status(200).json(allUsers);
+    } catch (error) {
+        console.log("Error in fetching users:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+}
+
 }
 
 export default MessageController;

@@ -4,7 +4,7 @@ import mongoose, { Schema, Document, model } from 'mongoose';
 export interface IMessage extends Document {
     senderId: mongoose.Types.ObjectId;
     receiverId: mongoose.Types.ObjectId;
-    conversationId: mongoose.Types.ObjectId; // Add this if needed
+    conversationId: mongoose.Types.ObjectId; 
     message: string;
     senderModel: 'User' | 'Trainer';
     receiverModel: 'User' | 'Trainer';
@@ -15,12 +15,12 @@ const messageSchema = new Schema<IMessage>(
         senderId: {
             type: mongoose.Schema.Types.ObjectId,
             required: true,
-            ref: 'User', // or 'Trainer'
+            ref: 'User',
         },
         receiverId: {
             type: mongoose.Schema.Types.ObjectId,
             required: true,
-            ref: 'User', // or 'Trainer'
+            ref: 'User', 
         },
         conversationId: {
             type: mongoose.Schema.Types.ObjectId,

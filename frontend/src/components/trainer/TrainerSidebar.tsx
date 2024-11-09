@@ -3,14 +3,16 @@ import { Link, useNavigate } from "react-router-dom";
 import LOGO from "../../assets/LOGO-2.png";
 import { useDispatch } from "react-redux";
 import {logoutTrainer} from '../../actions/trainerAction'
+import { IoChatbubbleEllipsesSharp } from "react-icons/io5";
+import { FaAddressBook } from "react-icons/fa6";
+
 import {
   FaBars,
   FaListAlt,
   FaTimes,
   FaChartPie,
   FaUser,
-  FaCog,
-  FaSignOutAlt
+  FaSignOutAlt,
 } from "react-icons/fa";
 import { AppDispatch } from "../../app/store";
 
@@ -69,13 +71,21 @@ function TrainerSidebar() {
           to="/trainer/bookings"
           className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
         >
-          <FaListAlt size={20} />
+          <FaAddressBook size={20} />
           <span className={`ml-2 ${!isSidebarOpen && "hidden"}`}>
             Bookings 
           </span>
         </Link>
 
-  
+        <Link
+          to="/trainer/chatSidebar"
+          className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
+        >
+          <IoChatbubbleEllipsesSharp size={20} />
+          <span className={`ml-2 ${!isSidebarOpen && "hidden"}`}>
+            Recent Chats
+          </span>
+        </Link>
         
         <Link
           to="/trainer/profile"
@@ -85,15 +95,7 @@ function TrainerSidebar() {
           <span className={`ml-2 ${!isSidebarOpen && "hidden"}`}>Profile</span>
         </Link>
         
-        <Link
-          to="#"
-          className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
-        >
-          <FaCog size={20} />
-          <span className={`ml-2 ${!isSidebarOpen && "hidden"}`}>
-            Settings
-          </span>
-        </Link>
+        
         
         <a
           href="#" // Using <a> to trigger the logout action
