@@ -3,6 +3,7 @@ import { BsSend } from "react-icons/bs";
 import useSendMessage from "../../hooks/useSendMessage";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
+import { useSocketContext } from "../../context/Socket";
 
 interface MessageInputBarProps {
   trainerId?: string; 
@@ -13,25 +14,34 @@ function MessageInputBar({ trainerId, onNewMessage }: MessageInputBarProps) {
   const [message, setMessage] = useState('');
   const { sendMessage } = useSendMessage();
   const { token } = useSelector((state: RootState) => state.user);
-
+  const { socket } = useSocketContext();
   const validToken = token ?? ""; 
 
   const handleSendMessage = async (e: React.FormEvent<HTMLElement>) => {
     e.preventDefault();
     if (!message) return;
 
-    const receiverId = trainerId ?? "defaultTrainerId"; 
+    const receiverId = trainerId ?? "defaultTrainerId";
     const newMessage = {
       message,
       receiverId,
-      senderModel: "User", 
+      senderModel: "User",
       createdAt: new Date().toISOString()
     };
 
+    // Emit the message through the socket if it is available
+    if (socket) {
+      socket.emit("sendMessage", newMessage); // Send message to the server via socket
+    } else {
+      console.error("Socket is not initialized");
+    }
+
+    // Call sendMessage API (if needed)
     await sendMessage({ message, receiverId, token: validToken });
 
+    // Callback to update the UI with the new message
     onNewMessage(newMessage);
-    setMessage("");
+    setMessage(""); // Reset the message input
   };
 
   return (

@@ -9,7 +9,7 @@ class MessageController {
   async sendMessage(req: Request, res: Response) {
     try {
       const { token, receiverId, message } = req.body;
-console.log('server', token,'---------', receiverId);
+// console.log('server', token,'---------', receiverId);
 
       if (!token) {
         res.status(400).json({ error: "Token is required" });
@@ -40,10 +40,10 @@ console.log('server', token,'---------', receiverId);
 
   async getMessage(req: Request, res: Response) {
     try {
-      console.log('get message');
+      // console.log('get message');
       
       const {token, id} = req.params
-      console.log(token,'==========', id);
+      // console.log(token,'==========', id);
       
       const decoded = jwt.verify(
         token,
@@ -64,20 +64,7 @@ console.log('server', token,'---------', receiverId);
     }
   }
 
-async getUsers(req: Request, res: Response) {
-    try {
 
-        const { trainerId } = req.params;
-
-      const bookekUsers = await messageService.getUsersForTrainer(trainerId)
-      console.log('bookekUsers',bookekUsers);
-      
-        res.status(200).json(bookekUsers);
-    } catch (error) {
-        console.log("Error in fetching users:", error);
-        res.status(500).json({ error: "Internal server error" });
-    }
-}
 
 }
 

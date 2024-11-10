@@ -11,6 +11,7 @@ import UserProfilePage from '../pages/user/UserProfilePage';
 import UserLayout from '../components/user/UserLayout';
 import Sessions from '../components/user/Sessions';
 import UserChatPage from '../pages/user/UserChatPage';
+import Bookings from '../components/user/Bookings';
 
 function UserRoutes() {
   return (
@@ -28,6 +29,7 @@ function UserRoutes() {
       <Route path='/profile' element={<UserLayout />}>
         <Route index element={<UserProfilePage />} />
         <Route path='sessions' element={<Sessions />} />
+        <Route path='bookings' element={<Bookings />} />
       </Route>
     </Routes>
   );

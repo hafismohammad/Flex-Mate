@@ -31,4 +31,5 @@ router.patch('/uploadProfileImage/:userId',  authMiddlewares(['user']), upload.s
 router.get('/bookings/:userId',  authMiddlewares(['user']), userController.getAllBookings.bind(userController))
 
 
+
 export default router;

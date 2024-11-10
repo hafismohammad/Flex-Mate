@@ -123,13 +123,13 @@ function UserProfileSideBar() {
             <span>Sessions</span>
           </Link>
           <Link
-            to="#"
+            to="/profile/bookings"
             className="flex items-center pl-8 p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
           >
             <span>Bookings</span>
           </Link>
           <Link
-            to="#"
+            to=""
             className="flex items-center pl-8 p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
             onClick={handleLogout}
           >
