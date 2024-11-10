@@ -326,6 +326,7 @@ class UserRepository {
           startTime: '$startTime',
           endTime: '$endTime',
           sessionType: '$sessionType',
+          bookingStatus: '$paymentStatus'
         },
       },
     ]);
@@ -335,6 +336,16 @@ class UserRepository {
     
     return allBookings
   }
+
+  async FetchBooking(bookingId: string) {
+    try {
+        const bookingData = await this.bookingModel.findById(bookingId);
+        return bookingData;
+    } catch (error) {
+        console.error("Error fetching booking:", error);
+        throw error;
+    }
+}
 }
 
 export default UserRepository;

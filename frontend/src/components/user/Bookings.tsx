@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import API_URL from "../../../axios/API_URL";
 import axiosInstance from "../../../axios/trainerAxiosInstance";
 import userAxiosInstance from "../../../axios/userAxionInstance";
+import Swal from "sweetalert2";
 
 interface Booking {
   _id: string;
@@ -15,6 +16,7 @@ interface Booking {
   sessionDates: { startDate: string };
   startTime: string;
   endTime: string;
+  bookingStatus: string
 }
 
 function Bookings() {
@@ -34,32 +36,57 @@ function Bookings() {
   }, [userInfo]);
 
   const handleCancelBooking = async (bookingId: string) => {
-    try {
-      await axios.delete(`${API_URL}/api/user/bookings/${bookingId}`, {});
-      setBookings((prev) => prev.filter((booking) => booking._id !== bookingId));
-    } catch (error) {
-      console.error("Error canceling booking:", error);
-    }
+    Swal.fire({
+      title: "Are you sure?",
+      text: "This session will be permanently deleted!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await axios.patch(`${API_URL}/api/user/cancelBooking/${bookingId}`);
+  
+          // Update booking status locally to 'Cancelled' instead of removing it
+          setBookings((prev) =>
+            prev.map((booking) =>
+              booking._id === bookingId
+                ? { ...booking, bookingStatus: 'Cancelled' }
+                : booking
+            )
+          );
+  
+          Swal.fire("Canceled!", "Your booking has been canceled.", "success");
+        } catch (error) {
+          console.error("Error canceling booking:", error);
+          Swal.fire("Error", "Could not cancel the booking.", "error");
+        }
+      }
+    });
   };
+  
 
   return (
     <div className="flex justify-center mt-5">
       <div className="h-[80vh] bg-white w-full shadow-md rounded-md overflow-y-auto p-3">
         <h1 className="p-2 font-bold text-2xl mb-5">Bookings</h1>
-        <div className="grid grid-cols-7 gap-2 text-lg font-bold text-gray-600 mb-4 border-b border-gray-200 pb-2">
+        <div className="grid grid-cols-8 gap-2 text-lg font-bold text-gray-600 mb-4 border-b border-gray-200 pb-2">
           <div>Trainer</div>
           <div>Session Type</div>
           <div>Specialization</div>
           <div>Session Date</div>
           <div>Start Time</div>
           <div>End Time</div>
+          <div>Status</div>
           <div>Action</div>
         </div>
 
         {bookings.map((booking) => (
           <div
             key={booking._id}
-            className="grid grid-cols-7 gap-2 items-center p-4 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none"
+            className="grid grid-cols-8 gap-2 items-center p-4 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none"
           >
             <div className="flex items-center space-x-2">
               <img
@@ -76,10 +103,11 @@ function Bookings() {
             </div>
             <div className="text-gray-800 font-medium">{booking.startTime}</div>
             <div className="text-gray-800 font-medium">{booking.endTime}</div>
+            <div className={`${booking.bookingStatus === 'Confirmed' ? 'text-green-500 rounded-md font-medium' : ' text-red-500 font-medium rounded-md'}`}>{booking.bookingStatus}</div>
             <div>
               <button
                 onClick={() => handleCancelBooking(booking._id)}
-                className="text-red-500 hover:text-red-700 font-bold"
+                className="bg-red-500 hover:bg-red-700 font-bold text-white px-6 py-2 rounded-lg"
               >
                 Cancel
               </button>

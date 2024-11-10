@@ -256,23 +256,19 @@ class UserService {
 
   async checkoutPayment(session_id: string, userId: string) {
     try {
-      const sessionData = await this.userRepository.findSessionDetails(
-        session_id
-      );
-
+      const sessionData = await this.userRepository.findSessionDetails(session_id);
+  
       if (!sessionData || !sessionData.trainerId || !sessionData.price) {
         throw new Error("Missing session data, trainer ID, or price");
       }
-
+  
       const trainer_id = sessionData.trainerId.toString();
-      const trainerData = await this.userRepository.findTrainerDetails(
-        trainer_id
-      );
-
+      const trainerData = await this.userRepository.findTrainerDetails(trainer_id);
+  
       if (!trainerData) {
         throw new Error("Trainer data not found");
       }
-// console.log('trainerData', trainerData)
+  
       const lineItems = [
         {
           price_data: {
@@ -281,36 +277,31 @@ class UserService {
             product_data: {
               name: `Trainer Name: ${trainerData.name} - (${trainerData.specialization})`,
               description: sessionData.isSingleSession
-                ? `Description: Session from ${sessionData.startTime} to ${
-                    sessionData.endTime
-                  } on ${sessionData.startDate.toLocaleDateString()}`
-                : `Description: Session from ${sessionData.startTime} to ${
-                    sessionData.endTime
-                  } on ${sessionData.startDate.toLocaleDateString()} to ${sessionData.endDate.toLocaleDateString()}`,
+                ? `Description: Session from ${sessionData.startTime} to ${sessionData.endTime} on ${sessionData.startDate.toLocaleDateString()}`
+                : `Description: Session from ${sessionData.startTime} to ${sessionData.endTime} on ${sessionData.startDate.toLocaleDateString()} to ${sessionData.endDate.toLocaleDateString()}`,
             },
           },
           quantity: 1,
         },
       ];
-
-      // Create the Stripe session
-      const session: Stripe.Checkout.Session =
-        await stripe.checkout.sessions.create({
-          payment_method_types: ["card"],
-          line_items: lineItems,
-          mode: "payment",
-          success_url: `http://localhost:5173/paymentSuccess?session_id=${sessionData._id}&user_id=${userId}`,
-          cancel_url: `http://localhost:5173/paymentFailed`,
-        });
-
-      return session;
+  
+      // Now define `session` only once it is assigned a value
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: lineItems,
+        mode: 'payment',
+        success_url: `http://localhost:5173/paymentSuccess?session_id=${sessionData._id}&user_id=${userId}&stripe_session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `http://localhost:5173/paymentFailed`,
+      });
+  
+      return session;  // Return the session to your frontend if needed
     } catch (error) {
       console.error("Error creating Stripe session:", error);
-      throw new Error("Failed to create checkout session.");
+      throw error;
     }
   }
 
-  async findBookingDetails(session_id: string, user_id: string) {
+  async findBookingDetails(session_id: string, user_id: string, stripe_session_id: string) {
     try {
       const session = await this.userRepository.findSessionDetails(session_id);
       if (session) {
@@ -321,22 +312,22 @@ class UserService {
       if (!trainerId) {
         throw new Error("Trainer ID is not available in the session.");
       }
-
+  
       const trainer = await this.getTrainer(trainerId.toString());
-
-      // console.log('session data', session, 'userdata', user, 'trainer data', trainer);
-
+  
+      const sessionData = await stripe.checkout.sessions.retrieve(stripe_session_id);
+      console.log('sessionData', sessionData);
+  
       if (!trainer || trainer.length === 0) {
         throw new Error("Trainer not found.");
       }
+  
       const bookingDetails: IBooking = {
         sessionId: new mongoose.Types.ObjectId(session._id),
         trainerId: new mongoose.Types.ObjectId(trainer[0]._id),
         userId: new mongoose.Types.ObjectId(user_id),
         specializationId: new mongoose.Types.ObjectId(session.specializationId._id),
-        sessionType: session.isSingleSession
-          ? "Single Session"
-          : "Package Session",
+        sessionType: session.isSingleSession ? "Single Session" : "Package Session",
         bookingDate: new Date(),
         startDate: session.startDate,
         endDate: session.endDate,
@@ -346,27 +337,23 @@ class UserService {
         paymentStatus: "Confirmed",
         createdAt: new Date(),
         updatedAt: new Date(),
+        payment_intent: sessionData.payment_intent ? sessionData.payment_intent.toString() : undefined
       };
-
-      const existingBooking = await this.userRepository.findExistingBooking(
-        bookingDetails
-      );
+  
+      const existingBooking = await this.userRepository.findExistingBooking(bookingDetails);
       if (existingBooking) {
         console.log("Booking already exists.");
-
         throw new Error("Booking already exists.");
       }
-
+  
       await this.userRepository.createBooking(bookingDetails);
-
-      // console.log('Booking Details:', bookingDetails);
-
       return bookingDetails;
     } catch (error) {
       console.error("Error fetching booking details:", error);
       throw new Error("Failed to fetch booking details.");
     }
   }
+  
 
   async fetchUserData(userId: string) {
     try {
@@ -399,6 +386,40 @@ class UserService {
       console.log(error);
     }
   }
+
+  async cancelBooking(bookingId: string) {
+    try {
+      // Fetch booking data from the database
+      const bookingData = await this.userRepository.FetchBooking(bookingId);
+  
+      if (!bookingData) throw new Error("Booking not found");
+  
+      // Verify payment status before attempting a refund
+      if (bookingData.paymentStatus !== 'Confirmed') {
+        throw new Error("Booking is not confirmed or has already been canceled");
+      }
+  
+      // Create refund with Stripe using paymentIntentId from booking data
+      const refund = await stripe.refunds.create({
+        payment_intent: bookingData.payment_intent, // Use the paymentIntentId stored in bookingData
+      });
+  
+      if (refund.status === 'succeeded') {
+        // Update booking status to 'Cancelled' in the database
+        bookingData.paymentStatus = 'Cancelled';
+        await bookingData.save();
+  
+      } else {
+        throw new Error("Refund failed or is incomplete");
+      }
+  
+      return bookingData;
+    } catch (error) {
+      console.error("Error in cancelBooking service:", error);
+      throw error;
+    }
+  }
+  
 }
 
 export default UserService;

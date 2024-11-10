@@ -211,7 +211,7 @@ function CurrentSchedules() {
       }
     });
   };
-console.log('sessionSchedules',sessionSchedules );
+// console.log('sessionSchedules',sessionSchedules );
 
   return (
     <div className="p-8 bg-gray-100 min-h-screen">

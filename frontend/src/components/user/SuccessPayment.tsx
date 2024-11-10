@@ -9,6 +9,7 @@ function SuccessPayment() {
   const queryParams = new URLSearchParams(location.search);
   const sessionId = queryParams.get('session_id');
   const userId = queryParams.get('user_id');
+  const stripe_session_id = queryParams.get('stripe_session_id')
 
   useEffect(() => {
     const createBooking = async () => {
@@ -18,7 +19,7 @@ function SuccessPayment() {
       if (sessionId && userId && !bookingCreated) {
         try {
           console.log('Creating booking...');
-          await userAxiosInstance.post('/api/user/createBooking', { sessionId, userId });
+          await userAxiosInstance.post('/api/user/createBooking', { sessionId, userId, stripe_session_id });
           console.log('Booking created successfully');
           // Set flag in local storage after successful booking
           localStorage.setItem('bookingCreated', 'true');
@@ -55,7 +56,7 @@ function SuccessPayment() {
             Go to Homepage
           </button>
           <button
-            onClick={() => navigate('/profile/sessions')}
+            onClick={() => navigate('/profile/bookings')}
             className="ml-4 bg-gray-600 text-white px-6 py-2 rounded-md hover:bg-gray-700 transition"
           >
             View Orders

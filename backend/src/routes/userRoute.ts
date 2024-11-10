@@ -29,6 +29,7 @@ router.get('/getUser/:userId',  authMiddlewares(['user']), userController.getUse
 router.patch('/updateUser',  authMiddlewares(['user']), userController.updateUserData.bind(userController))
 router.patch('/uploadProfileImage/:userId',  authMiddlewares(['user']), upload.single('profileImage'), userController.uploadProfileImage.bind(userController))
 router.get('/bookings/:userId',  authMiddlewares(['user']), userController.getAllBookings.bind(userController))
+router.patch('/cancelBooking/:bookingId', userController.cancelBooking.bind(userController))
 
 
 

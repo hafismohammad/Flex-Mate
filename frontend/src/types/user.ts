@@ -23,4 +23,5 @@ export interface IBookedSession {
   startTime: string;
   endTime: string;
   sessionType: string;
+  bookingStatus: string
 }

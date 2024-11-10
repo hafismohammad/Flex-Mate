@@ -14,6 +14,7 @@ const bookingSchema = new Schema<IBooking>({
   endTime: { type: String, required: true },
   amount: { type: Number, required: true },
   paymentStatus: { type: String, enum: [ "Confirmed", "Cancelled"], default: "Confirmed" }, 
+  payment_intent: {type: String, required: false }
 }, {
   timestamps: true, 
 });

@@ -41,6 +41,7 @@ export interface IBooking {
     paymentStatus: "Confirmed" | "Cancelled" ;
     createdAt: Date; 
     updatedAt: Date; 
+    payment_intent?: string;
   }
 
   export interface ICategory {

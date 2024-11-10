@@ -18,6 +18,7 @@ const sessionSchema = new Schema<ISession>({
     default: "Pending",
     required: true,
   },
+  paymentIntentId: { type: String, required: false }
 });
 
 const SessionModel = model<ISession>("Session", sessionSchema);

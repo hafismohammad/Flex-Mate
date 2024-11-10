@@ -231,10 +231,13 @@ class UserController {
 
   async createBooking(req: Request, res: Response, next: NextFunction) {
     try {
-      const { sessionId, userId } = req.body;
+      const { sessionId, userId , stripe_session_id} = req.body;
+    console.log('stripe_session_id',stripe_session_id);
+    
       const bookingDetails = await this.userService.findBookingDetails(
         sessionId,
-        userId
+        userId,
+        stripe_session_id
       );
     } catch (error) {
       console.log("Error in create booking");
@@ -302,6 +305,17 @@ class UserController {
       next(error)
     }
   }
+
+  async cancelBooking(req: Request, res: Response) {
+    try {
+        const { bookingId } = req.params;
+        const bookingCancelled = await this.userService.cancelBooking(bookingId);
+        res.status(200).json({ message: "Booking canceled and refund processed" });
+    } catch (error) {
+        console.error("Error canceling booking:", error);
+        res.status(500).json({ message: "Error canceling booking", error });
+    }
+}
 }
 
 export default UserController;

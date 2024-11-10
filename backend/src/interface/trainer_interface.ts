@@ -64,6 +64,7 @@ export interface ISession {
   price: number | undefined
   isBooked: boolean,
   status: 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled' | 'InProgress';
+  paymentIntentId?: string; 
 }
 
 

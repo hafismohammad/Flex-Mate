@@ -20,7 +20,10 @@ function Sessions() {
       const response = await userAxiosInstance.get(
         `/api/user/bookings/${userInfo?.id}`
       );
-      setSessions(response.data);
+      const activeSessions =  response.data.filter(
+        (sessions: IBookedSession) =>   sessions.bookingStatus === 'Confirmed'
+      )
+      setSessions(activeSessions);
     };
     fetchBookingDetails();
   }, [userInfo?.id]);
