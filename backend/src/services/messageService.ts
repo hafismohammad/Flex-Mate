@@ -72,8 +72,8 @@ class MessageService {
         
         // Get the receiver's socket ID
     const receiverSocketId = getReceiverSocketId(receiverId); // Corrected receiver socket retrieval
-    console.log('receiverId',receiverId);
-    console.log('receiverSocketId',receiverSocketId);
+    // console.log('receiverId',receiverId);
+    // console.log('receiverSocketId',receiverSocketId);
     if (receiverSocketId) {
         io.to(receiverSocketId).emit('newMessage', newMessage);
     }

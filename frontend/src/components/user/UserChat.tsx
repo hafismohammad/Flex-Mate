@@ -45,7 +45,7 @@ useEffect(() => {
 }, [messages]);
 
 const handleNewMessage = (newMessage: any) => {
-  console.log("Sending new message:", newMessage); // Debugging message sending
+  // console.log("Sending new message:", newMessage);
   setLocalMessages((prevMessages) => [...prevMessages, newMessage]);
 
   // Emit the message event to the server

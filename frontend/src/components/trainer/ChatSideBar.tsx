@@ -22,13 +22,15 @@ function ChatSideBar() {
     const fetchUsers = async () => {
       try {
         const response = await axiosInstance.get(`/api/trainer/bookingDetails/${trainerId}`);
-        setUsers(response.data);
+        const FilteredBoodkingDetails = response.data.filter((bookings: any) => bookings.paymentStatus === 'Confirmed' )
+        setUsers(FilteredBoodkingDetails);
       } catch (error) {
         console.error("Error fetching users:", error);
       }
     };
     fetchUsers();
   }, [trainerId]);
+console.log('users',users);
 
   const handleChat = (userId: string) => {
     navigate(`/trainer/trainerChat/${userId}`);

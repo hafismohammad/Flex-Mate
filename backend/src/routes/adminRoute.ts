@@ -24,6 +24,7 @@ router.get('/allUsers', authMiddleware(['admin']), adminController.getAllUsers.b
 router.get('/allTrainer', authMiddleware(['admin']), adminController.getAllTrainer.bind(adminController))
 router.patch('/user-block-unblock/:user_id', authMiddleware(['admin']), adminController.blockUnblockUser.bind(adminController))
 router.patch('/trainer-block-unblock/:trainer_id', authMiddleware(['admin']), adminController.blockUnblockTrainer.bind(adminController))
+router.get('/allBookings', authMiddleware(['admin']), adminController.getAllBookings.bind(adminController))
 
 
 

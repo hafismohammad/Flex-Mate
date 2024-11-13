@@ -8,14 +8,13 @@ import {
   FaListAlt,
   FaTimes,
   FaChartPie,
-  FaUser,
-  FaCog,
-  FaUserCircle,
+
   FaSignOutAlt,
   FaCheckCircle,
   FaUsers,
 } from "react-icons/fa";
 import { AppDispatch } from "../../app/store";
+import { FaAddressBook } from "react-icons/fa6";
 
 
 function AdminSideBar() {
@@ -82,6 +81,15 @@ const navigate = useNavigate()
             <FaCheckCircle size={20} />
             <span className={`ml-2 ${!isSidebarOpen && "hidden"}`}>
               Verification
+            </span>
+          </Link>
+          <Link
+            to="/admin/bookings"
+            className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
+          >
+            <FaAddressBook size={20} />
+            <span className={`ml-2 ${!isSidebarOpen && "hidden"}`}>
+              Bookings
             </span>
           </Link>
           <Link

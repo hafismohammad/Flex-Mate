@@ -134,6 +134,9 @@ class AdminService {
     return await this.adminRepository.updateTrainerStatus(trainer_id, trainerStatus)
   }
 
+  async getAllBookings() {
+    return await this.adminRepository.fetchAllBookings()
+  }
 
 }
 

@@ -15,11 +15,11 @@ function TrainerChat() {
   const { messages, loading } = useGetMessage(trainerToken!, userId!);
   const [localMessages, setLocalMessages] = useState(messages);
   const [socket, setSocket] = useState<Socket | null>(null);
-
+  
   useEffect(() => {
     // Initialize the socket when the component mounts
     const socketInstance = io(SOCKET_SERVER_URL, {
-      query: { trainerId: trainerInfo._id, userId: userId }
+      query: { trainerId: trainerInfo.id, userId: userId }
     });
 
     setSocket(socketInstance);
@@ -34,7 +34,7 @@ function TrainerChat() {
     return () => {
       socketInstance.disconnect();
     };
-  }, [userId, trainerInfo._id, messages]);
+  }, [userId, trainerInfo.id, messages]);
 
   useEffect(() => {
     // Update local messages when messages change

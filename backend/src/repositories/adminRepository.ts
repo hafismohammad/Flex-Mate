@@ -4,6 +4,7 @@ import KYCModel from "../models/KYC_Model";
 import TrainerModel from "../models/trainerModel";
 import UserModel from "../models/userModel";
 import KycRejectionReasonModel from "../models/kycRejectionReason";
+import BookingModel from "../models/booking";
 
 class AdminRepository {
   private adminModel = AdminModel;
@@ -187,6 +188,99 @@ class AdminRepository {
       console.log('Rejection reason saved successfully for trainer ID:', trainerId);
     } catch (error) {
       console.error('Error saving rejection reason:', error);
+      throw error;
+    }
+  }
+
+  async fetchAllBookings() {
+    try {
+      const allBookings = await BookingModel.aggregate([
+        {
+          $lookup: {
+            from: 'trainers',
+            localField: 'trainerId',
+            foreignField: '_id',
+            as: 'trainerDetails'
+          }
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'userId',
+            foreignField: '_id',
+            as: 'userDetails'
+          }
+        },
+        {
+          $lookup: {
+            from: 'sessions',
+            localField: 'sessionId',
+            foreignField: '_id',
+            as: 'sessionDetails'
+          }
+        },
+        {
+          $lookup: {
+            from: 'specializations',
+            localField: 'specializationId',
+            foreignField: '_id',
+            as: 'specializationDetails'
+          }
+        },
+        {
+          $unwind: {
+            path: "$trainerDetails",
+            preserveNullAndEmptyArrays: true 
+          }
+        },
+        {
+          $unwind: {
+            path: "$userDetails",
+            preserveNullAndEmptyArrays: true 
+          }
+        },
+        {
+          $unwind: {
+            path: "$sessionDetails",
+            preserveNullAndEmptyArrays: true 
+          }
+        }, {
+          $unwind: {
+            path: "$specializationDetails",
+            preserveNullAndEmptyArrays: true 
+          }
+        },
+        {
+          $project: {
+            bookingId: '$_d',
+            userName: '$userDetails.name',
+            trainerName: '$trainerDetails.name',
+            bookingDate: '$bookingDate',
+            sessionDates: {
+              $cond: {
+                if: {$eq: ["$sessionDetails.isSingleSession", true]},
+                then: {
+                  startDate: { $ifNull: ["$sessionDetails.startDate", null] },
+                },  else: {
+                  startDate: { $ifNull: ["$sessionDetails.startDate", null] },
+                  endDate: { $ifNull: ["$sessionDetails.endDate", null] },
+                },
+              }
+            },
+            sessionStartTime: "$startTime",
+            sessionEndTime: '$endTime',
+            sessionType: '$sessionType',
+            specialization: '$specializationDetails.name',
+            amount: '$amount',
+            status: '$paymentStatus'
+          }
+        }
+      ])
+// console.log(allBookings);
+
+      return allBookings
+    } catch (error) {
+      console.error('Error fetching all booking details:', error);
       throw error;
     }
   }

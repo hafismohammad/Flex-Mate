@@ -18,6 +18,8 @@ function TrainersSidebar() {
     allSpecializations();
   }, []);
 
+  
+
   return (
     <div className="h-screen w-80 bg-gray-100 text-black flex flex-col">
       <h2 className="text-2xl font-bold p-4 border-b border-gray-700 ">

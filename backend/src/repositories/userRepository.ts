@@ -199,6 +199,8 @@ class UserRepository {
 
   async findExistingBooking(bookingDetails: IBooking) {
     try {
+      console.log('findExistingBooking');
+      
       const existingBooking = await this.bookingModel.findOne({
         sessionId: bookingDetails.sessionId,
         userId: bookingDetails.userId,

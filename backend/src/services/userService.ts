@@ -1,4 +1,5 @@
 import { IUser, ILoginUser, IBooking } from "../interface/common";
+import { differenceInHours } from 'date-fns';
 import {
   generateAccessToken,
   generateRefreshToken,
@@ -294,7 +295,7 @@ class UserService {
         cancel_url: `http://localhost:5173/paymentFailed`,
       });
   
-      return session;  // Return the session to your frontend if needed
+      return session;  
     } catch (error) {
       console.error("Error creating Stripe session:", error);
       throw error;
@@ -389,26 +390,47 @@ class UserService {
 
   async cancelBooking(bookingId: string) {
     try {
-      // Fetch booking data from the database
       const bookingData = await this.userRepository.FetchBooking(bookingId);
   
       if (!bookingData) throw new Error("Booking not found");
   
-      // Verify payment status before attempting a refund
       if (bookingData.paymentStatus !== 'Confirmed') {
         throw new Error("Booking is not confirmed or has already been canceled");
       }
   
-      // Create refund with Stripe using paymentIntentId from booking data
+      if (typeof bookingData.amount !== 'number') {
+        throw new Error("Booking amount is undefined or invalid");
+      }
+  
+      const sessionStartDate = new Date(bookingData.startDate);
+      const hoursLeft = differenceInHours(sessionStartDate, new Date());
+      
+      let refundPercentage = 0;
+      if (hoursLeft > 24) {
+        refundPercentage = 1; // 100% refund
+      } else if (hoursLeft > 6) {
+        refundPercentage = 0.5; // 50% refund
+      } else {
+        refundPercentage = 0; // No refund
+      }
+  
+      if (refundPercentage === 0) {
+        bookingData.paymentStatus = 'Cancelled';
+        await bookingData.save();
+        console.log('booking cancelled without refund:', bookingData);
+        return bookingData;
+      }
+  
+      const refundAmount = Math.floor(bookingData.amount * refundPercentage);
+  
       const refund = await stripe.refunds.create({
-        payment_intent: bookingData.payment_intent, // Use the paymentIntentId stored in bookingData
+        payment_intent: bookingData.payment_intent, 
+        amount: refundAmount
       });
   
       if (refund.status === 'succeeded') {
-        // Update booking status to 'Cancelled' in the database
         bookingData.paymentStatus = 'Cancelled';
         await bookingData.save();
-  
       } else {
         throw new Error("Refund failed or is incomplete");
       }
@@ -419,6 +441,7 @@ class UserService {
       throw error;
     }
   }
+  
   
 }
 

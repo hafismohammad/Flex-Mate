@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import profileBG from "../../assets/trainer-profile-view-img.jpg";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { TrainerProfile } from "../../types/trainer";
 import LOGO from "../../assets/LOGO-2.png";
 import DatePicker from "react-datepicker";
@@ -105,7 +105,7 @@ function TrainerProfileView() {
       );
       // console.log(response.data);
       setSessionSchedules(response.data);
-      console.log("sessionSchedules", sessionSchedules);
+      // console.log("sessionSchedules", sessionSchedules);
     };
     fetchSeessionSchedules();
   }, []);
@@ -137,6 +137,13 @@ function TrainerProfileView() {
     )
   ).map((dateStr) => new Date(dateStr));
 
+  const bookingRef = useRef<HTMLDivElement>(null);
+
+  const handleBookSessionClick = () => {
+    // Smoothly scroll to the booking details section
+    bookingRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+  
   return (
     <div className="mb-40">
       <div>
@@ -180,9 +187,12 @@ function TrainerProfileView() {
             </div>
             <h2 className="ml-2 text-blue-500 text-2xl">2 reviews</h2>
           </div>
-          <button className="bg-gradient-to-b from-blue-500 to-blue-500 text-white font-bold py-2 px-4 w-64 mt-7  rounded-2xl shadow-md ">
-            Book Session
-          </button>
+          <button
+        className="bg-gradient-to-b from-blue-500 to-blue-500 text-white font-bold py-2 px-4 w-64 mt-7 rounded-2xl shadow-md"
+        onClick={handleBookSessionClick}
+      >
+        Book Session
+      </button>
         </div>
         <div className="bg-blue-50 rounded-md p-10 mt-10 ml-10 mr-36">
           <h1 className="text-3xl font-semibold mb-7">About {trainer?.name}</h1>
@@ -207,18 +217,18 @@ function TrainerProfileView() {
         </div>
       </div>
       <div className="bg-blue-500 h-[150vh] mt-20">
-  <div className="flex justify-between items-center p-10">
-    <img src={LOGO} alt="logo" className="w-80 h-20" />
+      <div ref={bookingRef} className="flex justify-between items-center p-10 mt-10">
+        <img src={LOGO} alt="logo" className="w-80 h-20" />
 
-    <DatePicker
-      minDate={new Date()}
-      selected={selectedDate}
-      inline
-      highlightDates={sessionDates}
-      onChange={(date) => setSelectedDate(date)}
-      className="h-80 w-80 border border-gray-300 rounded-lg shadow-lg p-2"
-    />
-  </div>
+        <DatePicker
+          minDate={new Date()}
+          selected={selectedDate}
+          inline
+          highlightDates={sessionDates}
+          onChange={(date) => setSelectedDate(date)}
+          className="h-80 w-80 border border-gray-300 rounded-lg shadow-lg p-2"
+        />
+      </div>
   <div className="flex justify-center">
     <div className="border-b-2 border-b-black w-96 mr-10"></div>
     <h1 className="font-semibold">

@@ -7,6 +7,7 @@ import SpecializationsPage from "../pages/admin/SpecializationsPage";
 import TrianerVerificationViewPage from "../pages/admin/TrianerVerificationViewPage";
 import UserListingPage from "../pages/admin/UserListingPage";
 import TrainerListingPage from "../pages/admin/TrainerListingPage";
+import Bookings from "../components/admin/Bookings";
 
 function AdminRoutes() {
   return (
@@ -20,6 +21,7 @@ function AdminRoutes() {
           <Route path="/trainerView/:trainerId" element={<TrianerVerificationViewPage />} />
           <Route path="/userListing" element={<UserListingPage />}/>
           <Route path="/trainerListing" element={<TrainerListingPage />}/>
+          <Route path="/bookings" element={<Bookings />}/>
         </Route>
       </Routes>
     </div>

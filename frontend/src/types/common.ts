@@ -20,3 +20,21 @@ export interface Specialization {
   image: string;
   isListed: boolean;
 }
+
+
+export interface IBookingDetails {
+  _id: string
+  userName: string
+  trainerName: string
+  bookingDate: string;
+  sessionDates: {
+    startDate: string; 
+    endDate?: string;  
+  };
+  sessionStartTime: string;
+  sessionEndTime: string;
+  sessionType: string;
+  specialization: string
+  amount: string
+  status: string
+}

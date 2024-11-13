@@ -6,6 +6,7 @@ import API_URL from "../../../axios/API_URL";
 import axiosInstance from "../../../axios/trainerAxiosInstance";
 import userAxiosInstance from "../../../axios/userAxionInstance";
 import Swal from "sweetalert2";
+import { formatTime } from "../../utils/timeAndPriceUtils";
 
 interface Booking {
   _id: string;
@@ -38,12 +39,12 @@ function Bookings() {
   const handleCancelBooking = async (bookingId: string) => {
     Swal.fire({
       title: "Are you sure?",
-      text: "This session will be permanently deleted!",
+      text: "This session will be cancelled!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, delete it!",
+      confirmButtonText: "Yes, cancel it!",
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
@@ -101,8 +102,8 @@ function Bookings() {
             <div className="text-gray-800 font-medium">
               {new Date(booking.sessionDates.startDate).toLocaleDateString()}
             </div>
-            <div className="text-gray-800 font-medium">{booking.startTime}</div>
-            <div className="text-gray-800 font-medium">{booking.endTime}</div>
+            <div className="text-gray-800 font-medium">{formatTime(booking.startTime)}</div>
+            <div className="text-gray-800 font-medium">{formatTime(booking.endTime)}</div>
             <div className={`${booking.bookingStatus === 'Confirmed' ? 'text-green-500 rounded-md font-medium' : ' text-red-500 font-medium rounded-md'}`}>{booking.bookingStatus}</div>
             <div>
               <button

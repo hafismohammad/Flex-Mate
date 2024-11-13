@@ -250,7 +250,14 @@ class AdminController {
     }
   }
 
-
+async getAllBookings(req: Request, res: Response, next: NextFunction) {
+  try {
+  const allbookings = await this.adminService.getAllBookings()    
+  res.status(200).json(allbookings)
+  } catch (error) {
+    next(error)
+  } 
+}
 
 }
 

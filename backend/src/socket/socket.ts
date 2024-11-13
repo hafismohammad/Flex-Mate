@@ -28,6 +28,9 @@ io.on("connection", (socket) => {
 
   const userId = socket.handshake.query.userId as string;
   const trainerId = socket.handshake.query.trainerId as string;
+// console.log('userId ----', userId);
+// console.log('trainerId -----', trainerId);
+
 
   // Map the socket to either the userId or trainerId if available
   if (userId) {

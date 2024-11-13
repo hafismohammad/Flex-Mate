@@ -41,11 +41,11 @@ function CurrentSchedules() {
 
   const handleAdd = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  
+    
     const today = new Date();
     const maxDate = new Date(today);
     maxDate.setDate(today.getDate() + 20);
-  
+    
     const clearSessionData = () => {
       setSelectedDate(null);
       setStartDate(null);
@@ -54,13 +54,12 @@ function CurrentSchedules() {
       setEndTime("");
       setPrice("");
     };
-  
+    
     if (isSingleSession) {
       if (!selectedDate || !startTime || !price) {
         toast.error("Please fill in all fields for the single session.");
         return;
       }
-  
       if (new Date(selectedDate) > maxDate) {
         toast.error("The session date must be within the next 20 days.");
         return;
@@ -70,17 +69,14 @@ function CurrentSchedules() {
         toast.error("Please fill in all fields for the package session.");
         return;
       }
-  
       if (startTime >= endTime) {
         toast.error("End time must be after start time");
         return;
       }
-  
       if (new Date(startDate) > maxDate) {
         toast.error("The package start date must be within the next 20 days.");
         return;
       }
-  
       if (new Date(startDate) >= new Date(endDate)) {
         toast.error("Start date must be before end date.");
         return;
@@ -113,10 +109,13 @@ function CurrentSchedules() {
         sessionData
       );
       const newSchedule = response.data.createdSessionData;
-  console.log('newSchedule', newSchedule);
+      console.log('newSchedule', newSchedule);
   
-      // Ensure the sessionSchedules are updated with the new session
-      setSessionSchedules((prevSchedules) => [...prevSchedules, newSchedule]);
+      setSessionSchedules((prevSchedules) =>
+        Array.isArray(newSchedule)
+          ? [...prevSchedules, ...newSchedule] // Add multiple sessions for a package
+          : [...prevSchedules, newSchedule] // Add single session
+      );
   
       if (response.status === 201) {
         toast.success("Session created successfully");
@@ -142,6 +141,7 @@ function CurrentSchedules() {
     setModalOpen(false);
     clearSessionData();
   };
+  
   
 
   const handleOpenModal = async () => {

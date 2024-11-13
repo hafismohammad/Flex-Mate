@@ -30,7 +30,6 @@ router.post('/login', trainerController.trainerLogin.bind(trainerController))
 router.post('/refresh-token', trainerController.refreshToken.bind(trainerController))
 router.post('/kyc', authMiddlewares(['trainer']), uploadTrainerDataFiles, trainerController.kycSubmission.bind(trainerController));
 router.post('/logout',  authMiddlewares(['trainer']), trainerController.logoutTrainer.bind(trainerController))
-// router.get('/getKycStatus', trainerController.getAllKycStatus.bind(trainerController))
 router.get('/kycStatus/:trainerId',  authMiddlewares(['trainer']), trainerController.trainerKycStatus.bind(trainerController));
 router.put('/resubmitKyc/:trainerId',  authMiddlewares(['trainer']), trainerController.resubmitkyc.bind(trainerController))
 router.get('/getTrainer/:trainerId',  authMiddlewares(['trainer']), trainerController.getTrainer.bind(trainerController))
