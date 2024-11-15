@@ -61,6 +61,7 @@ export interface KycDocument {
     specializations: Specialization[];
     imageUrl?: string;
     yearsOfExperience?: string | null
+    about: string
     language?: string | null
     gender?: string | null
     isBlocked: boolean;

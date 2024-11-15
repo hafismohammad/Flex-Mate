@@ -15,6 +15,7 @@ export interface ITrainer {
   yearsOfExperience?: number;
   language?: string;
   specializations: Types.ObjectId[];
+  about?: string
   dailySessionLimit: number 
   kycStatus: 'pending' | 'approved' | 'submitted' | 'rejected';
   isBlocked?: boolean;

@@ -283,6 +283,7 @@ class TrainerService {
         gender,
         language,
         dailySessionLimit,
+        about,
         specializations
       } = trainerData;
 
@@ -304,6 +305,7 @@ class TrainerService {
         existingTrainer.yearsOfExperience = yearsOfExperience;
       if (gender) existingTrainer.gender = gender;
       if (language) existingTrainer.language = language;
+      if (about) existingTrainer.about = about;
       if (dailySessionLimit)
         existingTrainer.dailySessionLimit = dailySessionLimit;
 

@@ -19,7 +19,7 @@ interface TrainerProfileData {
   gender: string;
   yearsOfExperience: string;
   language: string;
-  // dailySessionLimit?: number;
+  about: string; // Added the 'about' field
 }
 
 function TrainerProfile() {
@@ -147,14 +147,15 @@ function TrainerProfile() {
             </span>
           </div>
 
-          {/* <div className="bg-slate-100 p-4 rounded-lg shadow-sm transition-transform transform hover:scale-105">
+          {/* About Section */}
+          <div className="bg-slate-100 p-4 rounded-lg shadow-sm transition-transform transform hover:scale-105 col-span-2">
             <span className="block text-sm font-semibold text-gray-500">
-              Daily Session Limit
+              About
             </span>
-            <span className="text-lg text-gray-800">
-              {trainer[0].dailySessionLimit || "Not specified"}
-            </span>
-          </div> */}
+            <p className="text-lg text-gray-800">
+              {trainer[0].about || "Not specified"}
+            </p>
+          </div>
         </div>
 
         <button

@@ -18,11 +18,14 @@ interface FormData {
   gender: string;
   language: string;
   specializations: string[];
+  about: string;
 }
 
 const EditTrainerProfile: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
-  const [allSpecializations, setAllSpecializations] = useState<{ name: string; _id: string }[]>([]);
+  const [allSpecializations, setAllSpecializations] = useState<
+    { name: string; _id: string }[]
+  >([]);
   const [formData, setFormData] = useState<FormData>({
     profileImage: "",
     name: "",
@@ -32,6 +35,7 @@ const EditTrainerProfile: React.FC = () => {
     gender: "",
     language: "",
     specializations: [],
+    about: "",
   });
 
   const navigate = useNavigate();
@@ -43,7 +47,9 @@ const EditTrainerProfile: React.FC = () => {
   useEffect(() => {
     const fetchTrainer = async () => {
       try {
-        const response = await axiosInstance.get(`/api/trainer/getTrainer/${trainerId}`);
+        const response = await axiosInstance.get(
+          `/api/trainer/getTrainer/${trainerId}`
+        );
         const trainerData = response.data.trainerData[0];
 
         setFormData({
@@ -55,6 +61,7 @@ const EditTrainerProfile: React.FC = () => {
           gender: trainerData.gender || "",
           language: trainerData.language || "",
           specializations: trainerData.specializations || [],
+          about: trainerData.about || "",
         });
       } catch (err) {
         setError("Failed to load trainer data");
@@ -67,7 +74,9 @@ const EditTrainerProfile: React.FC = () => {
   useEffect(() => {
     const getAllSpecializations = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/trainer/getSpecializations`);
+        const response = await axios.get(
+          `${API_URL}/api/trainer/getSpecializations`
+        );
         setAllSpecializations(response.data.data);
       } catch (error) {
         console.error("Error fetching specializations:", error);
@@ -85,7 +94,9 @@ const EditTrainerProfile: React.FC = () => {
     }));
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
@@ -101,7 +112,7 @@ const EditTrainerProfile: React.FC = () => {
         profileImage: file,
       }));
     } else {
-      console.log('File not received');
+      console.log("File not received");
     }
   };
 
@@ -109,36 +120,44 @@ const EditTrainerProfile: React.FC = () => {
     e.preventDefault();
 
     const updatedData = new FormData();
-    Object.keys(formData).forEach((key) => {
-      const value = formData[key as keyof FormData];
-      if (Array.isArray(value)) {
-        value.forEach((item) => updatedData.append(key, item));
-      } else {
-        updatedData.append(key, value as string);
-      }
-    });
+    updatedData.append("name", formData.name);
+    updatedData.append("email", formData.email);
+    updatedData.append("phoneNumber", formData.phoneNumber);
+    updatedData.append("yearsOfExperience", formData.yearsOfExperience.toString());
+    updatedData.append("gender", formData.gender);
+    updatedData.append("language", formData.language);
+    updatedData.append("about", formData.about);  
 
+    // Append profile image only if it's a file
     if (formData.profileImage instanceof File) {
       updatedData.append("profileImage", formData.profileImage);
     }
 
     try {
-      const response = await axiosInstance.patch(`/api/trainer/updateTrainerData/${trainerId}`, updatedData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const response = await axiosInstance.patch(
+        `/api/trainer/updateTrainerData/${trainerId}`,
+        updatedData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       if (response.data.message === "Trainer updated successfully") {
         toast.success("Profile updated successfully");
-        setTimeout(() => navigate("/trainer/profile"), 1500);
+
+        setTimeout(() => {
+          navigate("/trainer/profile");
+        }, 1500);
       } else {
         toast.error("Profile update failed. Please try again.");
       }
     } catch (error) {
       console.error("Error updating profile:", error);
     }
-  };
+};
+
 
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col items-center">
@@ -147,20 +166,28 @@ const EditTrainerProfile: React.FC = () => {
         <h2 className="text-4xl font-bold text-gray-800">Trainer Profile</h2>
       </div>
 
-      <form onSubmit={handleProfileUpdate}>
-        <div className="bg-white flex flex-col items-center rounded-md relative w-full max-w-4xl overflow-hidden">
-          <img src={bgImage} alt="Background" className="w-full h-64 object-cover rounded-t-md" />
+      <form onSubmit={handleProfileUpdate} className="w-full max-w-4xl">
+        <div className="bg-white flex flex-col items-center rounded-md relative w-full overflow-hidden">
+          <img
+            src={bgImage}
+            alt="Background"
+            className="w-full h-64 object-cover rounded-t-md"
+          />
 
           <div className="absolute top-36 md:top-44 left-8 md:left-12 flex items-center justify-center">
             <img
-              src={typeof formData.profileImage === "string" ? formData.profileImage : URL.createObjectURL(formData.profileImage)}
+              src={
+                typeof formData.profileImage === "string"
+                  ? formData.profileImage
+                  : URL.createObjectURL(formData.profileImage)
+              }
               alt="Profile"
               className="w-40 h-40 rounded-full bg-slate-500 object-cover border-4 border-white shadow-lg"
             />
           </div>
 
           <div className="absolute top-36 md:top-80 left-8 md:left-48 flex items-center justify-center">
-            <label htmlFor="profileImageInput">
+            <label htmlFor="profileImageInput" className="cursor-pointer">
               <FaCamera className="text-gray-600" size={18} />
             </label>
             <input
@@ -172,7 +199,7 @@ const EditTrainerProfile: React.FC = () => {
             />
           </div>
 
-          <div className="mt-32 w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
+          <div className="mt-32 w-full grid grid-cols-1 md:grid-cols-2 gap-6 p-8">
             <input
               type="text"
               name="name"
@@ -206,19 +233,6 @@ const EditTrainerProfile: React.FC = () => {
               className="p-3 border border-gray-300 bg-slate-100 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <select
-              name="gender"
-              value={formData.gender}
-              onChange={handleChange}
-              className="p-3 border border-gray-300 bg-slate-100 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="" disabled>
-                Select Gender
-              </option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
-            </select>
-            <select
               name="language"
               value={formData.language}
               onChange={handleChange}
@@ -233,46 +247,72 @@ const EditTrainerProfile: React.FC = () => {
               <option value="german">German</option>
               <option value="mandarin">Mandarin</option>
             </select>
-
-            <div className="relative">
-              <label className="block mb-2 font-medium text-gray-700">Specialization</label>
-              <button
-                type="button"
-                className="p-3 border border-gray-300 w-full bg-slate-100 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                onClick={toggleDropdown}
-              >
-                {formData.specializations.length > 0
-                  ? formData.specializations.map((id) => allSpecializations.find((spec) => spec._id === id)?.name).join(", ")
-                  : "Select Specializations"}
-              </button>
-
-              {isDropdownOpen && (
-                <div className="absolute mt-1 max-h-48 w-full overflow-auto rounded-lg border border-gray-300 bg-white shadow-lg">
-                  {allSpecializations.map((spec) => (
-                    <div
-                      key={spec._id}
-                      onClick={() => handleSpecializationToggle(spec._id)}
-                      className="cursor-pointer p-2 hover:bg-gray-100"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={formData.specializations.includes(spec._id)}
-                        readOnly
-                        className="mr-2"
-                      />
-                      {spec.name}
-                    </div>
-                  ))}
-                </div>
-              )}
+            <select
+              name="gender"
+              value={formData.gender}
+              onChange={handleChange}
+              className="p-3 border border-gray-300 bg-slate-100 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="" disabled>
+                Select Gender
+              </option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="non-binary">Non-binary</option>
+              <option value="prefer-not-to-say">Prefer Not to Say</option>
+            </select>
+            <div className="col-span-2 flex flex-col">
+              <label htmlFor="about" className="font-medium mb-2">
+                About
+              </label>
+              <textarea
+                id="about"
+                name="about"
+                value={formData.about}
+                onChange={handleChange}
+                placeholder="Write something about yourself..."
+                className="p-3 border border-gray-300 bg-slate-100 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+                rows={4}
+              />
+            </div>
+            <div className="col-span-2 flex flex-col">
+              <label htmlFor="specializations" className="mb-2 font-medium">
+                Specializations
+              </label>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {allSpecializations.map((specialization) => (
+                  <div
+                    key={specialization._id}
+                    className={`flex items-center space-x-2 border border-gray-300 px-4 py-2 rounded-md cursor-pointer ${
+                      formData.specializations.includes(specialization._id)
+                        ? "bg-blue-100 border-blue-400"
+                        : ""
+                    }`}
+                    onClick={() =>
+                      handleSpecializationToggle(specialization._id)
+                    }
+                  >
+                    <input
+                      type="checkbox"
+                      checked={formData.specializations.includes(
+                        specialization._id
+                      )}
+                      readOnly
+                      className="hidden"
+                    />
+                    <span className="text-gray-700 text-sm">
+                      {specialization.name}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-
           <button
             type="submit"
-            className="bg-blue-500 text-white px-6 py-2 rounded-md shadow-md hover:bg-blue-600 mt-4 mb-8"
+            className="my-4 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
           >
-            Update Profile
+            Save Changes
           </button>
         </div>
       </form>
