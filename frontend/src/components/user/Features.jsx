@@ -43,7 +43,7 @@ function Features() {
           specializations.map((feature) => (
             <div
               key={feature._id}
-              className="flex flex-col justify-between h-full bg-white w-full max-w-xs mx-auto rounded-md shadow-md hover:shadow-lg transition-shadow duration-300"
+              className="flex flex-col justify-between h-full bg-white w-full max-w-xs mx-auto rounded-md shadow-md hover:shadow-[0px_10px_20px_-5px_rgba(0,0,0,0.4)] duration-300"
               data-aos="fade-up"
               data-aos-offset="200"
             >

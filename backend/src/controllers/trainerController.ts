@@ -13,6 +13,7 @@ class TrainerController {
 
   async getAllSpecializations(req: Request, res: Response, next: NextFunction) {
     try {
+      
       const specializationsData =
         await this.trainerService.findAllSpecializations();
 
@@ -286,36 +287,34 @@ class TrainerController {
     try {
       const trainer_id = req.params.trainerId;
       const trainerData = req.body;
-
+  
       const documents: { [key: string]: string | undefined } = {};
-
+  
       if (req.file) {
-        // Await the result of uploadToCloudinary to access secure_url
         const profileImageUrl = await uploadToCloudinary(
           req.file.buffer,
           "trainer_profileImage"
         );
         documents.profileImage = profileImageUrl.secure_url;
-      } else {
-        console.log("No file received");
       }
-      // console.log('document', documents);
-
+  
       const updatedTrainerData = { ...trainerData, ...documents };
-
+  
       const updatedTrainer = await this.trainerService.updateTrainer(
         trainer_id,
         updatedTrainerData
       );
-
-      res
-        .status(200)
-        .json({ message: "Trainer updated successfully", updatedTrainer });
+  
+      res.status(200).json({
+        message: "Trainer updated successfully",
+        updatedTrainer,
+      });
     } catch (error) {
       console.error("Error updating trainer:", error);
-     next(error)
+      next(error);
     }
   }
+  
 
   async fetchSpecialization(req: Request, res: Response, next: NextFunction) {
     try {

@@ -227,7 +227,7 @@ class TrainerRepository {
       
       ]);
   
-      console.log('trainerData', trainerData);
+      // console.log('trainerData', trainerData);
       return trainerData;
     } catch (error: any) {
       throw new Error(error);

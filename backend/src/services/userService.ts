@@ -8,10 +8,7 @@ import {
 import UserRepository from "../repositories/userRepository";
 import sendOTPmail from "../config/email_config";
 import bcrypt from "bcryptjs";
-import { ISession } from "../interface/trainer_interface";
 import stripe from "../config/stripeClient";
-import { start } from "repl";
-import Stripe from "stripe";
 import mongoose from "mongoose";
 import { User } from "../interface/user_interface";
 

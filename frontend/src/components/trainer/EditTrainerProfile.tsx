@@ -6,21 +6,23 @@ import { RootState } from "../../app/store";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import { FaCamera } from "react-icons/fa";
+import axios from "axios";
+import API_URL from "../../../axios/API_URL";
 
 interface FormData {
-  profileImage: string | File; 
+  profileImage: string | File;
   name: string;
   email: string;
   phoneNumber: string;
   yearsOfExperience: number;
   gender: string;
   language: string;
-  // dailySessionLimit: number;
+  specializations: string[];
 }
 
 const EditTrainerProfile: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
-
+  const [allSpecializations, setAllSpecializations] = useState<{ name: string; _id: string }[]>([]);
   const [formData, setFormData] = useState<FormData>({
     profileImage: "",
     name: "",
@@ -29,31 +31,30 @@ const EditTrainerProfile: React.FC = () => {
     yearsOfExperience: 0,
     gender: "",
     language: "",
-    // dailySessionLimit: 0,
+    specializations: [],
   });
 
   const navigate = useNavigate();
   const { trainerInfo } = useSelector((state: RootState) => state.trainer);
   const trainerId = trainerInfo.id;
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
   useEffect(() => {
     const fetchTrainer = async () => {
       try {
-        const response = await axiosInstance.get(
-          `/api/trainer/getTrainer/${trainerId}`
-        );
-        console.log("Trainer Data Response:", response.data);
-        const trainerData = response.data.trainerData;
-  
+        const response = await axiosInstance.get(`/api/trainer/getTrainer/${trainerId}`);
+        const trainerData = response.data.trainerData[0];
+
         setFormData({
-          profileImage: trainerData[0].profileImage || "",
-          name: trainerData[0].name || "",
-          email: trainerData[0].email || "",
-          phoneNumber: trainerData[0].phone || "",
-          yearsOfExperience: trainerData[0].yearsOfExperience || 0,
-          gender: trainerData[0].gender || "",
-          language: trainerData[0].language || "",
-          // dailySessionLimit: trainerData[0].dailySessionLimit || 0,
+          profileImage: trainerData.profileImage || "",
+          name: trainerData.name || "",
+          email: trainerData.email || "",
+          phoneNumber: trainerData.phone || "",
+          yearsOfExperience: trainerData.yearsOfExperience || 0,
+          gender: trainerData.gender || "",
+          language: trainerData.language || "",
+          specializations: trainerData.specializations || [],
         });
       } catch (err) {
         setError("Failed to load trainer data");
@@ -62,11 +63,29 @@ const EditTrainerProfile: React.FC = () => {
     };
     fetchTrainer();
   }, [trainerId]);
-  
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  useEffect(() => {
+    const getAllSpecializations = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/api/trainer/getSpecializations`);
+        setAllSpecializations(response.data.data);
+      } catch (error) {
+        console.error("Error fetching specializations:", error);
+      }
+    };
+    getAllSpecializations();
+  }, []);
+
+  const handleSpecializationToggle = (specializationId: string) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      specializations: prevData.specializations.includes(specializationId)
+        ? prevData.specializations.filter((id) => id !== specializationId)
+        : [...prevData.specializations, specializationId],
+    }));
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
@@ -90,36 +109,29 @@ const EditTrainerProfile: React.FC = () => {
     e.preventDefault();
 
     const updatedData = new FormData();
-    updatedData.append("name", formData.name);
-    updatedData.append("email", formData.email);
-    updatedData.append("phoneNumber", formData.phoneNumber);
-    updatedData.append("yearsOfExperience", formData.yearsOfExperience.toString());
-    updatedData.append("gender", formData.gender);
-    updatedData.append("language", formData.language);
-    // updatedData.append("dailySessionLimit", formData.dailySessionLimit.toString());
+    Object.keys(formData).forEach((key) => {
+      const value = formData[key as keyof FormData];
+      if (Array.isArray(value)) {
+        value.forEach((item) => updatedData.append(key, item));
+      } else {
+        updatedData.append(key, value as string);
+      }
+    });
 
-    // Append profile image only if it's a file
     if (formData.profileImage instanceof File) {
       updatedData.append("profileImage", formData.profileImage);
     }
 
     try {
-      const response = await axiosInstance.patch(
-        `/api/trainer/updateTrainerData/${trainerId}`,
-        updatedData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const response = await axiosInstance.patch(`/api/trainer/updateTrainerData/${trainerId}`, updatedData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       if (response.data.message === "Trainer updated successfully") {
         toast.success("Profile updated successfully");
-
-        setTimeout(() => {
-          navigate("/trainer/profile");
-        }, 1500);
+        setTimeout(() => navigate("/trainer/profile"), 1500);
       } else {
         toast.error("Profile update failed. Please try again.");
       }
@@ -137,19 +149,11 @@ const EditTrainerProfile: React.FC = () => {
 
       <form onSubmit={handleProfileUpdate}>
         <div className="bg-white flex flex-col items-center rounded-md relative w-full max-w-4xl overflow-hidden">
-          <img
-            src={bgImage}
-            alt="Background"
-            className="w-full h-64 object-cover rounded-t-md"
-          />
-          
+          <img src={bgImage} alt="Background" className="w-full h-64 object-cover rounded-t-md" />
+
           <div className="absolute top-36 md:top-44 left-8 md:left-12 flex items-center justify-center">
             <img
-              src={
-                typeof formData.profileImage === "string"
-                  ? formData.profileImage
-                  : URL.createObjectURL(formData.profileImage)
-              }
+              src={typeof formData.profileImage === "string" ? formData.profileImage : URL.createObjectURL(formData.profileImage)}
               alt="Profile"
               className="w-40 h-40 rounded-full bg-slate-500 object-cover border-4 border-white shadow-lg"
             />
@@ -194,6 +198,7 @@ const EditTrainerProfile: React.FC = () => {
               className="p-3 border border-gray-300 bg-slate-100 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <input
+              type="number"
               name="yearsOfExperience"
               value={formData.yearsOfExperience}
               onChange={handleChange}
@@ -206,7 +211,9 @@ const EditTrainerProfile: React.FC = () => {
               onChange={handleChange}
               className="p-3 border border-gray-300 bg-slate-100 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="" disabled>Select Gender</option>
+              <option value="" disabled>
+                Select Gender
+              </option>
               <option value="male">Male</option>
               <option value="female">Female</option>
               <option value="other">Other</option>
@@ -217,26 +224,53 @@ const EditTrainerProfile: React.FC = () => {
               onChange={handleChange}
               className="p-3 border border-gray-300 bg-slate-100 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="" disabled>Select Language</option>
+              <option value="" disabled>
+                Select Language
+              </option>
               <option value="english">English</option>
               <option value="spanish">Spanish</option>
               <option value="french">French</option>
               <option value="german">German</option>
               <option value="mandarin">Mandarin</option>
             </select>
-            {/* <input
-              name="dailySessionLimit"
-              type="number"
-              value={formData.dailySessionLimit}
-              onChange={handleChange}
-              placeholder="Daily Session Limit"
-              className="p-3 border border-gray-300 bg-slate-100 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            /> */}
+
+            <div className="relative">
+              <label className="block mb-2 font-medium text-gray-700">Specialization</label>
+              <button
+                type="button"
+                className="p-3 border border-gray-300 w-full bg-slate-100 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onClick={toggleDropdown}
+              >
+                {formData.specializations.length > 0
+                  ? formData.specializations.map((id) => allSpecializations.find((spec) => spec._id === id)?.name).join(", ")
+                  : "Select Specializations"}
+              </button>
+
+              {isDropdownOpen && (
+                <div className="absolute mt-1 max-h-48 w-full overflow-auto rounded-lg border border-gray-300 bg-white shadow-lg">
+                  {allSpecializations.map((spec) => (
+                    <div
+                      key={spec._id}
+                      onClick={() => handleSpecializationToggle(spec._id)}
+                      className="cursor-pointer p-2 hover:bg-gray-100"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={formData.specializations.includes(spec._id)}
+                        readOnly
+                        className="mr-2"
+                      />
+                      {spec.name}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           <button
             type="submit"
-            className="w-32 h-10  mt-5 mb-5 bg-blue-600 text-white  rounded-lg shadow-md hover:bg-blue-700 transition"
+            className="bg-blue-500 text-white px-6 py-2 rounded-md shadow-md hover:bg-blue-600 mt-4 mb-8"
           >
             Update Profile
           </button>

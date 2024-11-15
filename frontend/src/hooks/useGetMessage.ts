@@ -1,46 +1,46 @@
-    import axios from "axios";
-    import { useEffect, useState } from "react";
-    import API_URL from "../../axios/API_URL";
-
+import axios from "axios";
+import { useEffect, useState } from "react";
+import API_URL from "../../axios/API_URL";
 
 interface Message {
-    conversationId: string;
-    createdAt: string;
-    message: string;
-    receiverId: string;
-    receiverModel: string;
-    senderId: string;
-    senderModel: 'user' | 'trainer';
-    updatedAt: string;
-    _id: string;
-  }
+  conversationId: string;
+  createdAt: string;
+  message: string;
+  receiverId: string;
+  receiverModel: string;
+  senderId: string;
+  senderModel: "user" | "trainer";
+  updatedAt: string;
+  _id: string;
+}
 
-    const useGetMessage = (token: string, id: string) => {
-        // console.log('get data', token, '=====',id);
-        
-    const [loading, setLoading] = useState(false);
-    const [messages, setMessages] = useState<Message[]>([]);
-    // console.log('messages', messages);
+const useGetMessage = (token: string, id: string) => {
+  // console.log('get data', token, '=====',id);
 
-    useEffect(() => {
-        const getMessage = async () => {
-        setLoading(true);
-        try {
-            
-            const response = await axios.get(`${API_URL}/api/messages/${token}/${id}`);
-            console.log('res', response.data.message);
-            
-            setMessages(response.data); 
-        } catch (error) {
-            console.error("Failed to fetch messages:", error);
-        } finally {
-            setLoading(false);
-        }
-        };
-if(id)  getMessage();
-    }, [token, id, setMessages]);
+  const [loading, setLoading] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([]);
+  // console.log('messages', messages);
 
-    return { messages, loading };
+  useEffect(() => {
+    const getMessage = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get(
+          `${API_URL}/api/messages/${token}/${id}`
+        );
+        console.log("res", response.data.message);
+
+        setMessages(response.data);
+      } catch (error) {
+        console.error("Failed to fetch messages:", error);
+      } finally {
+        setLoading(false);
+      }
     };
+    if (id) getMessage();
+  }, [token, id, setMessages]);
 
-    export default useGetMessage;
+  return { messages, loading };
+};
+
+export default useGetMessage;

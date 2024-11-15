@@ -39,7 +39,7 @@ function Bookings() {
               key={booking._id}
               className="grid grid-cols-9 gap-2 items-center text-sm p-2 hover:bg-gray-50 transition-colors border-b border-gray-200 last:border-none"
             >
-              <div className="text-gray-700">{booking._id.slice(-4)}</div>
+              <div className="text-gray-700">{booking._id.substring(0, 8).toUpperCase()}</div>
               <div className="text-gray-700">{booking.userName}</div>
               <div className="text-gray-700">{booking.trainerName}</div>
               <div className="text-gray-700">

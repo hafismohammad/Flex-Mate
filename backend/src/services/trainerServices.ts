@@ -283,10 +283,10 @@ class TrainerService {
         gender,
         language,
         dailySessionLimit,
+        specializations
       } = trainerData;
-      // console.log('trainerData', trainerData);
 
-      console.log("profileimage", profileImage);
+      // console.log("profileimage", profileImage);
 
       const existingTrainer = await this.trainerRepository.updateTrainerData(
         trainer_id
@@ -306,6 +306,10 @@ class TrainerService {
       if (language) existingTrainer.language = language;
       if (dailySessionLimit)
         existingTrainer.dailySessionLimit = dailySessionLimit;
+
+      if(Array.isArray(specializations)) {
+        existingTrainer.specializations = specializations
+      }
 
       await existingTrainer.save();
 

@@ -18,13 +18,13 @@ function UserChat() {
   const [localMessages, setLocalMessages] = useState(messages);
   const [socket, setSocket] = useState<Socket | null>(null);
 
-console.log('messages',messages);
+// console.log('messages',messages);
 
 useEffect(() => {
   // Initialize the socket when the component mounts
   const socketInstance = io(SOCKET_SERVER_URL, {
     query: { userId: userInfo?.id, trainerId: trainerId }
-  });
+  });  
 
   setSocket(socketInstance);
 

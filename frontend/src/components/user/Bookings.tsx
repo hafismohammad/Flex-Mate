@@ -106,12 +106,16 @@ function Bookings() {
             <div className="text-gray-800 font-medium">{formatTime(booking.endTime)}</div>
             <div className={`${booking.bookingStatus === 'Confirmed' ? 'text-green-500 rounded-md font-medium' : ' text-red-500 font-medium rounded-md'}`}>{booking.bookingStatus}</div>
             <div>
-              <button
+             {
+              booking.bookingStatus !== 'Cancelled' ? (
+                <button
                 onClick={() => handleCancelBooking(booking._id)}
                 className="bg-red-500 hover:bg-red-700 font-bold text-white px-6 py-2 rounded-lg"
               >
                 Cancel
               </button>
+              ) : ''
+             }
             </div>
           </div>
         ))}

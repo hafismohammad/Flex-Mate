@@ -107,19 +107,19 @@ function TrainerSignup() {
     className="w-full flex flex-col items-center justify-center min-h-screen bg-cover bg-center"
     style={{ backgroundImage: `url(${BG_IMG})` }}
   >
-    <div className="bg-white h-[95vh] w-[90%] md:w-[75%] max-w-4xl shadow-lg rounded-md overflow-y-auto relative">
+    <div className="bg-white h-[88vh] w-[90%] md:w-[75%] max-w-3xl shadow-lg rounded-md overflow-y-auto relative">
       <div className="flex items-center justify-center space-x-4 p-5">
         <img className="w-32 h-14" src={LOGO} alt="logo" />
         <h1 className="font-bold text-3xl text-gray-800">Register Trainer</h1>
       </div>
-      <form onSubmit={handleSubmit} className="mt-5 w-full gap-6 p-8">
+      <form onSubmit={handleSubmit} className="mt-5 w-full gap-6 p-5">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <div className="mb-6">
               <label className="block mb-2 font-medium text-gray-700">Name</label>
               <input
                 type="text"
-                className="border border-gray-300 p-3 rounded-md w-full focus:ring-2 focus:ring-blue-500 transition-all"
+                className="border border-gray-300 p-2 rounded-md w-full focus:ring-2 focus:ring-blue-500 transition-all"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
@@ -130,7 +130,7 @@ function TrainerSignup() {
               <label className="block mb-2 font-medium text-gray-700">Email</label>
               <input
                 type="email"
-                className="border border-gray-300 p-3 rounded-md w-full focus:ring-2 focus:ring-blue-500 transition-all"
+                className="border border-gray-300 p-2 rounded-md w-full focus:ring-2 focus:ring-blue-500 transition-all"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -141,7 +141,7 @@ function TrainerSignup() {
               <label className="block mb-2 font-medium text-gray-700">Phone</label>
               <input
                 type="text"
-                className="border border-gray-300 p-3 rounded-md w-full focus:ring-2 focus:ring-blue-500 transition-all"
+                className="border border-gray-300 p-2 rounded-md w-full focus:ring-2 focus:ring-blue-500 transition-all"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
               />
@@ -152,7 +152,7 @@ function TrainerSignup() {
               <label className="block mb-2 font-medium text-gray-700">Password</label>
               <input
                 type="password"
-                className="border border-gray-300 p-3 rounded-md w-full focus:ring-2 focus:ring-blue-500 transition-all"
+                className="border border-gray-300 p-2 rounded-md w-full focus:ring-2 focus:ring-blue-500 transition-all"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -166,7 +166,7 @@ function TrainerSignup() {
               <div className="relative">
                 <button
                   type="button"
-                  className="border border-gray-300 p-3 rounded-md w-full text-left focus:ring-2 focus:ring-blue-500 transition-all"
+                  className="border border-gray-300 p-2 rounded-md w-full text-left focus:ring-2 focus:ring-blue-500 transition-all"
                   onClick={toggleDropdown}
                 >
                   {specializations.length > 0
@@ -178,7 +178,7 @@ function TrainerSignup() {
                     {specializationsData.map((spec) => (
                       <div
                         key={spec.id}
-                        className="p-3 hover:bg-gray-200 cursor-pointer"
+                        className="p-2 hover:bg-gray-200 cursor-pointer"
                         onClick={() => handleSpecializationChange(spec.name)}
                       >
                         <input

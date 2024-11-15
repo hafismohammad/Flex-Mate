@@ -1,7 +1,13 @@
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import io, { Socket } from 'socket.io-client';
-import { RootState } from '../app/store';
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { useSelector } from "react-redux";
+import io, { Socket } from "socket.io-client";
+import { RootState } from "../app/store";
 
 interface SocketContextType {
   socket: Socket | null;
@@ -17,37 +23,45 @@ export const useSocketContext = () => {
   return useContext(SocketContext);
 };
 
-export const SocketContextProvider = ({ children }: { children: ReactNode }): JSX.Element => {
+export const SocketContextProvider = ({
+  children,
+}: {
+  children: ReactNode;
+}): JSX.Element => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [onlineUser, setOnlineUser] = useState<any>(null);
 
   const { userInfo } = useSelector((state: RootState) => state.user);
   const { trainerInfo } = useSelector((state: RootState) => state.trainer);
+console.log('user info', userInfo);
 
-  const SOCKET_SERVER_URL = 'http://localhost:3000';
+  const SOCKET_SERVER_URL = "http://localhost:3000";
 
-  useEffect(() => {
-    // If both userInfo and trainerInfo are available, send both IDs in the query
-    const query = {
-      userId: userInfo?.id || null,
-      trainerId: trainerInfo?.id || null,
-    };
+  // useEffect(() => {
+  //   const query = {
+  //     userId: userInfo?.id || null,
+  //     trainerId: trainerInfo?.id || null,
+  //   };
 
-    // Check if either userInfo or trainerInfo exists
-    if (query.userId || query.trainerId) {
-      const newSocket = io(SOCKET_SERVER_URL, { query });
+  //   // Check if either userInfo or trainerInfo exists
+  //   if (query.userId || query.trainerId) {
+  //     const newSocket = io(SOCKET_SERVER_URL, { query });
 
-      setSocket(newSocket);
+  //     setSocket(newSocket);
 
-      newSocket.on('getOnlineUsers', (users) => {
-        setOnlineUser(users);
-      });
+  //     newSocket.on("getOnlineUsers", (users) => {
+  //       setOnlineUser(users);
+  //     });
 
-      return () => {
-        newSocket.close();
-      };
-    }
-  }, [userInfo, trainerInfo]);
+  //     return () => {
+  //       newSocket.close();
+  //     };
+  //   }
+  // }, [userInfo, trainerInfo]);
 
-  return <SocketContext.Provider value={{ socket, onlineUser }}>{children}</SocketContext.Provider>;
+  return (
+    <SocketContext.Provider value={{ socket, onlineUser }}>
+      {children}
+    </SocketContext.Provider>
+  );
 };
