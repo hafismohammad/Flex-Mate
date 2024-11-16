@@ -30,8 +30,11 @@ function CurrentSchedules() {
   const [specModal, setSpecModal] = useState(false);
   const [specId, setSpecId] = useState<string | null>(null);
   const [spec, setSpec] = useState<ISpec[]>([]);
-  const [recurrenceOption, setRecurrenceOption] = useState("oneDay"); 
+  const [recurrenceOption, setRecurrenceOption] = useState("oneDay");
   const [loading, setLoading] = useState(true);
+  const [filterType, setFilterType] = useState<string>("all");
+  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [filterStartDate, setFilterStartDate] = useState<string>("");
   const [sessionSchedules, setSessionSchedules] = useState<ISessionSchedule[]>(
     []
   );
@@ -41,11 +44,11 @@ function CurrentSchedules() {
 
   const handleAdd = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     const today = new Date();
     const maxDate = new Date(today);
     maxDate.setDate(today.getDate() + 20);
-    
+
     const clearSessionData = () => {
       setSelectedDate(null);
       setStartDate(null);
@@ -54,7 +57,7 @@ function CurrentSchedules() {
       setEndTime("");
       setPrice("");
     };
-    
+
     if (isSingleSession) {
       if (!selectedDate || !startTime || !price) {
         toast.error("Please fill in all fields for the single session.");
@@ -82,7 +85,7 @@ function CurrentSchedules() {
         return;
       }
     }
-  
+
     const sessionData = isSingleSession
       ? {
           recurrenceOption,
@@ -102,21 +105,21 @@ function CurrentSchedules() {
           endTime,
           price,
         };
-  
+
     try {
       const response = await axiosInstance.post(
         `${API_URL}/api/trainer/session/${trainerId}`,
         sessionData
       );
       const newSchedule = response.data.createdSessionData;
-      console.log('newSchedule', newSchedule);
-  
+      console.log("newSchedule", newSchedule);
+
       setSessionSchedules((prevSchedules) =>
         Array.isArray(newSchedule)
-          ? [...prevSchedules, ...newSchedule] // Add multiple sessions for a package
-          : [...prevSchedules, newSchedule] // Add single session
+          ? [...prevSchedules, ...newSchedule]
+          : [...prevSchedules, newSchedule]
       );
-  
+
       if (response.status === 201) {
         toast.success("Session created successfully");
       }
@@ -136,13 +139,11 @@ function CurrentSchedules() {
         toast.error(generalErrorMessage);
       }
     }
-  
+
     handleCloseModal();
     setModalOpen(false);
     clearSessionData();
   };
-  
-  
 
   const handleOpenModal = async () => {
     setSpecModal(true);
@@ -154,10 +155,9 @@ function CurrentSchedules() {
   };
 
   const handleSpecClick = (specId: string) => {
-    setSpecId(specId)
+    setSpecId(specId);
     setModalOpen(true);
-
-  }
+  };
 
   const handleCloseModal = () => {
     setModalOpen(false);
@@ -171,8 +171,8 @@ function CurrentSchedules() {
           `${API_URL}/api/trainer/sessiosShedules/${trainerId}`
         );
         const schedules = response.data.sheduleData;
-        console.log('schedules', schedules);
-        
+        console.log("schedules", schedules);
+
         setSessionSchedules(schedules);
       } catch (error) {
         console.error("Failed to fetch schedules:", error);
@@ -203,7 +203,7 @@ function CurrentSchedules() {
           setSessionSchedules((schedule) =>
             schedule.filter((schedule) => schedule._id != sessionId)
           );
-         
+
           return toast.success("Session deleted successfully");
         } catch (error) {
           Swal.fire("Error", "Failed to delete the session.", "error");
@@ -211,22 +211,76 @@ function CurrentSchedules() {
       }
     });
   };
-// console.log('sessionSchedules',sessionSchedules );
+  const filterSession = (type: string) => {
+    setFilterType(type);
+  };
+
+  const filterStatusType = (type: string) => {
+    setFilterStatus(type);
+  };
+
+  const filteredSchedules = sessionSchedules.filter((schedule) => {
+    if (filterType === "single" && !schedule.isSingleSession) return false;
+    if (filterType === "package" && schedule.isSingleSession) return false;
+
+    if (filterStatus === "pending" && schedule.status !== "Pending")
+      return false;
+    if (filterStatus === "confirmed" && schedule.status !== "Confirmed")
+      return false;
+
+    if (
+      filterStartDate &&
+      new Date(schedule.startDate).toISOString().split("T")[0] !==
+        filterStartDate
+    )
+      return false;
+
+    return true;
+  });
+console.log('sessionSchedules', sessionSchedules);
 
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
       <Toaster />
-      {!sessionSchedules && <Loading />}
       <div className="mb-8 flex flex-col md:flex-row items-center justify-between gap-4">
         <h2 className="text-4xl font-bold text-gray-800">Current Schedules</h2>
-        <button
-          onClick={handleOpenModal}
-          className="flex items-center bg-blue-500 px-3 py-2 text-white rounded-md hover:bg-blue-700"
-        >
-          <FaPlus className="mr-1" />
-          <span>Add Schedule</span>
-        </button>
+
+        <div className="flex items-center gap-4">
+          <input
+            type="date"
+            value={filterStartDate}
+            onChange={(e) => setFilterStartDate(e.target.value)}
+            className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+          />
+
+          <select
+            onChange={(e) => filterStatusType(e.target.value)}
+            className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+          >
+            <option value="all">All</option>
+            <option value="pending">Pending</option>
+            <option value="confirmed">Confirmed</option>
+          </select>
+          <select
+            onChange={(e) => filterSession(e.target.value)}
+            className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+          >
+            <option value="all">All Sessions</option>
+            <option value="single">Single Session</option>
+            <option value="package">Package Session</option>
+          </select>
+
+          <button
+            onClick={handleOpenModal}
+            className="flex items-center bg-blue-500 px-3 py-2 text-white rounded-md hover:bg-blue-700"
+          >
+            <FaPlus className="mr-1" />
+            <span>Add Schedule</span>
+          </button>
+        </div>
       </div>
+
+      {/* {!sessionSchedules && <Loading />} */}
 
       {specModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
@@ -276,7 +330,6 @@ function CurrentSchedules() {
         setPrice={setPrice}
         handleAdd={handleAdd}
         setRecurrenceOption={setRecurrenceOption}
-        
       />
 
       <div className="bg-white shadow-lg rounded-lg p-6">
@@ -290,8 +343,8 @@ function CurrentSchedules() {
           <div>Status</div>
           <div>Action</div>
         </div>
-        {sessionSchedules.length > 0 ? (
-          sessionSchedules.map((schedule) => (
+        {filteredSchedules.length > 0 ? (
+          filteredSchedules.map((schedule) => (
             <div
               key={schedule._id}
               className="grid grid-cols-8 gap-1 items-center p-4 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none mb-2"
