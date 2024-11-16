@@ -7,7 +7,7 @@ import useGetMessage from '../../hooks/useGetMessage';
 import { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 
-const SOCKET_SERVER_URL = "http://localhost:3000"; // Replace with your server URL
+const SOCKET_SERVER_URL = "http://localhost:3000"; 
 
 function TrainerChat() {
   const { userId } = useParams();

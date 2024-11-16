@@ -25,6 +25,7 @@ export interface Specialization {
 export interface IBookingDetails {
   _id: string
   userName: string
+  userId?:string
   trainerName: string
   bookingDate: string;
   sessionDates: {

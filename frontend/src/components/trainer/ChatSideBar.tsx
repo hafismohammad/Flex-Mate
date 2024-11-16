@@ -30,7 +30,7 @@ function ChatSideBar() {
     };
     fetchUsers();
   }, [trainerId]);
-console.log('users',users);
+// console.log('users',users);
 
   const handleChat = (userId: string) => {
     navigate(`/trainer/trainerChat/${userId}`);
@@ -47,9 +47,7 @@ console.log('users',users);
           users.map((user, index) => (
             <div
               key={user.userId}
-              className={`flex items-center justify-between mb-4 ${
-                index !== users.length - 1 ? "border-b border-gray-300 pb-4" : ""
-              }`}
+              className={`flex items-center justify-between mb-4 `}
             >
               <div className="flex items-center">
                 <img

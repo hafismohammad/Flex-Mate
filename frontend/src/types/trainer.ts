@@ -77,6 +77,7 @@ export interface KycDocument {
     startTime: string;
     endTime: string;
     price: number;
+    specializationId: Specialization
     duration?: string; 
     status: 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled' | 'InProgress'; 
     trainerId: string;

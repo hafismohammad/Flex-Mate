@@ -385,7 +385,7 @@ class TrainerService {
 
   async getSessionShedules(trainer_id: string) {
     try {
-      return await this.trainerRepository.fetchSessionData(trainer_id);
+      return await this.trainerRepository.fetchSessionData(trainer_id)
     } catch (error) {
       throw new Error("Error getting sessin shedule data");
     }

@@ -4,12 +4,17 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../app/store';
 import { formatTime, formatPriceToINR } from '../../utils/timeAndPriceUtils';
 
+interface Specialization {
+  _id: string
+  name: string
+}
 interface BookingDetail {
   _id: string;
   userName: string;
   trainerName: string;
   bookingDate: string;
   sessionType: string,
+  specialization: Specialization
   sessionDates: {
     startDate: string;
     endDate?: string;
@@ -112,45 +117,71 @@ console.log(bookingDetails);
         </div>
       </div>
 
-      <div className='bg-white shadow-lg p-6 '>
-        <div className='grid grid-cols-9 gap-1 text-lg font-bold text-gray-600  mb-4 border-b border-gray-200 pb-2'>
-          <div>Booking ID</div>
-          <div>User Name</div>
-          <div>Booking Date</div>
-          <div>Session Type</div>
-          <div>Session Date</div>
-          <div>Start Time</div>
-          <div>End Time</div>
-          <div>Amount</div>
-          <div>Status</div>
-        </div>
+      <div className='bg-white shadow-lg p-6 overflow-x-auto'>
+  <div className='grid grid-cols-10 gap-4 text-lg font-bold text-gray-600 mb-4 border-b border-gray-200 pb-2'>
+    <div className='text-center'>Booking ID</div>
+    <div className='text-center'>User Name</div>
+    <div className='text-center'>Date</div>
+    <div className='text-center'>Session</div>
+    <div className='text-center'>Specialization</div>
+    <div className='text-center'>Date(s)</div>
+    <div className='text-center'>Start Time</div>
+    <div className='text-center'>End Time</div>
+    <div className='text-center'>Amount</div>
+    <div className='text-center'>Status</div>
+  </div>
 
-        {filteredBookings.length > 0 ? (
-          filteredBookings.map((booking) => (
-            <div
-              key={booking._id}
-              className='grid grid-cols-9 gap-1 items-center   p-4 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none mb-2'
-            >
-              <div className='text-gray-800 font-medium'>{booking._id.substring(0, 8).toUpperCase()}</div>
-              <div className='text-gray-800 font-medium '>{booking.userName}</div>
-              <div className='text-gray-800 font-medium ml-5'>{new Date(booking.bookingDate).toLocaleDateString()}</div>
-              <div className='text-gray-800 font-medium'>{booking.sessionType}</div>
-              <div className='text-gray-800 font-medium ml-5'>
-                {new Date(booking.sessionDates.startDate).toLocaleDateString()}
-                {booking.sessionDates.endDate && 
-                  ` - ${new Date(booking.sessionDates.endDate).toLocaleDateString()}`
-                }
-              </div>
-              <div className='text-gray-800 font-medium'>{formatTime(booking.sessionStartTime)}</div>
-              <div className='text-gray-800 font-medium'>{formatTime(booking.sessionEndTime)}</div>
-              <div className='text-gray-800 font-medium'>{formatPriceToINR(booking.amount)}</div>
-              <div className={`text-gray-800 font-semibold ${booking.paymentStatus === 'Confirmed' ? 'text-green-500' : 'text-red-500'}`}>{booking.paymentStatus}</div>
-            </div>
-          ))
-        ) : (
-          <div className='text-gray-600 text-center mt-4'>No bookings found.</div>
-        )}
+  {filteredBookings.length > 0 ? (
+    filteredBookings.map((booking) => (
+      <div
+        key={booking._id}
+        className='grid grid-cols-10 gap-4 items-center p-2 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none'
+      >
+        <div className='text-center text-gray-800 font-medium'>
+          {booking._id.substring(0, 8).toUpperCase()}
+        </div>
+        <div className='text-center text-gray-800 font-medium'>
+          {booking.userName}
+        </div>
+        <div className='text-center text-gray-800 font-medium'>
+          {new Date(booking.bookingDate).toLocaleDateString()}
+        </div>
+        <div className='text-center text-gray-800 font-medium'>
+          {booking.sessionType}
+        </div>
+        <div className='text-center text-gray-800 font-medium'>
+          {booking.specialization.name}
+        </div>
+        <div className='text-center text-gray-800 font-medium'>
+          {new Date(booking.sessionDates.startDate).toLocaleDateString()}
+          {booking.sessionDates.endDate &&
+            ` - ${new Date(booking.sessionDates.endDate).toLocaleDateString()}`}
+        </div>
+        <div className='text-center text-gray-800 font-medium'>
+          {formatTime(booking.sessionStartTime)}
+        </div>
+        <div className='text-center text-gray-800 font-medium'>
+          {formatTime(booking.sessionEndTime)}
+        </div>
+        <div className='text-center text-gray-800 font-medium'>
+          {formatPriceToINR(booking.amount)}
+        </div>
+        <div
+          className={`text-center text-gray-800 font-semibold ${
+            booking.paymentStatus === 'Confirmed'
+              ? 'text-green-500'
+              : 'text-red-500'
+          }`}
+        >
+          {booking.paymentStatus}
+        </div>
       </div>
+    ))
+  ) : (
+    <div className='text-gray-600 text-center mt-4'>No bookings found.</div>
+  )}
+</div>
+
     </div>
   );
 }

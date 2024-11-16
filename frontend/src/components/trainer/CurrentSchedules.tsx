@@ -14,7 +14,6 @@ import {
   formatPriceToINR,
 } from "../../utils/timeAndPriceUtils";
 import Swal from "sweetalert2";
-import Loading from "../spinner/Loading";
 
 function CurrentSchedules() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -171,14 +170,14 @@ function CurrentSchedules() {
           `${API_URL}/api/trainer/sessiosShedules/${trainerId}`
         );
         const schedules = response.data.sheduleData;
-        console.log("schedules", schedules);
+        // console.log("schedules", schedules);
 
         setSessionSchedules(schedules);
       } catch (error) {
         console.error("Failed to fetch schedules:", error);
         toast.error("Failed to fetch schedules");
       } finally {
-        setLoading(false); // End loading
+        setLoading(false);
       }
     };
     fetchSessionData();
@@ -237,7 +236,7 @@ function CurrentSchedules() {
 
     return true;
   });
-console.log('sessionSchedules', sessionSchedules);
+// console.log('sessionSchedules', sessionSchedules);
 
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
@@ -333,8 +332,9 @@ console.log('sessionSchedules', sessionSchedules);
       />
 
       <div className="bg-white shadow-lg rounded-lg p-6">
-        <div className="grid grid-cols-8 gap-1 text-lg font-bold text-gray-600 mb-4 border-b border-gray-200 pb-2">
+        <div className="grid grid-cols-9 gap-1 text-lg font-bold text-gray-600 mb-4 border-b border-gray-200 pb-2">
           <div>Session Type</div>
+          <div>Name</div>
           <div>Date</div>
           <div>Start Time</div>
           <div>End Time</div>
@@ -347,10 +347,13 @@ console.log('sessionSchedules', sessionSchedules);
           filteredSchedules.map((schedule) => (
             <div
               key={schedule._id}
-              className="grid grid-cols-8 gap-1 items-center p-4 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none mb-2"
+              className="grid grid-cols-9 gap-1 items-center p-2 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none mb-2"
             >
               <div className="text-gray-800 font-medium">
                 {schedule.isSingleSession ? "Single Session" : "Package"}
+              </div>
+              <div className="text-gray-800 font-medium">
+                {schedule.specializationId.name}
               </div>
               <div className="text-gray-800 font-medium mt-3">
                 {schedule.isSingleSession

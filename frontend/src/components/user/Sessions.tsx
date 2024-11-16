@@ -53,7 +53,7 @@ const handleChatButton = (trainerId: string) => {
     <div>
         <div className="flex justify-center mt-5">
         <div className="h-[80vh] bg-white w-[75%] shadow-md rounded-md overflow-y-auto p-3">
-        <h1 className="p-2 font-bold text-2xl">Sessions</h1>
+        <h1 className="p-2 font-bold text-2xl">Upcoming Sessions</h1>
 
         {currentSessions.length > 0 ? (
           currentSessions.map((session) => (

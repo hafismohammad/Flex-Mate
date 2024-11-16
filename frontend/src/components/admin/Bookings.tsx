@@ -8,6 +8,7 @@ function Bookings() {
   const [filterSessionType, setFilterSessionType] = useState<string>("all");
   const [filterStatus, setFilterStatus] = useState<string>();
   const [filterStartDate, setFilterStartDate] = useState<string>("");
+console.log('bookings', bookings);
 
   useEffect(() => {
     const fetchAllBookings = async () => {
@@ -94,7 +95,7 @@ function Bookings() {
           <div>Date(s)</div>
           <div>Time</div>
           <div>Type</div>
-          <div>Specialty</div>
+          <div>Specialization</div>
           <div>Amount</div>
           <div>Status</div>
         </div>

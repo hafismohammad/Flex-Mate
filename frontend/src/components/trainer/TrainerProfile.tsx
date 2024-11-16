@@ -58,11 +58,11 @@ function TrainerProfile() {
 
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col items-center py-8">
-      <div className="w-full max-w-4xl mb-8 flex flex-col items-start gap-4 px-4 md:justify-between">
+      {/* <div className="w-full max-w-4xl mb-8 flex flex-col items-start gap-4 px-4 md:justify-between">
         <h2 className="text-4xl font-extrabold text-gray-900">
           Trainer Profile
         </h2>
-      </div>
+      </div> */}
 
       <div className="bg-white flex flex-col items-center rounded-lg shadow-lg relative w-full max-w-4xl overflow-hidden">
         <img

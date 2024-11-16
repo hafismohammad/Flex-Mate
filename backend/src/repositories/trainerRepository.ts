@@ -327,11 +327,11 @@ class TrainerRepository {
       const trainer = await this.trainerModel.findById(sessionData.trainerId);
       if (!trainer) throw new Error("Trainer not found.");
       
-      const dailySessionLimit = trainer.dailySessionLimit;
+      // const dailySessionLimit = trainer.dailySessionLimit;
   
-      const allSessions = await this.sessionModel.find({
-        trainerId: sessionData.trainerId,
-      });
+      // const allSessions = await this.sessionModel.find({
+      //   trainerId: sessionData.trainerId,
+      // });
   
       // if (allSessions.length >= dailySessionLimit) {
       //   throw new Error(`Daily session limit of ${dailySessionLimit} reached.`);
@@ -384,7 +384,7 @@ class TrainerRepository {
       sessionData.price = Number(sessionData.price);
       
       // Create the session with multiple specializations
-      const createdSessionData = await this.sessionModel.create(sessionData);
+      const createdSessionData = (await this.sessionModel.create(sessionData)).populate('specializationId')
   
       return createdSessionData;
     } catch (error) {
@@ -401,8 +401,8 @@ class TrainerRepository {
     try {
       const sesseionData = await this.sessionModel.find({
         trainerId: trainer_id,
-      });
-      console.log(sesseionData);
+      }).populate('specializationId')
+
       return sesseionData;
     } catch (error) {
       throw error
@@ -465,6 +465,20 @@ class TrainerRepository {
           },
         },
         {
+          $lookup: {
+            from: 'specializations',
+            localField: 'sessionDetails.specializationId', // Assuming this is the field in `sessionDetails`
+            foreignField: '_id',
+            as: 'specializationDetails',
+          },
+        },
+        {
+          $unwind: {
+            path: "$specializationDetails",
+            preserveNullAndEmptyArrays: true, // Preserve if specialization details are not found
+          },
+        },
+        {
           $project: {
             bookingId: "$_id",
             userId: "$userDetails._id",
@@ -491,17 +505,20 @@ class TrainerRepository {
             },
             amount: "$amount",
             paymentStatus: "$paymentStatus",
+            specialization: {
+              id: "$specializationDetails._id",
+              name: "$specializationDetails.name",
+            },
           },
         },
       ]);
-  
-      // console.log("bookingDetails", bookingDetails);
   
       return bookingDetails;
     } catch (error) {
       throw error;
     }
   }
+  
   
 
   static async getIsBlockedTrainer(trainer_id: string): Promise<boolean> {
