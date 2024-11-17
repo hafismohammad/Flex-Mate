@@ -27,9 +27,8 @@ io.on("connection", (socket) => {
 
   const userId = socket.handshake.query.userId as string;
   const trainerId = socket.handshake.query.trainerId as string;
-// console.log('userId ----', userId);
-// console.log('trainerId -----', trainerId);
-
+  // console.log('userId ----', userId);
+  // console.log('trainerId -----', trainerId);
 
   // Map the socket to either the userId or trainerId if available
   if (userId) {
@@ -61,6 +60,33 @@ io.on("connection", (socket) => {
     // Emit updated online users list after a disconnection
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
   });
+
+  socket.on("offer", (data) => {
+    console.log("Offer received", data);
+    io.to(data.to).emit("offer", {
+      from: socket.id,
+      offer: data.offer,
+    });
+  });
+
+  socket.on("answer", (data) => {
+    console.log("Answer received", data);
+    io.to(data.to).emit("answer", {
+      from: socket.id,
+      answer: data.answer,
+    });
+  });
+
+  socket.on('ice-candidate', (data) => {
+    console.log('ICE candidate received:', data);
+    io.to(data.to).emit('ice-candidate', {
+      from: socket.id,
+      candidate: data.candidate,
+    })
+    
+  })
+
 });
+
 
 export { app, io, server };

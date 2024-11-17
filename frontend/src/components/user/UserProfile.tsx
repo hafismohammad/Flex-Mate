@@ -132,6 +132,7 @@ function UserProfile() {
                 <input
                   type="text"
                   name="email"
+                  readOnly
                   value={formData.email}
                   onChange={handleChange}
                   className="border border-gray-500 p-2 rounded-md w-full"

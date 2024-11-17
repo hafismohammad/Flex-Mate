@@ -22,8 +22,17 @@ function ChatSideBar() {
     const fetchUsers = async () => {
       try {
         const response = await axiosInstance.get(`/api/trainer/bookingDetails/${trainerId}`);
-        const FilteredBoodkingDetails = response.data.filter((bookings: any) => bookings.paymentStatus === 'Confirmed' )
-        setUsers(FilteredBoodkingDetails);
+        const confirmedBookings = response.data.filter((bookings: any) => bookings.paymentStatus === 'Confirmed' )
+
+        const seenUserId = new Set()
+        const uniqueUser = confirmedBookings.filter((booking: any) => {
+          if(seenUserId.has(booking.userId)) {
+            return false
+          } 
+          seenUserId.add(booking.userId)
+          return true
+        })
+        setUsers(uniqueUser);
       } catch (error) {
         console.error("Error fetching users:", error);
       }
@@ -35,6 +44,7 @@ function ChatSideBar() {
   const handleChat = (userId: string) => {
     navigate(`/trainer/trainerChat/${userId}`);
   };
+
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">

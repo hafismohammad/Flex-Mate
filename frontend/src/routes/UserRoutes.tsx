@@ -12,6 +12,7 @@ import UserLayout from '../components/user/UserLayout';
 import Sessions from '../components/user/Sessions';
 import UserChatPage from '../pages/user/UserChatPage';
 import Bookings from '../components/user/Bookings';
+import VideoCall from '../components/videoCall/VideoCall';
 
 function UserRoutes() {
   return (
@@ -26,6 +27,7 @@ function UserRoutes() {
       <Route path='/paymentSuccess' element={<SuccessPaymentPage />} />
       <Route path='/paymentFailed' element={<FailedPaymentPage />} />
       <Route path='/userChat/:trainerId' element={<UserChatPage />} />
+      <Route path='/videoCall' element={<VideoCall />} />
       <Route path='/profile' element={<UserLayout />}>
         <Route index element={<UserProfilePage />} />
         <Route path='sessions' element={<Sessions />} />

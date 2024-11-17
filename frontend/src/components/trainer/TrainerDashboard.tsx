@@ -81,7 +81,7 @@ function TrainerDashboard() {
       <div className="mt-10">
   <h1 className="text-2xl font-bold text-gray-800">Upcoming Sessions</h1>
 </div>
-<div className="mt-10">
+<div className="mt-10 bg-white shadow-md p-3">
   <div className=" grid grid-cols-6 gap-4 text-center text-lg font-bold border-b border-gray-200 pb-2">
     <div>User Name</div>
     <div>Date</div>
