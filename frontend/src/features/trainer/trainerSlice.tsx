@@ -17,6 +17,20 @@ interface TrainerState {
   loading: boolean;
   rejectionReason: null | string;
   error: null | string;
+  videoCall:  VideoCallPayload | null;
+  showVideoCallTrainer: boolean
+  roomIdTrainer: null | string
+}
+
+interface VideoCallPayload {
+  userID: string;
+  type: string;
+  callType: string;
+  roomId: string;
+  userImage: string;
+  trainerImage: string;
+  name: string;
+  // appointmentId: string | null;
 }
 
 const trainer = localStorage.getItem("trainer");
@@ -30,6 +44,9 @@ const initialState: TrainerState = {
   rejectionReason: null,
   loading: false,
   error: null,
+  videoCall: null,
+  showVideoCallTrainer: false,
+  roomIdTrainer: null
 };
 
 const trainerSlice = createSlice({
@@ -48,6 +65,25 @@ const trainerSlice = createSlice({
     setError(state, action: PayloadAction<string | null>) {
       state.error = action.payload;
     },
+    setVideoCall(state, action: PayloadAction<VideoCallPayload  | null>) {
+      state.videoCall = action.payload;
+      console.log('hit vidocall slice', state.videoCall);
+      
+    },
+    setShowVideoCall(state, action: PayloadAction<boolean>) {
+      state.showVideoCallTrainer = action.payload;
+      console.log('showVideoCallTrainer slice', state.showVideoCallTrainer);
+
+    },
+    setRoomId(state, action: PayloadAction<string | null>) {
+      state.roomIdTrainer = action.payload;
+      console.log('roomIdTrainer slice', state.roomIdTrainer);
+      
+    },
+    endCallTrainer: (state) => {
+      state.videoCall = null
+      localStorage.removeItem('IncomingVideoCall')
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -165,5 +201,5 @@ const trainerSlice = createSlice({
 });
 
 // Export the actions and reducer
-export const { clearTrainer, setError, setLoading } = trainerSlice.actions;
+export const { clearTrainer, setError, setLoading, setVideoCall, setShowVideoCall, setRoomId, endCallTrainer } = trainerSlice.actions;
 export default trainerSlice.reducer;

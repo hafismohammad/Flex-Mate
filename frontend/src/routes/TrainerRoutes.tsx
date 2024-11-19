@@ -11,6 +11,7 @@ import TrainerProfileEditPage from "../pages/trainer/TrainerProfileEditPage";
 import CurrentSchedulesPage from "../pages/trainer/CurrentSchedulesPage";
 import ChatSideBar from "../components/trainer/ChatSideBar";
 import TrainerChat from "../components/trainer/TrainerChat";
+import VideoCall from "../components/trainer/VideoCall";
 
 function TrainerRoutes() {
   return (
@@ -18,7 +19,6 @@ function TrainerRoutes() {
       <Route path="/login" element={<TrainerLoginPage />} />
       <Route path="/signup" element={<TrainerSignupPage />} />
       <Route path="/otp" element={<TrainerOtpPage />} />
-      
       <Route path="/" element={<TrainerLayout />}>
         <Route index element={<ProtectRoute><TrainerDashboard /></ProtectRoute>} />
         <Route path="profile" element={<ProtectRoute><TrainerProfilePage /></ProtectRoute>} />
@@ -27,7 +27,7 @@ function TrainerRoutes() {
         <Route path="currentSchedules" element={<ProtectRoute><CurrentSchedulesPage /></ProtectRoute>} />
         <Route path="chatSidebar" element={<ChatSideBar />} />
       </Route>
-
+      <Route path='/trainerVideoCall' element={<VideoCall />} />
       <Route path="/trainerChat/:userId" element={<TrainerChat />} />
     </Routes>
   );

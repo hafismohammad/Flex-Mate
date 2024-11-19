@@ -2,10 +2,13 @@ import { useParams } from 'react-router-dom';
 import Message from './Message';
 import MessageInputBar from './MessageInputBar';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../app/store';
+import { AppDispatch, RootState } from '../../app/store';
 import useGetMessage from '../../hooks/useGetMessage';
 import { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
+import {FcVideoCall} from 'react-icons/fc'
+import {setVideoCall} from '../../features/trainer/trainerSlice'
+import { useDispatch } from 'react-redux';
 
 const SOCKET_SERVER_URL = "http://localhost:3000"; 
 
@@ -16,6 +19,8 @@ function TrainerChat() {
   const [localMessages, setLocalMessages] = useState(messages);
   const [socket, setSocket] = useState<Socket | null>(null);
   
+  const dispatch = useDispatch<AppDispatch>()
+
   useEffect(() => {
     // Initialize the socket when the component mounts
     const socketInstance = io(SOCKET_SERVER_URL, {
@@ -49,10 +54,31 @@ function TrainerChat() {
     }
   };
 
+  const navigateVideoChat = () => {
+    console.log(' hit navigateVideoChat ');
+    
+    dispatch(
+      setVideoCall({
+        userID: userId || "", // Provide a fallback if userId is undefined
+        type: "out-going",
+        callType: "video",
+        roomId: `${Date.now()}`,
+        userImage: "https://path-to-user-image.com", // Replace with actual data
+        trainerImage: "https://path-to-trainer-image.com", // Replace with actual data
+        name: trainerInfo?.name || "Unknown", // Ensure a fallback for name
+        // appointmentId: null,
+      })
+    );
+  };
+
+  
+
   return (
     <div className="w-full lg:max-w-full md:max-w-[450px] flex flex-col h-screen">
-      <div className="bg-blue-800 px-4 py-2 mb-2 h-7">
-        {/* Optional Header Information */}
+      <div className="bg-blue-800 px-4 py-2 mb-2 h-12 flex justify-end">
+      <button onClick={navigateVideoChat}>
+      <FcVideoCall className="h-8 w-8 " />
+      </button>
       </div>
 
       <div className="px-4 flex-1 overflow-auto">

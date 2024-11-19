@@ -56,9 +56,9 @@ const handleChatButton = (trainerId: string) => {
         <h1 className="p-2 font-bold text-2xl">Upcoming Sessions</h1>
 
         {currentSessions.length > 0 ? (
-          currentSessions.map((session) => (
+          currentSessions.map((session, index) => (
             <div
-              key={session.bookingId}
+            key={`${session.bookingId}-${index}`}
               className="h-[20vh] bg-blue-50 rounded-xl flex items-center justify-between px-6 mb-4"
             >
               <div className="flex items-center">

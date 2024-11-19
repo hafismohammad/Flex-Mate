@@ -60,7 +60,7 @@ function Header() {
             <Link to="/" className="hover:text-gray-300">Home</Link>
           </li>
           <li>
-            <Link to="#" className="hover:text-gray-300">About</Link>
+            <Link to="/aboutUs" className="hover:text-gray-300">About</Link>
           </li>
           <li>
             <Link to="/trainers" className="hover:text-gray-300">Trainers</Link>

@@ -19,16 +19,13 @@ const io = new Server(server, {
 const userSocketMap: Record<string, string> = {}; // { userId: socketId, trainerId: socketId }
 
 export const getReceiverSocketId = (receiverId: string) => {
+  console.log('server getReceiverSocketId');
   return userSocketMap[receiverId];
 };
 
 io.on("connection", (socket) => {
-  // console.log("A user connected", socket.id);
-
   const userId = socket.handshake.query.userId as string;
   const trainerId = socket.handshake.query.trainerId as string;
-  // console.log('userId ----', userId);
-  // console.log('trainerId -----', trainerId);
 
   // Map the socket to either the userId or trainerId if available
   if (userId) {
@@ -61,32 +58,48 @@ io.on("connection", (socket) => {
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
   });
 
-  socket.on("offer", (data) => {
-    console.log("Offer received", data);
-    io.to(data.to).emit("offer", {
-      from: socket.id,
-      offer: data.offer,
-    });
+  // Handle outgoing video call
+  socket.on("outgoing-video-call", (data) => {
+    console.log('Server received outgoing-video-call event with data:', data);
+
+    const userSocketId = getReceiverSocketId(data.to);
+    if (userSocketId) {
+      console.log('User socket ID found, sending incoming-video-call to:', userSocketId);
+      io.to(userSocketId).emit('incoming-video-call', {
+        from: data.from,
+        roomId: data.roomId,
+        callType: data.callType,
+      });
+    } else {
+      console.log(`Receiver not found for user ID: ${data.to}`);
+    }
   });
 
-  socket.on("answer", (data) => {
-    console.log("Answer received", data);
-    io.to(data.to).emit("answer", {
-      from: socket.id,
-      answer: data.answer,
-    });
-  });
-
-  socket.on('ice-candidate', (data) => {
-    console.log('ICE candidate received:', data);
-    io.to(data.to).emit('ice-candidate', {
-      from: socket.id,
-      candidate: data.candidate,
-    })
+  socket.on('accept-incoming-call', (data) => {
+    console.log('call accepted');
     
+    const friendSocketId = getReceiverSocketId(data.to)
+    if(friendSocketId) {
+      socket.to(friendSocketId).emit('accept-call', (data))
+    }
+  }) 
+
+  socket.on('reject-call', async (data) => {
+    console.log('call rejected');
+    const friendSocketId = getReceiverSocketId(data.to) 
+    if(friendSocketId) {
+      socket.to(friendSocketId).emit('call-rejected')
+    }
   })
 
+  socket.on('leave-room', (data) => {
+    // console.log('coming here')
+    const friendSocketId = getReceiverSocketId(data.to)
+    if (friendSocketId) {
+      // console.log('coming here')
+      socket.to(friendSocketId).emit('user-left');
+    }
+  });
 });
-
 
 export { app, io, server };

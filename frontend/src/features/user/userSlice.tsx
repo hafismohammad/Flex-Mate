@@ -12,6 +12,16 @@ const initialState: UserState = {
   token: localStorage.getItem("access_token") || null,
   loading: false,
   error: null,
+  showIncomingVideoCall: {
+    _id: "",
+    profilePic: "",
+    callType: "",
+    roomId: null,
+  },
+  videoCall: null,
+  showVideoCallUser: false,
+  roomIdUser: null,
+  
 };
 
 // User slice
@@ -28,6 +38,25 @@ const userSlice = createSlice({
     setError(state, action: PayloadAction<string>) {
       state.error = action.payload;
     },
+    setShowIncomingVideoCall: (state, action) => {
+      state.showIncomingVideoCall = action.payload
+      console.log('show incoming call in user slice',action.payload);
+      
+    },
+    setVideoCall(state, action: PayloadAction<string | null>) {
+      state.videoCall = action.payload;
+    },
+    setShowVideoCall(state, action: PayloadAction<boolean>) {
+      state.showVideoCallUser = action.payload;
+    },
+    setRoomId(state, action: PayloadAction<string | null>) {
+      state.roomIdUser = action.payload;
+    },
+    endCallUser: (state) => {
+      state.videoCall = null
+      state.showIncomingVideoCall = null
+      localStorage.removeItem('IncomingVideoCall')
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -94,5 +123,5 @@ const userSlice = createSlice({
 });
 
 // Export actions and reducer
-export const { clearUser, setLoading, setError } = userSlice.actions;
+export const { clearUser, setLoading, setError, setVideoCall, setShowVideoCall, setRoomId, setShowIncomingVideoCall, endCallUser } = userSlice.actions;
 export default userSlice.reducer;
