@@ -36,7 +36,7 @@ const Specializations = () => {
     setLoading(true); // Start loading
     try {
       const response = await adminAxiosInstance.get(
-        `/api/admin/allSpecializations`
+        `/api/admin/specialization`
       );
       setSpecializations(response.data);
     } catch (error) {

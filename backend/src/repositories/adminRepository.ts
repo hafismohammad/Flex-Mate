@@ -270,7 +270,7 @@ class AdminRepository {
             sessionStartTime: "$startTime",
             sessionEndTime: '$endTime',
             sessionType: '$sessionType',
-            specialization: '$specializationDetails.name',
+            specialization: '$specialization',
             amount: '$amount',
             status: '$paymentStatus'
           }

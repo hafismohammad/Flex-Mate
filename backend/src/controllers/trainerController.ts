@@ -167,7 +167,7 @@ class TrainerController {
     try {
       const { trainer_id, specialization, name, email, phone } = req.body;
 
-      // console.log('specialization', specialization);
+      console.log('-->>>',trainer_id, specialization, name, email, phone);
       
       const files = req.files as {
         [fieldname: string]: Express.Multer.File[];
@@ -215,6 +215,7 @@ class TrainerController {
         email,
         phone,
       };
+console.log('documents',documents);
 
       // Pass formData and document URLs to your service for KYC submission
       const kycStatus = await this.trainerService.kycSubmit(
@@ -455,6 +456,16 @@ class TrainerController {
       );
 
       res.status(200).json(bookingDetails);
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async fetchUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      
+      const userData = await this.trainerService.fetchUser(req.params.userId)
+      res.status(200).json(userData)
     } catch (error) {
       next(error)
     }

@@ -33,7 +33,7 @@ function TrainerProfile() {
     const fetchTrainer = async () => {
       try {
         const response = await axiosInstance.get(
-          `/api/trainer/getTrainer/${trainerId}`
+          `/api/trainer/${trainerId}`
         );
         setTrainer(response.data.trainerData);
       } catch (err) {

@@ -10,11 +10,11 @@ const adminLogout = () => {
 };
 
 const addSpecialization = (formData: FormData) => {
-  return adminAxiosInstance.post(`/api/admin/addSpecialization`, formData);
+  return adminAxiosInstance.post(`/api/admin/specialization`, formData);
 };
 
 const getAllSpecialization = () => {
-  return adminAxiosInstance.get(`/api/admin/allSpecializations`);
+  return adminAxiosInstance.get(`/api/admin/specialization`);
 };
 
 const adminService = {

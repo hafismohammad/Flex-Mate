@@ -37,7 +37,7 @@ function Bookings() {
   useEffect(() => {
     const fetchBookingDetails = async () => {
       try {
-        const response = await trainerAxiosInstance.get(`api/trainer/bookingDetails/${trainerId}`);
+        const response = await trainerAxiosInstance.get(`api/trainer/booking-details/${trainerId}`);
         setBookingDetails(response.data);
       } catch (error) {
         console.error("Error fetching booking details:", error);

@@ -8,11 +8,10 @@ function Bookings() {
   const [filterSessionType, setFilterSessionType] = useState<string>("all");
   const [filterStatus, setFilterStatus] = useState<string>();
   const [filterStartDate, setFilterStartDate] = useState<string>("");
-console.log('bookings', bookings);
 
   useEffect(() => {
     const fetchAllBookings = async () => {
-      const response = await adminAxiosInstance.get(`api/admin/allBookings`);
+      const response = await adminAxiosInstance.get(`api/admin/bookings`);
       setBookings(response.data);
     };
     fetchAllBookings();

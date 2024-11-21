@@ -5,14 +5,15 @@ interface MessageProps {
     message: string;
     sender: 'User' | 'Trainer';
     time: string;
-    avatarUrl: string;
+    userImage: string | undefined;
+    trainerImage: string | undefined;
   }
-function Message({ sender, message, time, avatarUrl }: MessageProps) {
+function Message({ sender, message, time, userImage, trainerImage }: MessageProps) {
   return (
     <div className={`chat ${sender === 'Trainer' ? 'chat-end' : 'chat-start'}`}>
       <div className="chat-image avatar">
         <div className="w-10 rounded-full">
-          <img alt="Avatar" src={avatarUrl} />
+          <img alt="Avatar" src={sender === 'User' ? userImage : trainerImage} />
         </div>
       </div>
 

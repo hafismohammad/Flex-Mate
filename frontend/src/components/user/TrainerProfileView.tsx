@@ -43,7 +43,7 @@ function TrainerProfileView() {
     const fetchTrainer = async () => {
       try {
         const response = await axios.get(
-          `${API_URL}/api/user/getTrainer/${trainerId}`
+          `${API_URL}/api/user/trainers/${trainerId}`
         );
         setTrainer(response.data[0]);
       } catch (error) {
@@ -65,7 +65,7 @@ function TrainerProfileView() {
       if(userInfo) {
         setLoading(true);
         const response = await userAxiosInstance.post(
-          `/api/user/makePayment/${sessionId}`,
+          `/api/user/payment/${sessionId}`,
           { userData: userInfo }
         );
         const stripe = await loadStripe(
@@ -101,7 +101,7 @@ function TrainerProfileView() {
   useEffect(() => {
     const fetchSeessionSchedules = async () => {
       const response = await axios.get(
-        `${API_URL}/api/user/sessionSchedules`
+        `${API_URL}/api/user/schedules`
       );
       // console.log(response.data);
       setSessionSchedules(response.data);

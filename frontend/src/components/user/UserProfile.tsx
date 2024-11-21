@@ -25,7 +25,7 @@ function UserProfile() {
 
     const fetchUserDetails = async () => {
       try {
-        const response = await userAxiosInstance.get(`/api/user/getUser/${userId}`);
+        const response = await userAxiosInstance.get(`/api/user/users/${userId}`);
         setFormData(response.data);
       } catch (error) {
         console.error("Failed to fetch user details", error);
@@ -50,7 +50,7 @@ function UserProfile() {
     e.preventDefault();
 
     try {
-      const response = await userAxiosInstance.patch("/api/user/updateUser", formData);
+      const response = await userAxiosInstance.patch("/api/user/users", formData);
       setEditOpen(false);
       if(response.status === 200) {
         toast.success(response.data.message)

@@ -35,7 +35,7 @@ function Verification() {
   useEffect(() => {
     const getAllTrainersKycData = async () => {
       try {
-        const response = await adminAxiosInstance.get(`/api/admin/allTrainerKyc`);
+        const response = await adminAxiosInstance.get(`/api/admin/trainers/kyc`);
         const trainersData: Trainer[] = response.data.data.map((trainer: any) => ({          
           id: trainer._id, 
           name: trainer.name,

@@ -34,7 +34,7 @@ function TrainerView() {
     const fetchTrainerDetails = async () => {
       try {
         const response = await adminAxiosInstance.get(
-          `/api/admin/trainerKycDetails/${trainerId}`
+          `/api/admin/trainers/kyc/${trainerId}`
         );
         const trainerData = response.data.kycData;
         const kycData = trainerData._doc;

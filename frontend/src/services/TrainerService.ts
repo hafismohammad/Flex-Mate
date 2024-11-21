@@ -2,7 +2,7 @@ import axiosInstance from "../../axios/trainerAxiosInstance";
 
 const getAllSpecializations = async () => {
   try {
-    const response = await axiosInstance.get(`/api/trainer/getSpecializations`);
+    const response = await axiosInstance.get(`/api/trainer/specializations`);
     console.log("All data from backend", response.data);
     return response.data;
     
@@ -89,7 +89,7 @@ const trainerLogin = async (trainerData: {
 
 const kycSubmission = async (formData: FormData) => {
   try {
-    const response = await axiosInstance.post(`/api/trainer/kyc`, formData, {
+    const response = await axiosInstance.post(`/api/trainer/trainers/kyc`, formData, {
       withCredentials: true,
       headers: {
         "Content-Type": "multipart/form-data",

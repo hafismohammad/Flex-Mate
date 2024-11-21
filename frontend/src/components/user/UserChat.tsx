@@ -7,21 +7,44 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 import { io, Socket } from "socket.io-client";
 import {useSocketContext} from '../../context/Socket'
+import axios from "axios";
+import API_URL from "../../../axios/API_URL";
+import userAxiosInstance from "../../../axios/userAxionInstance";
+import { User } from "../../types/user";
 
 // const SOCKET_SERVER_URL = "http://localhost:3000"; // Replace with your server URL
 
 let socket: Socket;
 
 function UserChat() {
+  const [trainerData, setTrainerData] = useState<{name: string, profileImage: string} | null>(null)
+  const [userData, setUserData] = useState<User | null>(null)
   const { trainerId } = useParams();
   const { token, userInfo } = useSelector((state: RootState) => state.user);
   const { messages, loading } = useGetMessage(token!, trainerId!);
   const [localMessages, setLocalMessages] = useState(messages);
   // const [socket, setSocket] = useState<Socket | null>(null);
+  
   const {  trainerInfo } = useSelector((state: RootState) => state.trainer);
   let {socket}  = useSocketContext()
 
-// console.log('messages',messages);
+useEffect(() => {
+  const trainerData = async () => { 
+   const response =  await axios(`${API_URL}/api/user/trainers/${trainerId}`)
+    setTrainerData(response.data[0])
+  }
+  trainerData()
+},[])
+
+useEffect(() => {
+  const trainerData = async () => { 
+   const response =  await userAxiosInstance(`/api/user/users/${userInfo?.id}`)
+    setUserData(response.data)
+  }
+  trainerData()
+},[])
+
+
 
 useEffect(() => {
   if (!socket) return;
@@ -43,6 +66,7 @@ useEffect(() => {
 }, [socket, trainerInfo?.id, userInfo?.id]);
 
 
+
 useEffect(() => {
   setLocalMessages(messages);
 }, [messages]);
@@ -59,9 +83,13 @@ const handleNewMessage = (newMessage: any) => {
 
   return (
     <div className="w-full lg:max-w-full md:max-w-[450px] flex flex-col h-screen">
-      <div className="bg-slate-500 px-4 py-2 mb-2 h-7"></div>
-
-      <div className="px-4 flex-1 overflow-auto">
+      <div className="bg-slate-500 px-4 py-2 h-12  mb-2 ">
+       <div className="flex items-start gap-5">
+       <img className="h-10 w-10 rounded-full " src={trainerData?.profileImage} alt="profile" />
+       <h1 className="text-lg font-medium text-white">{trainerData?.name}</h1>
+       </div>
+      </div>
+      <div className="px-4 flex-1 overflow-auto mt-2">
         {loading ? (
           <div>Loading...</div>
         ) : (
@@ -71,7 +99,8 @@ const handleNewMessage = (newMessage: any) => {
               sender={msg.senderModel.charAt(0).toUpperCase() + msg.senderModel.slice(1) as 'User' | 'Trainer'}
               message={msg.message}
               time={new Date(msg.createdAt).toLocaleTimeString()}
-              avatarUrl="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" 
+              userImage={userData?.image} 
+              trainerImage={trainerData?.profileImage}
             />
           ))
         )}

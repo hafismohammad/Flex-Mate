@@ -15,7 +15,7 @@ function TrainerListing() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await adminAxiosInstance.get(`/api/admin/allTrainer`);
+        const response = await adminAxiosInstance.get(`/api/admin/trainers`);
         setTrainers(response.data.trainer);
       } catch (error) {
         console.error("Error fetching trainers:", error);
@@ -35,7 +35,7 @@ function TrainerListing() {
     try {
         
       const response = await adminAxiosInstance.patch(
-        `/api/admin/trainer-block-unblock/${trainerId}`,
+        `/api/admin/${trainerId}/trainer-block-unblock`,
         { status: !currentStatus }
       );
   

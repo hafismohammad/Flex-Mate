@@ -148,7 +148,7 @@ function CurrentSchedules() {
     setSpecModal(true);
 
     const response = await axiosInstance.get(
-      `/api/trainer/fetchSecializations/${trainerInfo.id}`
+      `/api/trainer/${trainerInfo.id}/specializations`
     );
     setSpec(response.data.specializations);
   };
@@ -167,7 +167,7 @@ function CurrentSchedules() {
       setLoading(true); // Start loading
       try {
         const response = await axiosInstance.get(
-          `${API_URL}/api/trainer/sessiosShedules/${trainerId}`
+          `${API_URL}/api/trainer/shedules/${trainerId}`
         );
         const schedules = response.data.sheduleData;
         // console.log("schedules", schedules);
@@ -196,7 +196,7 @@ function CurrentSchedules() {
       if (result.isConfirmed) {
         try {
           const response = await axiosInstance.delete(
-            `api/trainer/deleteSessionSchedule/${sessionId}`
+            `api/trainer/sessions/${sessionId}`
           );
           console.log(response.data);
           setSessionSchedules((schedule) =>

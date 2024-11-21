@@ -12,6 +12,7 @@ import SessionModel from "../models/sessionModel";
 import mongoose, { Types } from "mongoose";
 import moment from "moment";
 import BookingModel from "../models/booking";
+import UserModel from "../models/userModel";
 
 
 class TrainerRepository {
@@ -518,7 +519,16 @@ class TrainerRepository {
       throw error;
     }
   }
-  
+
+  async fetchUeserDetails(userId: string) {
+    try {
+      const  userData = await UserModel.findById(userId)
+      return userData
+    } catch (error) {
+      throw error
+    }
+  }
+
   
 
   static async getIsBlockedTrainer(trainer_id: string): Promise<boolean> {
@@ -530,6 +540,7 @@ class TrainerRepository {
       throw new Error(`Failed to fetch trainer's blocked status: ${error.message}`);
     }
   }
+
 }
 
 export default TrainerRepository;

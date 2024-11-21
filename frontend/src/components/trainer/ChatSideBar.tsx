@@ -21,8 +21,9 @@ function ChatSideBar() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axiosInstance.get(`/api/trainer/bookingDetails/${trainerId}`);
+        const response = await axiosInstance.get(`/api/trainer/booking-details/${trainerId}`);
         const confirmedBookings = response.data.filter((bookings: any) => bookings.paymentStatus === 'Confirmed' )
+console.log('response',response);
 
         const seenUserId = new Set()
         const uniqueUser = confirmedBookings.filter((booking: any) => {

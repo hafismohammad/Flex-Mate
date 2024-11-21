@@ -38,7 +38,7 @@ function TrainerDashboard() {
   useEffect(() => {
     const fetchBookings = async () => {
       const response = await axiosInstance(
-        `/api/trainer/bookingDetails/${trainerInfo.id}`
+        `/api/trainer/booking-details/${trainerInfo.id}`
       );
       setBookingDetails(response.data);
     };

@@ -27,7 +27,7 @@ function Bookings() {
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const response = await userAxiosInstance.get(`/api/user/bookings/${userInfo?.id}`);
+        const response = await userAxiosInstance.get(`/api/user/bookings-details/${userInfo?.id}`);
         setBookings(response.data);
       } catch (error) {
         console.error("Error fetching bookings:", error);
@@ -48,7 +48,7 @@ function Bookings() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.patch(`${API_URL}/api/user/cancelBooking/${bookingId}`);
+          await axios.patch(`${API_URL}/api/user/cancel-booking/${bookingId}`);
   
           // Update booking status locally to 'Cancelled' instead of removing it
           setBookings((prev) =>

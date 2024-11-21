@@ -21,7 +21,7 @@ function Features() {
   useEffect(() => {
     const getAllSpecializations = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/user/allspecializations`);
+        const response = await axios.get(`${API_URL}/api/user/specializations`);
         const listedSpecializations = response.data.filter(spec => spec.isListed);
         setSpecializations(listedSpecializations);
       } catch (error) {

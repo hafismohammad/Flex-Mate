@@ -18,7 +18,7 @@ function Sessions() {
   useEffect(() => {
     const fetchBookingDetails = async () => {
       const response = await userAxiosInstance.get(
-        `/api/user/bookings/${userInfo?.id}`
+        `/api/user/bookings-details/${userInfo?.id}`
       );
       const activeSessions =  response.data.filter(
         (sessions: IBookedSession) =>   sessions.bookingStatus === 'Confirmed'

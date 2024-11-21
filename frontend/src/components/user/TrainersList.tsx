@@ -21,7 +21,7 @@ function TrainersList() {
     const fetchAllTrainers = async () => {
       try {
         const response = await axios.get<Trainer[]>(
-          `${API_URL}/api/user/allTrainers`
+          `${API_URL}/api/user/trainers`
         );
         const trainers = response.data;
 

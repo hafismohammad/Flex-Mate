@@ -27,7 +27,7 @@ function UserProfileSideBar() {
 
     const fetchUserDetails = async () => {
       try {
-        const response = await userAxiosInstance.get(`/api/user/getUser/${userInfo.id}`);
+        const response = await userAxiosInstance.get(`/api/user/users/${userInfo.id}`);
         setPreview(response.data.image);
       } catch (error) {
         console.error("Failed to fetch user details", error);
@@ -48,7 +48,7 @@ function UserProfileSideBar() {
 
     try {
       const response = await userAxiosInstance.patch(
-        `/api/user/uploadProfileImage/${userInfo?.id}`,
+        `/api/user/profile-image/${userInfo?.id}`,
         formData
       );
       if (response.status === 200) {

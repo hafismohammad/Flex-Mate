@@ -5,14 +5,18 @@ import { useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../app/store';
 import useGetMessage from '../../hooks/useGetMessage';
 import { useEffect, useState } from 'react';
-import { io, Socket } from 'socket.io-client';
-import {FcVideoCall} from 'react-icons/fc'
 import {setVideoCall} from '../../features/trainer/trainerSlice'
 import { useDispatch } from 'react-redux';
 import {useSocketContext} from '../../context/Socket'
+import axiosInstance from '../../../axios/trainerAxiosInstance';
+import { User } from '../../types/user';
+import { Trainer } from '../../types/trainer';
+import { FaVideo } from "react-icons/fa";
 const SOCKET_SERVER_URL = "http://localhost:3000"; 
 
 function TrainerChat() {
+  const [userData, setUserData] = useState<User | null>(null)
+  const [traierData, setTrainerData] = useState<Trainer | null>(null)
   const { userId } = useParams();
   const { trainerToken, trainerInfo } = useSelector((state: RootState) => state.trainer);
   const {  userInfo } = useSelector((state: RootState) => state.user);
@@ -21,6 +25,24 @@ function TrainerChat() {
   // const [socket, setSocket] = useState<Socket | null>(null);
   let {socket}  = useSocketContext()
   const dispatch = useDispatch<AppDispatch>()
+console.log('traierData', traierData);
+
+
+  useEffect(() => {
+    const fetchUserDetais = async () => {
+      const response = await axiosInstance.get(`/api/trainer/users/${userId}`)
+      setUserData(response.data)
+    }
+    fetchUserDetais()
+  },[])
+
+  useEffect(() => {
+    const fetchTrainer = async() => {
+      const response = await axiosInstance.get(`/api/trainer/${trainerInfo.id}`)
+      setTrainerData(response.data.trainerData[0])
+    }
+    fetchTrainer()
+  })
 
   useEffect(() => {
     if (!socket) return;
@@ -58,7 +80,6 @@ function TrainerChat() {
   
 
   const navigateVideoChat = () => {
-    console.log(' hit navigateVideoChat ');
     
     dispatch(
       setVideoCall({
@@ -78,13 +99,20 @@ function TrainerChat() {
 
   return (
     <div className="w-full lg:max-w-full md:max-w-[450px] flex flex-col h-screen">
-      <div className="bg-blue-800 px-4 py-2 mb-2 h-12 flex justify-end">
+      <div className="bg-blue-800 px-4 py-2 mb-2 h-12 flex justify-between">
+      <div className="flex items-start  gap-5">
+       <img className="h-10 w-10 rounded-full" src={userData?.image} alt="" />
+       <h1 className="text-lg text-white font-medium">{userData?.name}</h1>
+       </div>
       <button onClick={navigateVideoChat}>
-      <FcVideoCall className="h-8 w-8 " />
+      <div className='flex justify-center gap-3'>
+        <h1 className='text-lg text-white'>Start Session</h1>
+      <FaVideo className="h-8 w-8 " />
+      </div>
       </button>
       </div>
 
-      <div className="px-4 flex-1 overflow-auto">
+      <div className="px-4 flex-1 overflow-auto mt-2">
         {loading ? (
           <div>Loading...</div>
         ) : (
@@ -94,7 +122,8 @@ function TrainerChat() {
               sender={msg.senderModel.charAt(0).toUpperCase() + msg.senderModel.slice(1) as 'User' | 'Trainer'}
               message={msg.message}
               time={new Date(msg.createdAt).toLocaleTimeString()}
-              avatarUrl="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+              userImage={userData?.image}
+              trainerImage={traierData?.profileImage}
             />
           ))
         )}

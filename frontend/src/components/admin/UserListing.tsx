@@ -13,7 +13,7 @@ function UserListing() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await adminAxiosInstance.get(`/api/admin/allUsers`);
+        const response = await adminAxiosInstance.get(`/api/admin/users`);
         setUsers(response.data.users);
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -31,7 +31,7 @@ function UserListing() {
   const handleBlockUnblock = async (userId: string, currentStatus: boolean) => {
     try {
       const response = await adminAxiosInstance.patch(
-        `/api/admin/user-block-unblock/${userId}`,
+        `/api/admin/${userId}/block-unblock`,
         { status: !currentStatus }
       );
 

@@ -406,6 +406,10 @@ class TrainerService {
       throw error;
     }
   }
+
+  async fetchUser(userId: string) {
+    return await this.trainerRepository.fetchUeserDetails(userId)
+  }
 }
 
 export default TrainerService;

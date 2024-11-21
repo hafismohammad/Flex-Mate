@@ -48,7 +48,7 @@ const EditTrainerProfile: React.FC = () => {
     const fetchTrainer = async () => {
       try {
         const response = await axiosInstance.get(
-          `/api/trainer/getTrainer/${trainerId}`
+          `/api/trainer/${trainerId}`
         );
         const trainerData = response.data.trainerData[0];
 
@@ -75,7 +75,7 @@ const EditTrainerProfile: React.FC = () => {
     const getAllSpecializations = async () => {
       try {
         const response = await axios.get(
-          `${API_URL}/api/trainer/getSpecializations`
+          `${API_URL}/api/trainer/specializations`
         );
         setAllSpecializations(response.data.data);
       } catch (error) {

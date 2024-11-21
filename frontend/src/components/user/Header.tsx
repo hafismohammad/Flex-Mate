@@ -29,7 +29,7 @@ function Header() {
 
     const fetchUserDetails = async () => {
       try {
-        const response = await userAxiosInstance.get(`/api/user/getUser/${userInfo?.id}`);
+        const response = await userAxiosInstance.get(`/api/user/users/${userInfo?.id}`);
         setImage(response.data.image);
       } catch (error) {
         console.error("Failed to fetch user details", error);

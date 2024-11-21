@@ -15,7 +15,7 @@ function KycRejectionStatus() {
   const handleResubmit = async () => {
     try {
       const response = await axiosInstance.put(
-        `/api/trainer/resubmitKyc/${trainerId}`
+        `/api/trainer/kyc/resubmit/${trainerId}`
       );
 
       if (response.status === 200) {

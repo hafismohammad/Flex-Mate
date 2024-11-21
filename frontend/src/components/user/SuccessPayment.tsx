@@ -19,7 +19,7 @@ function SuccessPayment() {
       if (sessionId && userId && !bookingCreated) {
         try {
           console.log('Creating booking...');
-          await userAxiosInstance.post('/api/user/createBooking', { sessionId, userId, stripe_session_id });
+          await userAxiosInstance.post('/api/user/bookings', { sessionId, userId, stripe_session_id });
           console.log('Booking created successfully');
           // Set flag in local storage after successful booking
           localStorage.setItem('bookingCreated', 'true');

@@ -184,6 +184,7 @@ class UserController {
 
   async getTrainer(req: Request, res: Response, next: NextFunction) {
     try {
+      
       const trainerId = req.params.trainerId;
 
       if (!trainerId) {

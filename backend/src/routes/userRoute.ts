@@ -19,17 +19,17 @@ router.post("/resend-otp", userController.resendOtp.bind(userController));
 router.post("/login", userController.login.bind(userController));
 router.post('/refresh-token', userController.refreshToken.bind(userController))
 router.post("/logout",  authMiddlewares(['user']), userController.logout.bind(userController));
-router.get("/allTrainers",  userController.getAllTrainers.bind(userController))
-router.get("/allspecializations",  userController.getAllspecializations.bind(userController))
-router.get("/getTrainer/:trainerId",  userController.getTrainer.bind(userController))
-router.get("/sessionSchedules", userController.getSessionSchedules.bind(userController))
-router.post("/makePayment/:sessionId",  authMiddlewares(['user']), userController.checkoutPayment.bind(userController))
-router.post("/createBooking",  authMiddlewares(['user']), userController.createBooking.bind(userController))
-router.get('/getUser/:userId',  authMiddlewares(['user']), userController.getUser.bind(userController))
-router.patch('/updateUser',  authMiddlewares(['user']), userController.updateUserData.bind(userController))
-router.patch('/uploadProfileImage/:userId',  authMiddlewares(['user']), upload.single('profileImage'), userController.uploadProfileImage.bind(userController))
-router.get('/bookings/:userId',  authMiddlewares(['user']), userController.getAllBookings.bind(userController))
-router.patch('/cancelBooking/:bookingId', userController.cancelBooking.bind(userController))
+router.get("/trainers",  userController.getAllTrainers.bind(userController))
+router.get("/specializations",  userController.getAllspecializations.bind(userController))
+router.get("/trainers/:trainerId",  userController.getTrainer.bind(userController))
+router.get("/schedules", userController.getSessionSchedules.bind(userController))
+router.post("/payment/:sessionId",  authMiddlewares(['user']), userController.checkoutPayment.bind(userController))
+router.post("/bookings",  authMiddlewares(['user']), userController.createBooking.bind(userController))
+router.get('/users/:userId',  authMiddlewares(['user']), userController.getUser.bind(userController))
+router.patch('/users',  authMiddlewares(['user']), userController.updateUserData.bind(userController))
+router.patch('/profile-image/:userId',  authMiddlewares(['user']), upload.single('profileImage'), userController.uploadProfileImage.bind(userController))
+router.get('/bookings-details/:userId',  authMiddlewares(['user']), userController.getAllBookings.bind(userController))
+router.patch('/cancel-booking/:bookingId', userController.cancelBooking.bind(userController))
 
 
 

@@ -13,6 +13,7 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
     (config: CustomAxiosRequestConfig) => {
         const token = localStorage.getItem("trainer_access_token");
+console.log('token==>', token);
 
         if (token) {
             config.headers['Authorization'] = `Bearer ${token}`;

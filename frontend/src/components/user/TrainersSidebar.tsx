@@ -13,7 +13,7 @@ function TrainersSidebar() {
   useEffect(() => {
     const fetchSpecializations = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/user/allspecializations`);
+        const response = await axios.get(`${API_URL}/api/user/specializations`);
         setSpecializations(response.data);
       } catch (error) {
         console.error("Error fetching specializations:", error);
