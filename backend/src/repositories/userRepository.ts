@@ -7,6 +7,7 @@ import SpecializationModel from "../models/specializationModel";
 import SessionModel from "../models/sessionModel";
 import BookingModel from "../models/booking";
 import { User } from "../interface/user_interface";
+import { ISpecialization } from "../interface/trainer_interface";
 
 class UserRepository {
   private userModel = UserModel;
@@ -144,7 +145,7 @@ class UserRepository {
   }
 
   async findSessionDetails(session_id: string) {
-    return await this.sessionModel.findById(session_id).populate('specializationId')
+    return await this.sessionModel.findById(session_id).populate<{ specializationId: ISpecialization }>("specializationId");
   }
 
   async findTrainerDetails(trainer_id: string) {
@@ -293,26 +294,13 @@ class UserRepository {
           preserveNullAndEmptyArrays: true,
         },
       },
-      {
-        $lookup: {
-          from: 'specializations',
-          localField: 'sessionDetails.specializationId', 
-          foreignField: '_id', 
-          as: 'specializationDetails',
-        },
-      },
-      {
-        $unwind: {
-          path: '$specializationDetails',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
+      
       {
         $project: {
           trainerId: '$trainerDetails._id',
           trainerImage: '$trainerDetails.profileImage',
           trainerName: '$trainerDetails.name',
-          specialization: '$specializationDetails.name', 
+          specialization: '$specialization', 
           sessionDates: {
             $cond: {
               if: { $eq: ["$sessionDetails.isSingleSession", true] },

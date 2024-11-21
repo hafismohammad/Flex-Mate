@@ -14,12 +14,15 @@ import VideoCall from './components/user/VideoCall';
 const App: React.FC = () => {
   const {videoCall, showVideoCallTrainer} = useSelector((state: RootState) => state.trainer)
   const {showIncomingVideoCall, showVideoCallUser} = useSelector((state: RootState) => state.user)
+  // console.log('showVideoCallTrainer',showVideoCallTrainer);
+  console.log('App  showIncomingVideoCall',showIncomingVideoCall);
+
   
   return (
     <>
       <Router>
           {videoCall && <OutgoingVideocallPage />}
-          {showIncomingVideoCall && <IncomingVideocallPage />}
+          {showIncomingVideoCall?._id && <IncomingVideocallPage />}
           {showVideoCallTrainer && <TrainerVideoCall />}
           {showVideoCallUser && <VideoCall />}
         <Routes>          

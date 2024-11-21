@@ -41,6 +41,8 @@ const userSlice = createSlice({
     setShowIncomingVideoCall: (state, action) => {
       state.showIncomingVideoCall = action.payload
       console.log('show incoming call in user slice',action.payload);
+      console.log('show incoming call in user slice  state.showIncomingVideoCall', state.showIncomingVideoCall);
+
       
     },
     setVideoCall(state, action: PayloadAction<string | null>) {
@@ -53,10 +55,15 @@ const userSlice = createSlice({
       state.roomIdUser = action.payload;
     },
     endCallUser: (state) => {
-      state.videoCall = null
-      state.showIncomingVideoCall = null
-      localStorage.removeItem('IncomingVideoCall')
-    }
+      
+      state.videoCall = null;
+      state.showIncomingVideoCall = null;
+      state.showVideoCallUser = false; // Ensure the video call state is false
+      state.roomIdUser = null;         // Clear the room ID if necessary
+      console.log('callend user slice',state.showIncomingVideoCall);
+      localStorage.removeItem("IncomingVideoCall");
+    },
+    
   },
   extraReducers: (builder) => {
     builder

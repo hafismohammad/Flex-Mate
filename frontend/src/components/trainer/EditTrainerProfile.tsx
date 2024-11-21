@@ -115,6 +115,7 @@ const EditTrainerProfile: React.FC = () => {
       console.log("File not received");
     }
   };
+console.log('formdata for spec', formData);
 
   const handleProfileUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -132,6 +133,10 @@ const EditTrainerProfile: React.FC = () => {
     if (formData.profileImage instanceof File) {
       updatedData.append("profileImage", formData.profileImage);
     }
+
+    formData.specializations.forEach((specializationId) => {
+      updatedData.append("specializations[]", specializationId);
+    })
 
     try {
       const response = await axiosInstance.patch(

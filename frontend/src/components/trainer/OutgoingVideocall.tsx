@@ -12,7 +12,6 @@ function OutgoingVideocall() {
     const { socket } = useSocketContext()
       const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const dispatch = useDispatch<AppDispatch>()
-console.log('hite outgoing component');
 
 useEffect(() => {
     if (videoCall?.type === 'out-going') {

@@ -9,14 +9,23 @@ import {
   setShowVideoCall,
   setVideoCall,
 } from "../../features/user/userSlice";
+import {useSocketContext} from '../../context/Socket'
 
-const socket = io("http://localhost:3000"); // Replace with your server URL
+// const socket = io("http://localhost:3000"); // Replace with your server URL
 
 function VideoCall() {
   const videoCallRef = useRef<HTMLDivElement | null>(null);
   const { roomIdUser, showIncomingVideoCall,  } = useSelector((state: RootState) => state.user);
-
+  let {socket}  = useSocketContext()
   const dispatch = useDispatch();
+
+  
+
+  useEffect(() => {
+    console.log("Room ID roomIdUser:", roomIdUser);
+    if ( !roomIdUser) return;
+    // Continue setup...
+  }, [ roomIdUser]);
 
   useEffect(() => {
     if (!roomIdUser) return;
@@ -32,9 +41,12 @@ function VideoCall() {
       "User"
     );
 
-    const zp = ZegoUIKitPrebuilt.create(kitToken);
+ 
 
-    zp.joinRoom({
+    const zp = ZegoUIKitPrebuilt.create(kitToken);
+console.log('zp',zp);
+
+    zp.joinRoom({      
       container: videoCallRef.current,
       scenario: {
         mode: ZegoUIKitPrebuilt.OneONoneCall,
@@ -43,29 +55,37 @@ function VideoCall() {
       turnOnCameraWhenJoining: true,
       showPreJoinView: false,
       onLeaveRoom: () => {
-        socket.emit("leave-room", { to: showIncomingVideoCall?._id });
+        socket?.emit("leave-room", { to: showIncomingVideoCall?._id });
+        console.log('leave-room >>>>>');
+        
         dispatch(setShowVideoCall(false));
         dispatch(setRoomId(null));
         dispatch(setVideoCall(null));
+        dispatch(setShowIncomingVideoCall(null))
         // localStorage.removeItem("roomId");
         // localStorage.removeItem("showVideoCall");
       },
     });
 
-    socket.on("user-left", () => {
+    socket?.on("user-left", () => {
+      console.log('hit user left');
+      
       zp.destroy();
       dispatch(setShowVideoCall(false));
       dispatch(setRoomId(null));
       dispatch(setVideoCall(null));
+      dispatch(setShowIncomingVideoCall(null))
       localStorage.removeItem("roomId");
       localStorage.removeItem("showVideoCall");
     });
 
     return () => {
       zp.destroy();
-      socket.off("user-left");
+      socket?.off("user-left");
     };
   }, [roomIdUser,  dispatch]);
+
+  
 
   return (
     <div

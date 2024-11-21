@@ -8,8 +8,9 @@ import {
   setShowVideoCall,
   setVideoCall,
 } from "../../features/trainer/trainerSlice";
+import { useSocketContext } from "../../context/Socket";
 
-const socket = io("http://localhost:3000"); // Replace with your server URL if deployed
+// const socket = io("http://localhost:3000"); // Replace with your server URL if deployed
 
 function TrainerVideoCall() {
   const videoCallRef = useRef<HTMLDivElement | null>(null);
@@ -17,6 +18,15 @@ function TrainerVideoCall() {
     (state: RootState) => state.trainer
   );
   const dispatch = useDispatch();
+// console.log('videoCallRef', videoCallRef);
+
+  let  {socket} = useSocketContext()
+
+  useEffect(() => {
+    console.log("Room ID roomIdTrainer:", roomIdTrainer );
+    if (!roomIdTrainer ) return;
+    // Continue setup...
+  }, [roomIdTrainer]);
 
   useEffect(() => {
     if (!roomIdTrainer) return;
@@ -32,7 +42,11 @@ function TrainerVideoCall() {
       "Trainer"
     );
 
+  
+
+
     const zp = ZegoUIKitPrebuilt.create(kitToken);
+// console.log('zp',zp);
 
     zp.joinRoom({
       container: videoCallRef.current,
@@ -42,12 +56,19 @@ function TrainerVideoCall() {
       turnOnMicrophoneWhenJoining: true,
       turnOnCameraWhenJoining: true,
       showPreJoinView: false,
+      onUserJoin: (users) => {
+        users.forEach((user) => {
+          console.log("User joined the room:", user);
+          // console.log("Camera status for user:", user === "ON");
+        });
+      },
       onLeaveRoom: () => {
         console.log("onLeaveRoom hit");
 
         // Pass the roomId and/or userId when emitting the leave-room event
-        socket.emit("leave-room", { roomId: roomIdTrainer, to: videoCall?.userID });
-        
+        socket?.emit("leave-room", { roomId: roomIdTrainer, to: videoCall?.userID });
+
+        console.log("Received leave-room event for Room ID:", roomIdTrainer, "To:", videoCall?.userID);
         // Dispatch actions to reset the state and leave the room
         dispatch(setShowVideoCall(false));
         dispatch(setRoomId(null));
@@ -56,9 +77,12 @@ function TrainerVideoCall() {
         // localStorage.removeItem("showVideoCall");
       },
     });
+    
+
+    // console.log("Room joined with container:", videoCallRef.current);
 
     // Handle when the user leaves the session
-    socket.on("user-left", () => {
+    socket?.on("user-left", () => {
       zp.destroy();
       dispatch(setShowVideoCall(false));
       dispatch(setRoomId(null));
@@ -69,9 +93,11 @@ function TrainerVideoCall() {
 
     return () => {
       zp.destroy();
-      socket.off("user-left");
+      socket?.off("user-left");
     };
-  }, [roomIdTrainer, videoCall, dispatch]);
+  }, [roomIdTrainer,  dispatch]);
+
+  
 
   return (
     <div

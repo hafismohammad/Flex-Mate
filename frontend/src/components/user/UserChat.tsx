@@ -6,8 +6,9 @@ import useGetMessage from "../../hooks/useGetMessage";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 import { io, Socket } from "socket.io-client";
+import {useSocketContext} from '../../context/Socket'
 
-const SOCKET_SERVER_URL = "http://localhost:3000"; // Replace with your server URL
+// const SOCKET_SERVER_URL = "http://localhost:3000"; // Replace with your server URL
 
 let socket: Socket;
 
@@ -16,43 +17,45 @@ function UserChat() {
   const { token, userInfo } = useSelector((state: RootState) => state.user);
   const { messages, loading } = useGetMessage(token!, trainerId!);
   const [localMessages, setLocalMessages] = useState(messages);
-  const [socket, setSocket] = useState<Socket | null>(null);
+  // const [socket, setSocket] = useState<Socket | null>(null);
+  const {  trainerInfo } = useSelector((state: RootState) => state.trainer);
+  let {socket}  = useSocketContext()
 
-console.log('messages',messages);
+// console.log('messages',messages);
 
 useEffect(() => {
-  // Initialize the socket when the component mounts
-  const socketInstance = io(SOCKET_SERVER_URL, {
-    query: { userId: userInfo?.id, trainerId: trainerId }
-  });  
+  if (!socket) return;
 
-  setSocket(socketInstance);
+  // Ensure the socket joins the correct room
+  socket.emit("join", trainerInfo?.id || userInfo?.id);
 
-  socketInstance.emit("join", userInfo?.id);
-
-  socketInstance.on("newMessage", (newMessage: any) => {
+  const handleNewMessage = (newMessage: any) => {
     setLocalMessages((prevMessages) => [...prevMessages, newMessage]);
-  });
-
-  // Clean up on unmount
-  return () => {
-    socketInstance.disconnect();
   };
-}, [trainerId, userInfo?.id, messages]);
+
+  // Add the event listener
+  socket.on("newMessage", handleNewMessage);
+
+  // Clean up the listener on unmount or when dependencies change
+  return () => {
+    socket.off("newMessage", handleNewMessage); // Removes only this specific listener
+  };
+}, [socket, trainerInfo?.id, userInfo?.id]);
+
 
 useEffect(() => {
   setLocalMessages(messages);
 }, [messages]);
 
 const handleNewMessage = (newMessage: any) => {
-  // console.log("Sending new message:", newMessage);
-  setLocalMessages((prevMessages) => [...prevMessages, newMessage]);
-
-  // Emit the message event to the server
-  if (socket) {
-    socket.emit("sendMessage", { trainerId: trainerId, message: newMessage });
-  }
+  setLocalMessages((prevMessages) => {
+    const isDuplicate = prevMessages.some(
+      (msg) => msg._id === newMessage._id || (msg.createdAt === newMessage.createdAt && msg.message === newMessage.message)
+    );
+    return isDuplicate ? prevMessages : [...prevMessages, newMessage];
+  });
 };
+
 
   return (
     <div className="w-full lg:max-w-full md:max-w-[450px] flex flex-col h-screen">

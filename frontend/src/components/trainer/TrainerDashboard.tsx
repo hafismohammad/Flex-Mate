@@ -99,21 +99,21 @@ function TrainerDashboard() {
         <h1 className="text-2xl font-bold text-gray-800">Upcoming Sessions</h1>
       </div>
       <div className="mt-10 bg-white shadow-md p-3">
-        <div className="grid grid-cols-7 gap-4 text-center text-lg font-bold border-b border-gray-200 pb-2">
+        <div className="grid grid-cols-6 gap-4 text-center text-lg font-bold border-b border-gray-200 pb-2">
           <div>User Name</div>
           <div>Date</div>
           <div>Time</div>
           <div>Session Type</div>
           <div>Specialization</div>
           <div>Status</div>
-          <div>Action</div>
+          {/* <div>Action</div> */}
         </div>
 
         {bookingDetails.length > 0 ? (
           bookingDetails.map((booking) => (
             <div
               key={booking._id}
-              className="grid grid-cols-7 gap-4 items-center p-2 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none"
+              className="grid grid-cols-6 gap-4 items-center p-2 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none"
             >
               <div className="text-center text-gray-800 font-medium">
                 {booking.userName}
@@ -140,14 +140,14 @@ function TrainerDashboard() {
               >
                 {booking.paymentStatus}
               </div>
-              <button
+              {/* <button
                 onClick={() =>
                   handleStartSession(booking.userId, booking._id)
                 }
                 className="px-4 py-2 bg-blue-500 shadow-lg hover:bg-blue-700 rounded-lg text-white font-medium"
               >
                 Start Session
-              </button>
+              </button> */}
             </div>
           ))
         ) : (

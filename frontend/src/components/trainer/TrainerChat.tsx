@@ -9,37 +9,38 @@ import { io, Socket } from 'socket.io-client';
 import {FcVideoCall} from 'react-icons/fc'
 import {setVideoCall} from '../../features/trainer/trainerSlice'
 import { useDispatch } from 'react-redux';
-
+import {useSocketContext} from '../../context/Socket'
 const SOCKET_SERVER_URL = "http://localhost:3000"; 
 
 function TrainerChat() {
   const { userId } = useParams();
   const { trainerToken, trainerInfo } = useSelector((state: RootState) => state.trainer);
+  const {  userInfo } = useSelector((state: RootState) => state.user);
   const { messages, loading } = useGetMessage(trainerToken!, userId!);
   const [localMessages, setLocalMessages] = useState(messages);
-  const [socket, setSocket] = useState<Socket | null>(null);
-  
+  // const [socket, setSocket] = useState<Socket | null>(null);
+  let {socket}  = useSocketContext()
   const dispatch = useDispatch<AppDispatch>()
 
   useEffect(() => {
-    // Initialize the socket when the component mounts
-    const socketInstance = io(SOCKET_SERVER_URL, {
-      query: { trainerId: trainerInfo.id, userId: userId }
-    });
-
-    setSocket(socketInstance);
-
-    socketInstance.emit("join", trainerInfo.id);
-
-    socketInstance.on("newMessage", (newMessage: any) => {
+    if (!socket) return;
+  
+    // Ensure the socket joins the correct room
+    socket.emit("join", trainerInfo?.id || userInfo?.id);
+  
+    const handleNewMessage = (newMessage: any) => {
       setLocalMessages((prevMessages) => [...prevMessages, newMessage]);
-    });
-
-    // Clean up on unmount
-    return () => {
-      socketInstance.disconnect();
     };
-  }, [userId, trainerInfo.id, messages]);
+  
+    // Add the event listener
+    socket.on("newMessage", handleNewMessage);
+  
+    // Clean up the listener on unmount or when dependencies change
+    return () => {
+      socket.off("newMessage", handleNewMessage); // Removes only this specific listener
+    };
+  }, [socket, trainerInfo?.id, userInfo?.id]);
+  
 
   useEffect(() => {
     // Update local messages when messages change
@@ -47,12 +48,14 @@ function TrainerChat() {
   }, [messages]);
 
   const handleNewMessage = (newMessage: any) => {
-    setLocalMessages((prevMessages) => [...prevMessages, newMessage]);
-
-    if (socket) {
-      socket.emit("sendMessage", { userId, message: newMessage });
-    }
+    setLocalMessages((prevMessages) => {
+      const isDuplicate = prevMessages.some(
+        (msg) => msg._id === newMessage._id || (msg.createdAt === newMessage.createdAt && msg.message === newMessage.message)
+      );
+      return isDuplicate ? prevMessages : [...prevMessages, newMessage];
+    });
   };
+  
 
   const navigateVideoChat = () => {
     console.log(' hit navigateVideoChat ');
@@ -65,7 +68,7 @@ function TrainerChat() {
         roomId: `${Date.now()}`,
         userImage: "https://path-to-user-image.com", // Replace with actual data
         trainerImage: "https://path-to-trainer-image.com", // Replace with actual data
-        name: trainerInfo?.name || "Unknown", // Ensure a fallback for name
+        name: trainerInfo?.name || "Trainer", // Ensure a fallback for name
         // appointmentId: null,
       })
     );

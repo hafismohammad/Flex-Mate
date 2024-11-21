@@ -25,7 +25,7 @@ export const getReceiverSocketId = (receiverId: string) => {
 
 io.on("connection", (socket) => {
   const userId = socket.handshake.query.userId as string;
-  const trainerId = socket.handshake.query.trainerId as string;
+  // const trainerId = socket.handshake.query.trainerId as string;
 
   // Map the socket to either the userId or trainerId if available
   if (userId) {
@@ -33,13 +33,13 @@ io.on("connection", (socket) => {
     console.log(`User connected with ID: ${userId}`);
   }
 
-  if (trainerId) {
-    userSocketMap[trainerId] = socket.id;
-    console.log(`Trainer connected with ID: ${trainerId}`);
-  }
+  // if (trainerId) {
+  //   userSocketMap[trainerId] = socket.id;
+  //   console.log(`Trainer connected with ID: ${trainerId}`);
+  // }
 
   // Emit online users (those with a socket connection)
-  io.emit("getOnlineUsers", Object.keys(userSocketMap));
+  // io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
   // Handle disconnection
   socket.on("disconnect", () => {
@@ -49,13 +49,10 @@ io.on("connection", (socket) => {
     if (userId && userSocketMap[userId]) {
       delete userSocketMap[userId];
       console.log(`User with ID: ${userId} disconnected`);
-    } else if (trainerId && userSocketMap[trainerId]) {
-      delete userSocketMap[trainerId];
-      console.log(`Trainer with ID: ${trainerId} disconnected`);
-    }
+    } 
 
     // Emit updated online users list after a disconnection
-    io.emit("getOnlineUsers", Object.keys(userSocketMap));
+    // io.emit("getOnlineUsers", Object.keys(userSocketMap));
   });
 
   // Handle outgoing video call
@@ -76,24 +73,30 @@ io.on("connection", (socket) => {
   });
 
   socket.on('accept-incoming-call', (data) => {
-    console.log('call accepted');
+    // console.log('accept-incoming-call', data);
     
     const friendSocketId = getReceiverSocketId(data.to)
-    if(friendSocketId) {
-      socket.to(friendSocketId).emit('accept-call', (data))
+    
+    if (!friendSocketId) {
+      console.error('No socket ID found for the receiver');
+    } else {
+    // console.log('friendSocketId', friendSocketId, 'data', data);
+      socket.to(friendSocketId).emit('accepted-call', (data))
     }
   }) 
 
   socket.on('reject-call', async (data) => {
     console.log('call rejected');
     const friendSocketId = getReceiverSocketId(data.to) 
-    if(friendSocketId) {
+    if (!friendSocketId) {
+      console.error('No socket ID found for the receiver');
+    }else {
       socket.to(friendSocketId).emit('call-rejected')
     }
   })
 
   socket.on('leave-room', (data) => {
-    // console.log('coming here')
+    // console.log("Received leave-room event for Room ID:", data.roomId, "To:", data.to);
     const friendSocketId = getReceiverSocketId(data.to)
     if (friendSocketId) {
       // console.log('coming here')
@@ -103,3 +106,28 @@ io.on("connection", (socket) => {
 });
 
 export { app, io, server };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  

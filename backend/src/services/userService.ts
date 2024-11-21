@@ -324,7 +324,7 @@ class UserService {
         sessionId: new mongoose.Types.ObjectId(session._id),
         trainerId: new mongoose.Types.ObjectId(trainer[0]._id),
         userId: new mongoose.Types.ObjectId(user_id),
-        specializationId: new mongoose.Types.ObjectId(session.specializationId._id),
+        specialization: session.specializationId.name,
         sessionType: session.isSingleSession ? "Single Session" : "Package Session",
         bookingDate: new Date(),
         startDate: session.startDate,

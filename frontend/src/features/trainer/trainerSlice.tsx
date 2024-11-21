@@ -81,9 +81,11 @@ const trainerSlice = createSlice({
       
     },
     endCallTrainer: (state) => {
-      state.videoCall = null
-      localStorage.removeItem('IncomingVideoCall')
-    }
+      state.videoCall = null;
+      state.showVideoCallTrainer = false; // Ensure trainer call state is cleared
+      state.roomIdTrainer = null;        // Clear the room ID
+      localStorage.removeItem("IncomingVideoCall"); // Cleanup local storage
+    },
   },
   extraReducers: (builder) => {
     builder

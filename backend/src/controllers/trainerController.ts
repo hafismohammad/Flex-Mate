@@ -287,6 +287,7 @@ class TrainerController {
     try {
       const trainer_id = req.params.trainerId;
       const trainerData = req.body;
+  console.log('updateTrainer->>', trainerData);
   
       const documents: { [key: string]: string | undefined } = {};
   

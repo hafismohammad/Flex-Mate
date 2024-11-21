@@ -13,6 +13,8 @@ function IncomingVideocall() {
     const {socket} = useSocketContext()
 
     const handleEndCall = async () => {
+      console.log('showIncomingVideoCall', showIncomingVideoCall);
+      
         if (!showIncomingVideoCall) {
           console.error("No incoming call to end.");
           return;
@@ -31,6 +33,7 @@ function IncomingVideocall() {
           console.error("No incoming call to accept.");
           return;
         }
+      // console.log('accept-incoming-call hit in handleclick');
       
         socket?.emit("accept-incoming-call", {
           to: showIncomingVideoCall._id,
