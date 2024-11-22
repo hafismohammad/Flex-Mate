@@ -1,6 +1,7 @@
 import 'daisyui/dist/styled.css'
 import { useEffect } from 'react';
 import { formatTime } from '../../utils/timeAndPriceUtils';
+import { useSocketContext } from '../../context/Socket';
 
 interface MessageProps {
   message: string;
@@ -10,7 +11,8 @@ interface MessageProps {
   trainerImage: string | undefined
 }
 
-function Message({ sender, message, time, userImage, trainerImage }: MessageProps)  {
+function Message({ sender, message, time, userImage, trainerImage, }: MessageProps)  {
+  let {socket}  = useSocketContext()
   useEffect(() => {
     // Import DaisyUI styles dynamically
     import('daisyui/dist/styled.css');

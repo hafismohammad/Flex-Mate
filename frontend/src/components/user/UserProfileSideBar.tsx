@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../app/store";
 import userAxiosInstance from "../../../axios/userAxionInstance";
 import toast from "react-hot-toast";
-import profileDummy from '../../assets/profile-dummy.webp';
+import profileDummy from "../../assets/profile-dummy.webp";
 import Loading from "../spinner/Loading";
 
 function UserProfileSideBar() {
@@ -27,7 +27,9 @@ function UserProfileSideBar() {
 
     const fetchUserDetails = async () => {
       try {
-        const response = await userAxiosInstance.get(`/api/user/users/${userInfo.id}`);
+        const response = await userAxiosInstance.get(
+          `/api/user/users/${userInfo.id}`
+        );
         setPreview(response.data.image);
       } catch (error) {
         console.error("Failed to fetch user details", error);
@@ -72,7 +74,7 @@ function UserProfileSideBar() {
   };
 
   return (
-    <div className="w-[17%] bg-blue-500 h-[65vh] mt-10 ml-10 flex flex-col items-center">
+    <div className="w-[17%] bg-blue-500 h-[70vh] mt-10 ml-10 flex flex-col items-center">
       <nav className="flex flex-col space-y-4 w-full">
         <div className="flex justify-center">
           <img
@@ -128,13 +130,20 @@ function UserProfileSideBar() {
           >
             <span>Bookings</span>
           </Link>
+
           <Link
-            to=""
+            to="/profile/message"
+            className="flex items-center pl-8 p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
+          >
+            <span>Message</span>
+          </Link>
+
+          <div
             className="flex items-center pl-8 p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
             onClick={handleLogout}
           >
             <span>Logout</span>
-          </Link>
+          </div>
         </div>
       </nav>
     </div>

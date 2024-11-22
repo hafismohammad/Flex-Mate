@@ -65,8 +65,7 @@ export const SocketContextProvider = ({
       console.log('query.userId', query.userId);
       
       const newSocket = io(SOCKET_SERVER_URL, { query });
-      console.log('newSocket->>',newSocket);
-      console.log('socket-->', socket);
+
       
 
       newSocket.on("connect",()=>{
@@ -87,6 +86,8 @@ export const SocketContextProvider = ({
       newSocket.on("disconnect", () => {
         console.log("Socket disconnected");
       });
+
+
 
       // Clean up on component unmount
       return () => {

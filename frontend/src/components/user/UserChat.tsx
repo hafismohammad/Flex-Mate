@@ -14,12 +14,15 @@ import { User } from "../../types/user";
 
 // const SOCKET_SERVER_URL = "http://localhost:3000"; // Replace with your server URL
 
-let socket: Socket;
 
-function UserChat() {
+interface TrainerChatProps {
+  trainerId: string;
+}
+
+function UserChat({ trainerId }: TrainerChatProps) {
   const [trainerData, setTrainerData] = useState<{name: string, profileImage: string} | null>(null)
   const [userData, setUserData] = useState<User | null>(null)
-  const { trainerId } = useParams();
+  // const { trainerId } = useParams();
   const { token, userInfo } = useSelector((state: RootState) => state.user);
   const { messages, loading } = useGetMessage(token!, trainerId!);
   const [localMessages, setLocalMessages] = useState(messages);
@@ -34,7 +37,7 @@ useEffect(() => {
     setTrainerData(response.data[0])
   }
   trainerData()
-},[])
+},[socket,trainerData])
 
 useEffect(() => {
   const trainerData = async () => { 
@@ -42,26 +45,23 @@ useEffect(() => {
     setUserData(response.data)
   }
   trainerData()
-},[])
+},[socket,userData])
 
 
 
 useEffect(() => {
   if (!socket) return;
 
-  // Ensure the socket joins the correct room
   socket.emit("join", trainerInfo?.id || userInfo?.id);
 
   const handleNewMessage = (newMessage: any) => {
     setLocalMessages((prevMessages) => [...prevMessages, newMessage]);
   };
 
-  // Add the event listener
   socket.on("newMessage", handleNewMessage);
 
-  // Clean up the listener on unmount or when dependencies change
   return () => {
-    socket.off("newMessage", handleNewMessage); // Removes only this specific listener
+    socket.off("newMessage", handleNewMessage); 
   };
 }, [socket, trainerInfo?.id, userInfo?.id]);
 
@@ -83,13 +83,13 @@ const handleNewMessage = (newMessage: any) => {
 
   return (
     <div className="w-full lg:max-w-full md:max-w-[450px] flex flex-col h-screen">
-      <div className="bg-slate-500 px-4 py-2 h-12  mb-2 ">
+      <div className="bg-gray-500 px-4 py-2 mb-2 h-14 flex justify-between sticky top-0 z-10 ">
        <div className="flex items-start gap-5">
        <img className="h-10 w-10 rounded-full " src={trainerData?.profileImage} alt="profile" />
        <h1 className="text-lg font-medium text-white">{trainerData?.name}</h1>
        </div>
       </div>
-      <div className="px-4 flex-1 overflow-auto mt-2">
+      <div className="px-4 flex-1 overflow-y-auto mt-2 overflow-x-hidden ">
         {loading ? (
           <div>Loading...</div>
         ) : (
@@ -106,7 +106,7 @@ const handleNewMessage = (newMessage: any) => {
         )}
       </div>
 
-      <div className="px-4 py-2 border-t border-gray-700 bg-gray-800">
+      <div className="px-4 py-2 border-t border-gray-700 bg-gray-800 sticky bottom-0 z-10">
         <MessageInputBar trainerId={trainerId} onNewMessage={handleNewMessage} />
       </div>
     </div>

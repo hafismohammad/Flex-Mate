@@ -55,13 +55,28 @@ io.on("connection", (socket) => {
     // io.emit("getOnlineUsers", Object.keys(userSocketMap));
   });
 
+  io.on('connection', (socket) => {
+    console.log(`Socket connected:${socket.id}`);
+  
+    socket.on('sendMessage', (data) => {
+  
+      // Use receiverId as userId or any other logic to determine the right ID
+      if (userId) {
+        io.emit('messageUpdate',data) // Emit receiverId as userId
+        console.log(`Emitted messageUpdate for receiverId: ${data}`);
+      } else {
+        console.error("receiverId is missing in sendMessage data");
+      }
+    });
+  });
+  
+
+
   // Handle outgoing video call
   socket.on("outgoing-video-call", (data) => {
-    console.log('Server received outgoing-video-call event with data:', data);
 
     const userSocketId = getReceiverSocketId(data.to);
     if (userSocketId) {
-      console.log('User socket ID found, sending incoming-video-call to:', userSocketId);
       io.to(userSocketId).emit('incoming-video-call', {
         from: data.from,
         roomId: data.roomId,

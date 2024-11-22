@@ -13,10 +13,10 @@ interface MessageInputBarProps {
 function MessageInputBar({ trainerId, onNewMessage }: MessageInputBarProps) {
   const [message, setMessage] = useState('');
   const { sendMessage } = useSendMessage();
-  const { token } = useSelector((state: RootState) => state.user);
+  const { token, userInfo } = useSelector((state: RootState) => state.user);
   const { socket } = useSocketContext();
   const validToken = token ?? ""; 
-
+  const userId = userInfo?.id
   const handleSendMessage = async (e: React.FormEvent<HTMLElement>) => {
     e.preventDefault();
     if (!message) return;
@@ -26,12 +26,13 @@ function MessageInputBar({ trainerId, onNewMessage }: MessageInputBarProps) {
       message,
       receiverId,
       senderModel: "User",
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      userId: userId
     };
 
     // Emit the message through the socket if it is available
     if (socket) {
-      socket.emit("sendMessage", newMessage); // Send message to the server via socket
+      socket.emit("sendMessage", newMessage); 
     } else {
       console.error("Socket is not initialized");
     }

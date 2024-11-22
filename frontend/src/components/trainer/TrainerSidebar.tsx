@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom"; 
 import LOGO from "../../assets/LOGO-2.png";
 import { useDispatch } from "react-redux";
@@ -15,11 +15,14 @@ import {
   FaSignOutAlt,
 } from "react-icons/fa";
 import { AppDispatch } from "../../app/store";
+import { useSocketContext } from "../../context/Socket";
 
 function TrainerSidebar() {
+  const {socket} = useSocketContext()
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const [hasMessage, setHasMessage] = useState(false)
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -30,6 +33,20 @@ function TrainerSidebar() {
     dispatch(logoutTrainer());
     navigate('/trainer/login'); 
   };
+
+  useEffect(() => {
+    
+    socket?.on('messageUpdate', (data) => {
+      console.log('messageUpdate ---',data);
+      if(data) {
+        setHasMessage(true)
+      }
+    })
+  },[socket])
+
+  const handleClick = () => {
+    setHasMessage(false)
+  }
 
   return (
     <div className={`h-screen bg-blue-800 text-white flex flex-col p-4 shadow-md transition-all duration-300 ${isSidebarOpen ? "w-64" : "w-16"} sticky top-0`}>
@@ -82,9 +99,13 @@ function TrainerSidebar() {
           className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
         >
           <IoChatbubbleEllipsesSharp size={20} />
-          <span className={`ml-2 ${!isSidebarOpen && "hidden"}`}>
-            Recent Chats
+          <span onClick={handleClick} className={`ml-2 mr-2 ${!isSidebarOpen && "hidden"}`}>
+           Message 
           </span>
+         {/* {hasMessage === true ?
+          <div className="px-2 py-2 rounded-full bg-red-500" />
+          : ''
+         } */}
         </Link>
         
         <Link

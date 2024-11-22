@@ -82,7 +82,7 @@ function TrainersList() {
   };
 
   const handleTrainerProfileView = (trainerId: string) => {
-    navigate(`/trainerProfileView/${trainerId}`);
+    navigate(`/trainer-profile/${trainerId}`);
   };
 
   return (

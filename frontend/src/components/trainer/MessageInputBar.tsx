@@ -13,7 +13,7 @@ interface MessageInputBarProps {
 function MessageInputBar({ userId, onNewMessage }: MessageInputBarProps) {
     const [message, setMessage] = useState('');
     const { sendMessage } = useSendMessage();
-    const { trainerToken } = useSelector((state: RootState) => state.trainer);
+    const { trainerToken, trainerInfo } = useSelector((state: RootState) => state.trainer);
     const { socket } = useSocketContext();  // Get socket from context
 
     const validToken = trainerToken ?? ""; 
@@ -27,7 +27,8 @@ function MessageInputBar({ userId, onNewMessage }: MessageInputBarProps) {
             message,
             receiverId,
             senderModel: "Trainer",
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            userId: trainerInfo.id
         };
 
         // Emit the message using socket if available

@@ -484,6 +484,7 @@ class TrainerRepository {
             bookingId: "$_id",
             userId: "$userDetails._id",
             userName: "$userDetails.name",
+            userImage: '$userDetails.image',
             trainerName: "$trainerDetails.name",
             sessionDate: {
               $ifNull: ["$sessionDetails.startDate", null], // If session is deleted, show as null

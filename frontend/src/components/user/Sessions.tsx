@@ -46,8 +46,9 @@ function Sessions() {
   };
 
 const handleChatButton = (trainerId: string) => {
-  navigate(`/userChat/${trainerId}`)
+  navigate(`/trainer-profile/${trainerId}`)
 }
+
 
   return (
     <div>
@@ -117,6 +118,8 @@ const handleChatButton = (trainerId: string) => {
           <p className="text-center text-gray-500">No bookings available</p>
         )}
       </div>
+
+  
         </div>
       
 
@@ -140,6 +143,8 @@ const handleChatButton = (trainerId: string) => {
           Next
         </button>
       </div>
+
+  
     </div>
   );
 }

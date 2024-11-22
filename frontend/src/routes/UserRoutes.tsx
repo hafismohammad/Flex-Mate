@@ -13,6 +13,7 @@ import Sessions from '../components/user/Sessions';
 import UserChatPage from '../pages/user/UserChatPage';
 import Bookings from '../components/user/Bookings';
 import AboutUsPage from '../pages/user/AboutUsPage';
+import ChatSideBar from '../components/user/ChatSideBar';
 
 function UserRoutes() {
   return (
@@ -23,7 +24,7 @@ function UserRoutes() {
       <Route path='/login' element={<Login />} />
       <Route path='/trainers' element={<Trainers />} />
       <Route path='/trainers/:specId' element={<Trainers />} />
-      <Route path='/trainerProfileView/:trainerId' element={<TrainerProfileViewPage />} />
+      <Route path='/trainer-profile/:trainerId' element={<TrainerProfileViewPage />} />
       <Route path='/paymentSuccess' element={<SuccessPaymentPage />} />
       <Route path='/paymentFailed' element={<FailedPaymentPage />} />
       <Route path='/userChat/:trainerId' element={<UserChatPage />} />
@@ -32,6 +33,7 @@ function UserRoutes() {
         <Route index element={<UserProfilePage />} />
         <Route path='sessions' element={<Sessions />} />
         <Route path='bookings' element={<Bookings />} />
+        <Route path='message' element={<ChatSideBar />} />
       </Route>
     </Routes>
   );
