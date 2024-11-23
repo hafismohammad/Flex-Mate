@@ -402,7 +402,7 @@ class TrainerRepository {
     try {
       const sesseionData = await this.sessionModel.find({
         trainerId: trainer_id,
-      }).populate('specializationId')
+      }).populate('specializationId').sort({ createdAt: -1 });
 
       return sesseionData;
     } catch (error) {
@@ -511,6 +511,11 @@ class TrainerRepository {
               id: "$specializationDetails._id",
               name: "$specializationDetails.name",
             },
+          },
+        },
+        {
+          $sort: {
+            bookingDate: -1, 
           },
         },
       ]);

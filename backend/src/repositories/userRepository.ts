@@ -316,7 +316,13 @@ class UserRepository {
           startTime: '$startTime',
           endTime: '$endTime',
           sessionType: '$sessionType',
-          bookingStatus: '$paymentStatus'
+          bookingStatus: '$paymentStatus',
+          bookingDate: '$bookingDate'
+        },
+      },
+      {
+        $sort: {
+          bookingDate: -1, 
         },
       },
     ]);

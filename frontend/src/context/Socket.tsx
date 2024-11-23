@@ -1,6 +1,4 @@
-
-
-import {
+import React, {
   createContext,
   ReactNode,
   useContext,
@@ -18,7 +16,7 @@ import {
 import {
   endCallTrainer,
   setShowVideoCall,
-  setRoomId
+  setRoomId,
 } from "../features/trainer/trainerSlice";
 import toast from "react-hot-toast";
 
@@ -28,121 +26,113 @@ interface SocketContextType {
 
 const SocketContext = createContext<SocketContextType>({ socket: null });
 
-export const useSocketContext = () => {
-  return useContext(SocketContext);
-};
+export const useSocketContext = () => useContext(SocketContext);
 
 export const SocketContextProvider = ({
   children,
 }: {
-  children: ReactNode;}): JSX.Element => {
+  children: ReactNode;
+}): JSX.Element => {
   const [socket, setSocket] = useState<Socket | null>(null);
-
   const { userInfo } = useSelector((state: RootState) => state.user);
-  const { trainerInfo, showVideoCallTrainer } = useSelector(
-    (state: RootState) => state.trainer
-  );
+  const { trainerInfo } = useSelector((state: RootState) => state.trainer);
   const loggedUser = userInfo?.id || trainerInfo?.id || null;
   const dispatch = useDispatch<AppDispatch>();
 
+
+useEffect(() => {
+console.log('-----socket',socket);
+
+},[userInfo, trainerInfo])
   const SOCKET_SERVER_URL = "http://localhost:3000";
 
-
   useEffect(() => {
-
     if (!loggedUser) {
       console.warn("No loggedUser; skipping socket initialization.");
+      setSocket(null); // Ensure socket is cleared when user logs out
       return;
     }
 
-    const query = {
-      userId: loggedUser || null,
-      // trainerId: trainerInfo?.id || null,
+    console.log("Initializing socket for loggedUser:", loggedUser);
+
+    // Initialize socket
+    const newSocket = io(SOCKET_SERVER_URL, {
+      query: { userId: loggedUser },
+    });
+
+
+      setSocket(newSocket);
+
+    newSocket.on("connect", () => {
+      console.log("Socket connected:", newSocket.id);
+    });
+
+    newSocket.on("connect_error", (err) => {
+      console.error("Socket connection error:", err);
+    });
+
+    newSocket.on("disconnect", () => {
+      console.log("Socket disconnected.");
+    });
+
+    // Cleanup on component unmount or loggedUser change
+    return () => {
+      console.log("Cleaning up socket...");
+      newSocket.disconnect();
+      setSocket(null); // Clear socket reference
     };
-
-    // Only initialize socket if at least one ID is provided
-    if (query.userId) {
-      console.log('query.userId', query.userId);
-      
-      const newSocket = io(SOCKET_SERVER_URL, { query });
-
-      
-
-      newSocket.on("connect",()=>{
-        console.log("Socket connected",socket);
-        setSocket(newSocket);
-      })
-
-      console.log("Initializing socket with query:", query);
-
-      newSocket.on("connect", () => {
-        console.log("Socket connected:", newSocket.id);
-      });
-
-      newSocket.on("connect_error", (err) => {
-        console.error("Socket connection error:", err);
-      });
-
-      newSocket.on("disconnect", () => {
-        console.log("Socket disconnected");
-      });
-
-
-
-      // Clean up on component unmount
-      return () => {
-        console.log("Cleaning up socket...");
-        newSocket.disconnect();
-      };
-    }
   }, [loggedUser]);
 
   useEffect(() => {
+    console.log('socket>>>>>', socket);
     
-    console.log("Socket instance useEffect:", socket);
-    console.log("Socket connected useEffect:", socket?.connected);
-    if (!socket) return;
+    if (!socket) {
+      console.warn("Socket instance is null; skipping event listener setup.");
+      return;
+    }
 
+    console.log("Setting up event listeners for socket:", socket.id);
 
-    // Event listener setup
-    socket.on("incoming-video-call", (data) => {
+    const handleIncomingCall = (data: any) => {
       console.log("Incoming video call:", data);
       dispatch(
         setShowIncomingVideoCall({
-          ...data.from,
+          _id: data._id,
           callType: data.callType,
+          trainerName: data.trainerName,
+          trainerImage: data.trainerImage,
           roomId: data.roomId,
         })
       );
-    });
-// console.log('accepted-call');
+    };
 
-socket.on("accepted-call", (data) => {
-  console.log("Call accepted: -->", data.roomId);
+    const handleAcceptedCall = (data: any) => {
+      console.log('accepted-call',data);
+      
+      console.log("Call accepted: -->", data.roomId);
+      dispatch(setRoomId(data.roomId));
+      dispatch(setShowVideoCall(true));
+    };
 
-  // Dispatch the roomId to the store
-  dispatch(setRoomId(data.roomId));
-
-  // Dispatch to show the video call UI
-  dispatch(setShowVideoCall(true));
-});
-    
-
-    socket.on("call-rejected", () => {
-      console.log("Call rejected ");
+    const handleCallRejected = () => {
+      console.log("Call rejected");
       toast.error("Call ended or rejected");
       dispatch(endCallTrainer());
       dispatch(endCallUser());
-    });
+    };
 
-    // Clean up listeners on component unmount
+    socket.on("incoming-video-call", handleIncomingCall);
+    socket.on("accepted-call", handleAcceptedCall);
+    socket.on("call-rejected", handleCallRejected);
+
+    // Cleanup event listeners on socket change or component unmount
     return () => {
       console.log("Cleaning up socket event listeners...");
-      socket.off("incoming-video-call");
-      socket.off("accepted-call");
-      socket.off("call-rejected");
+      socket.off("incoming-video-call", handleIncomingCall);
+      socket.off("accepted-call", handleAcceptedCall);
+      socket.off("call-rejected", handleCallRejected);
     };
-  }, [socket, dispatch]);
+  }, [ dispatch, socket]);
 
   return (
     <SocketContext.Provider value={{ socket }}>
@@ -150,25 +140,6 @@ socket.on("accepted-call", (data) => {
     </SocketContext.Provider>
   );
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -236,10 +207,10 @@ socket.on("accepted-call", (data) => {
 //       console.log('socket-->', socket);
       
 
-//       newSocket.on("connect",()=>{
-//         console.log("Socket connected",socket);
-//         setSocket(newSocket);
-//       })
+      // newSocket.on("connect",()=>{
+      //   console.log("Socket connected",socket);
+      //   setSocket(newSocket);
+      // })
 
 //       console.log("Initializing socket with query:", query);
 

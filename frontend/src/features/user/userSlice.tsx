@@ -14,8 +14,9 @@ const initialState: UserState = {
   error: null,
   showIncomingVideoCall: {
     _id: "",
-    profilePic: "",
     callType: "",
+    trainerName: "",
+    trainerImage: '',
     roomId: null,
   },
   videoCall: null,
@@ -40,8 +41,7 @@ const userSlice = createSlice({
     },
     setShowIncomingVideoCall: (state, action) => {
       state.showIncomingVideoCall = action.payload
-      console.log('show incoming call in user slice',action.payload);
-      console.log('show incoming call in user slice  state.showIncomingVideoCall', state.showIncomingVideoCall);
+console.log('userslcie', state.showIncomingVideoCall);
 
       
     },

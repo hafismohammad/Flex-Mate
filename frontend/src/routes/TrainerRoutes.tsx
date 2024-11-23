@@ -24,9 +24,8 @@ function TrainerRoutes() {
         <Route path="editProfile" element={<ProtectRoute><TrainerProfileEditPage /></ProtectRoute>} />
         <Route path="bookings" element={<ProtectRoute><BookingsPage /></ProtectRoute>} />
         <Route path="currentSchedules" element={<ProtectRoute><CurrentSchedulesPage /></ProtectRoute>} />
-        <Route path="chatSidebar" element={<ChatSideBar />} />
+        <Route path="chat-sidebar" element={<ChatSideBar />} />
       </Route>
-      <Route path="/trainerChat/:userId" element={<TrainerChat />} />
     </Routes>
   );
 }

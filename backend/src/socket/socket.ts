@@ -55,20 +55,20 @@ io.on("connection", (socket) => {
     // io.emit("getOnlineUsers", Object.keys(userSocketMap));
   });
 
-  io.on('connection', (socket) => {
-    console.log(`Socket connected:${socket.id}`);
+  // io.on('connection', (socket) => {
+  //   console.log(`Socket connected:${socket.id}`);
   
-    socket.on('sendMessage', (data) => {
+  //   socket.on('sendMessage', (data) => {
   
-      // Use receiverId as userId or any other logic to determine the right ID
-      if (userId) {
-        io.emit('messageUpdate',data) // Emit receiverId as userId
-        console.log(`Emitted messageUpdate for receiverId: ${data}`);
-      } else {
-        console.error("receiverId is missing in sendMessage data");
-      }
-    });
-  });
+  //     // Use receiverId as userId or any other logic to determine the right ID
+  //     if (userId) {
+  //       io.emit('messageUpdate',data) // Emit receiverId as userId
+  //       console.log(`Emitted messageUpdate for receiverId: ${data}`);
+  //     } else {
+  //       console.error("receiverId is missing in sendMessage data");
+  //     }
+  //   });
+  // });
   
 
 
@@ -78,9 +78,11 @@ io.on("connection", (socket) => {
     const userSocketId = getReceiverSocketId(data.to);
     if (userSocketId) {
       io.to(userSocketId).emit('incoming-video-call', {
-        from: data.from,
-        roomId: data.roomId,
+        _id: data.to,
         callType: data.callType,
+        trainerName: data.trainerName,
+        trainerImage: data.trainerImage,
+        roomId: data.roomId,
       });
     } else {
       console.log(`Receiver not found for user ID: ${data.to}`);
@@ -88,17 +90,18 @@ io.on("connection", (socket) => {
   });
 
   socket.on('accept-incoming-call', (data) => {
-    // console.log('accept-incoming-call', data);
-    
-    const friendSocketId = getReceiverSocketId(data.to)
-    
+    const friendSocketId = getReceiverSocketId(data.to);
+    console.log('Data received in accept-incoming-call:', data);
+    console.log('Resolved friendSocketId:', friendSocketId);
+  
     if (!friendSocketId) {
       console.error('No socket ID found for the receiver');
     } else {
-    // console.log('friendSocketId', friendSocketId, 'data', data);
-      socket.to(friendSocketId).emit('accepted-call', (data))
+      console.log('Emitting accepted-call to socket:', friendSocketId);
+      socket.to(friendSocketId).emit('accepted-call', data);
     }
-  }) 
+  });
+  
 
   socket.on('reject-call', async (data) => {
     console.log('call rejected');

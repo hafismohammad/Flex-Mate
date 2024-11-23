@@ -8,8 +8,8 @@ import { MdCallEnd } from "react-icons/md"
 
 function IncomingVideocall() {
 
-    const {showIncomingVideoCall, userInfo} = useSelector((state: RootState) => state.user)
-    const dispath = useDispatch<AppDispatch>()
+    const {showIncomingVideoCall} = useSelector((state: RootState) => state.user)
+    const dispatch = useDispatch<AppDispatch>()
     const {socket} = useSocketContext()
 
     const handleEndCall = async () => {
@@ -23,9 +23,9 @@ function IncomingVideocall() {
         await socket?.emit("reject-call", {            
           to: showIncomingVideoCall._id,
           sender: "user",
-          name: showIncomingVideoCall.profilePic,
+          name: showIncomingVideoCall.trainerName,
         });
-        dispath(endCallUser());
+        dispatch(endCallUser());
       };
       
       const handleAcceptCall = async () => {
@@ -33,15 +33,19 @@ function IncomingVideocall() {
           console.error("No incoming call to accept.");
           return;
         }
-      // console.log('accept-incoming-call hit in handleclick');
+        console.log('Emitting accept-incoming-call with data:', {
+          to: showIncomingVideoCall._id,
+          roomId: showIncomingVideoCall.roomId,
+        });
       
         socket?.emit("accept-incoming-call", {
           to: showIncomingVideoCall._id,
           roomId: showIncomingVideoCall.roomId,
         });
-        dispath(setRoomId(showIncomingVideoCall.roomId));
-        dispath(setShowVideoCall(true));
+        dispatch(setRoomId(showIncomingVideoCall.roomId));
+        dispatch(setShowVideoCall(true));
       };
+      
       
 
   return (
@@ -52,11 +56,11 @@ function IncomingVideocall() {
                 <span className='text-lg text-white  mt-4'>
                     {'Incoming video call'}
                 </span>
-                {/* <span className='text-3xl text-white font-bold'>{showVideoCallUser?.name}</span> */}
+                <span className='text-3xl text-white font-bold'>{showIncomingVideoCall?.trainerName}</span>
 
             </div>
             <div className='flex m-5'>
-                {/* <img className='w-24 h-24 rounded-full' src={showVideoCallUser?.profilePic} alt='profile' /> */}
+                <img className='w-24 h-24 rounded-full' src={showIncomingVideoCall?.trainerImage} alt='profile' />
             </div>
             <div className='flex m-2  mb-5 gap-7'>
 

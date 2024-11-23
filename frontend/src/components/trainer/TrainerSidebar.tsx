@@ -95,7 +95,7 @@ function TrainerSidebar() {
         </Link>
 
         <Link
-          to="/trainer/chatSidebar"
+          to="/trainer/chat-sidebar"
           className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
         >
           <IoChatbubbleEllipsesSharp size={20} />

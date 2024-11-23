@@ -27,10 +27,10 @@ interface VideoCallPayload {
   type: string;
   callType: string;
   roomId: string;
+  userName: string
   userImage: string;
+  trainerName: string;
   trainerImage: string;
-  name: string;
-  // appointmentId: string | null;
 }
 
 const trainer = localStorage.getItem("trainer");
@@ -82,9 +82,9 @@ const trainerSlice = createSlice({
     },
     endCallTrainer: (state) => {
       state.videoCall = null;
-      state.showVideoCallTrainer = false; // Ensure trainer call state is cleared
-      state.roomIdTrainer = null;        // Clear the room ID
-      localStorage.removeItem("IncomingVideoCall"); // Cleanup local storage
+      state.showVideoCallTrainer = false; 
+      state.roomIdTrainer = null;        
+      localStorage.removeItem("IncomingVideoCall"); 
     },
   },
   extraReducers: (builder) => {

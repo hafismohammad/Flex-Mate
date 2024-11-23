@@ -15,9 +15,10 @@ export interface User {
   }
 
   interface IncomingVideoCall {
-    _id: string;
-    profilePic: string;
+    _id: string | null;
     callType: string;
+    trainerName: string
+    trainerImage: string
     roomId: string  | null;
   }
   // Initial state structure for the user slice

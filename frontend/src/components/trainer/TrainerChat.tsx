@@ -46,17 +46,14 @@ function TrainerChat({ userId }: TrainerChatProps) {
   useEffect(() => {
     if (!socket) return;
 
-    // Ensure the socket joins the correct room
     socket.emit("join", trainerInfo?.id || userInfo?.id);
 
     const handleNewMessage = (newMessage: any) => {
       setLocalMessages((prevMessages) => [...prevMessages, newMessage]);
     };
 
-    // Add the event listener
     socket.on("newMessage", handleNewMessage);
 
-    // Clean up the listener on unmount or when dependencies change
     return () => {
       socket.off("newMessage", handleNewMessage);
     };
@@ -76,22 +73,23 @@ function TrainerChat({ userId }: TrainerChatProps) {
   };
 
   const navigateVideoChat = () => {
+    
     dispatch(
       setVideoCall({
         userID: userId || "",
         type: "out-going",
         callType: "video",
         roomId: `${Date.now()}`,
-        userImage: "https://path-to-user-image.com",
-        trainerImage: "https://path-to-trainer-image.com",
-        name: trainerInfo?.name || "Trainer",
+        userName: `${userData?.name}`,
+        userImage: `${userData?.image}`,
+        trainerName: `${trainerData?.name}`,
+        trainerImage: `${trainerData?.profileImage}`,
       })
     );
   };
 
   return (
     <div className="w-full lg:max-w-full md:max-w-[450px] flex flex-col h-screen">
-      {/* Fixed Header */}
       <div className=" bg-gray-500 px-4 py-2 mb-2 h-14 flex justify-between sticky top-0 z-10">
         <div className="flex items-start gap-5">
           <img className="h-10 w-10 rounded-full" src={userData?.image} alt="" />
@@ -103,7 +101,6 @@ function TrainerChat({ userId }: TrainerChatProps) {
         </button>
       </div>
 
-      {/* Scrollable Message Area */}
       <div className="px-4 flex-1 overflow-y-auto mt-2 overflow-x-hidden ">
         {loading ? (
           <div>Loading...</div>
@@ -121,7 +118,6 @@ function TrainerChat({ userId }: TrainerChatProps) {
         )}
       </div>
 
-      {/* Fixed Input Box */}
       <div className="px-4 py-2 border-t border-gray-700 bg-gray-800 sticky bottom-0 z-10">
         <MessageInputBar userId={userId} onNewMessage={handleNewMessage} />
       </div>

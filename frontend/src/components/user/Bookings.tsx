@@ -18,6 +18,7 @@ interface Booking {
   startTime: string;
   endTime: string;
   bookingStatus: string
+  bookingDate: string
 }
 
 function Bookings() {
@@ -73,8 +74,9 @@ function Bookings() {
     <div className="flex justify-center mt-5">
       <div className="h-[80vh] bg-white w-full shadow-md rounded-md overflow-y-auto p-3">
         <h1 className="p-2 font-bold text-2xl mb-5">Bookings</h1>
-        <div className="grid grid-cols-8 gap-2 text-lg font-bold text-gray-600 mb-4 border-b border-gray-200 pb-2">
+        <div className="grid grid-cols-9 gap-2 text-lg font-bold text-gray-600 mb-4 border-b border-gray-200 pb-2">
           <div>Trainer</div>
+          <div>Booking Date</div>
           <div>Session Type</div>
           <div>Specialization</div>
           <div>Session Date</div>
@@ -87,7 +89,7 @@ function Bookings() {
         {bookings.map((booking) => (
           <div
             key={booking._id}
-            className="grid grid-cols-8 gap-2 items-center p-4 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none"
+            className="grid grid-cols-9 gap-2 items-center p-4 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none"
           >
             <div className="flex items-center space-x-2">
               <img
@@ -97,6 +99,7 @@ function Bookings() {
               />
               <span className="font-medium text-gray-800">{booking.trainerName}</span>
             </div>
+            <div className="text-gray-800 font-medium">{new Date(booking.bookingDate).toLocaleDateString()}</div>
             <div className="text-gray-800 font-medium">{booking.sessionType}</div>
             <div className="text-gray-800 font-medium">{booking.specialization}</div>
             <div className="text-gray-800 font-medium">

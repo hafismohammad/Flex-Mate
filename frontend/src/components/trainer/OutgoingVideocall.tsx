@@ -15,22 +15,11 @@ function OutgoingVideocall() {
 
 useEffect(() => {
     if (videoCall?.type === 'out-going') {
-        console.log('Preparing to emit outgoing-video-call:', {
-            to: videoCall.userID,
-            from: {
-                _id: trainerInfo.id,
-                profilePic: videoCall.trainerImage,
-            },
-            callType: videoCall.callType,
-            roomId: videoCall.roomId,
-        });
 
         socket?.emit('outgoing-video-call', {
             to: videoCall.userID,
-            from: {
-                _id: trainerInfo.id,
-                profilePic: videoCall.trainerImage,
-            },
+            trainerName: videoCall.trainerName,
+            trainerImage: videoCall.trainerImage,
             callType: videoCall.callType,
             roomId: videoCall.roomId,
         });
@@ -57,7 +46,7 @@ useEffect(() => {
       
 
     const handleEndCall = async () => {
-        await socket?.emit('reject-call', {to: videoCall?.userID, sender:'trainer', name:videoCall?.name, from:trainerInfo.name, sneder: trainerInfo.id})
+        await socket?.emit('reject-call', {to: videoCall?.userID, sender:'trainer', name:videoCall?.userName, from:trainerInfo.name, sneder: trainerInfo.id})
         dispatch(endCallTrainer())
         if(timeoutRef.current) {
             clearTimeout(timeoutRef.current)
@@ -69,7 +58,7 @@ useEffect(() => {
     <div className="w-96 bg-cyan-950 flex justify-center items-center z-50 rounded-xl shadow-2xl shadow-black">
       <div className="flex flex-col gap-6 items-center">
         <span className="text-lg text-white mt-3"></span>
-        <span className="text-3xl text-white">{videoCall?.name}</span>
+        <span className="text-3xl text-white">{videoCall?.userName}</span>
         <div className="flex">
           <img className="w-24 h-24 rounded-full" src={videoCall?.userImage} alt="profile" />
         </div>
