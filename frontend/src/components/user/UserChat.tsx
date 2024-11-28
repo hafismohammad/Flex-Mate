@@ -45,7 +45,7 @@ useEffect(() => {
     setUserData(response.data)
   }
   trainerData()
-},[socket,userData])
+},[socket])
 
 
 
@@ -58,10 +58,10 @@ useEffect(() => {
     setLocalMessages((prevMessages) => [...prevMessages, newMessage]);
   };
 
-  socket.on("newMessage", handleNewMessage);
+  socket.on("messageUpdate", handleNewMessage);
 
   return () => {
-    socket.off("newMessage", handleNewMessage); 
+    socket.off("messageUpdate", handleNewMessage); 
   };
 }, [socket, trainerInfo?.id, userInfo?.id]);
 
@@ -72,6 +72,8 @@ useEffect(() => {
 }, [messages]);
 
 const handleNewMessage = (newMessage: any) => {
+  // console.log('handleNewMessage', newMessage);
+  
   setLocalMessages((prevMessages) => {
     const isDuplicate = prevMessages.some(
       (msg) => msg._id === newMessage._id || (msg.createdAt === newMessage.createdAt && msg.message === newMessage.message)
@@ -79,6 +81,10 @@ const handleNewMessage = (newMessage: any) => {
     return isDuplicate ? prevMessages : [...prevMessages, newMessage];
   });
 };
+
+// const handleNewMessage = (newMessage: any) => {
+//   setLocalMessages((prevMessages) => [...prevMessages, newMessage]);
+// };
 
 
   return (

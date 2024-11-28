@@ -41,17 +41,17 @@ const userSlice = createSlice({
     },
     setShowIncomingVideoCall: (state, action) => {
       state.showIncomingVideoCall = action.payload
-console.log('userslcie', state.showIncomingVideoCall);
+// console.log('userslcie', state.showIncomingVideoCall);
 
       
     },
-    setVideoCall(state, action: PayloadAction<string | null>) {
+    setVideoCallUser(state, action: PayloadAction<string | null>) {
       state.videoCall = action.payload;
     },
-    setShowVideoCall(state, action: PayloadAction<boolean>) {
+    setShowVideoCallUser(state, action: PayloadAction<boolean>) {
       state.showVideoCallUser = action.payload;
     },
-    setRoomId(state, action: PayloadAction<string | null>) {
+    setRoomIdUser(state, action: PayloadAction<string | null>) {
       state.roomIdUser = action.payload;
     },
     endCallUser: (state) => {
@@ -130,5 +130,5 @@ console.log('userslcie', state.showIncomingVideoCall);
 });
 
 // Export actions and reducer
-export const { clearUser, setLoading, setError, setVideoCall, setShowVideoCall, setRoomId, setShowIncomingVideoCall, endCallUser } = userSlice.actions;
+export const { clearUser, setLoading, setError, setVideoCallUser, setShowVideoCallUser, setRoomIdUser, setShowIncomingVideoCall, endCallUser } = userSlice.actions;
 export default userSlice.reducer;

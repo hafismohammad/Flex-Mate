@@ -13,6 +13,7 @@ import {
   FaChartPie,
   FaUser,
   FaSignOutAlt,
+  FaWallet
 } from "react-icons/fa";
 import { AppDispatch } from "../../app/store";
 import { useSocketContext } from "../../context/Socket";
@@ -115,8 +116,14 @@ function TrainerSidebar() {
           <FaUser size={20} />
           <span className={`ml-2 ${!isSidebarOpen && "hidden"}`}>Profile</span>
         </Link>
-        
-        
+
+        <Link
+          to="/trainer/wallet"
+          className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
+        >
+          <FaWallet size={20} />
+          <span className={`ml-2 ${!isSidebarOpen && "hidden"}`}>wallet</span>
+        </Link>    
         
         <a
           href="#" // Using <a> to trigger the logout action

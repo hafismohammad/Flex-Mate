@@ -64,7 +64,24 @@ class MessageController {
     }
   }
 
+async getCallHistory(req: Request, res: Response) {
+  const {trainerId} = req.params
+  
+  const respons = await messageService.getCallHistory(trainerId)
+  
+  res.status(200).json(respons)
+}
+async getCallHistoryUser(req: Request, res: Response) {
+  const {userId} = req.params
+  console.log('hit controller historuy');
+  
+console.log('userid',userId);
 
+  const respons = await messageService.getCallHistoryUser(userId)
+  console.log(respons);
+  
+  res.status(200).json(respons)
+}
 
 }
 

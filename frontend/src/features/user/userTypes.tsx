@@ -27,7 +27,7 @@ export interface User {
     loading: boolean;       
     error: string | null;   
     token:string|null;
-    showIncomingVideoCall: IncomingVideoCall | null; 
+    showIncomingVideoCall: any | null; 
     videoCall: null | string;
     showVideoCallUser: boolean;
     roomIdUser: null | string;

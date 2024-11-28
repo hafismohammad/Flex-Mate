@@ -57,7 +57,7 @@ function TrainerProfile() {
   }
 
   return (
-    <div className="bg-gray-100 min-h-screen flex flex-col items-center py-8">
+    <div className="bg-gray-100 min-h-screen flex flex-col items-center py-5">
       {/* <div className="w-full max-w-4xl mb-8 flex flex-col items-start gap-4 px-4 md:justify-between">
         <h2 className="text-4xl font-extrabold text-gray-900">
           Trainer Profile
@@ -79,7 +79,7 @@ function TrainerProfile() {
           />
         </div>
 
-        <div className="mt-20 w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-6 p-8">
+        <div className="mt-20 w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-6 p-5">
           <div className="bg-slate-100 p-4 rounded-lg shadow-sm transition-transform transform hover:scale-105">
             <span className="block text-sm font-semibold text-gray-500">
               Full Name

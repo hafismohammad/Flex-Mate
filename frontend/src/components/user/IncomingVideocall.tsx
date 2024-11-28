@@ -3,12 +3,14 @@ import { useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../../app/store'
 import { useDispatch } from 'react-redux'
 import { useSocketContext } from '../../context/Socket'
-import { endCallUser, setRoomId, setShowVideoCall } from '../../features/user/userSlice'
+import { endCallUser, setRoomIdUser, setShowVideoCallUser } from '../../features/user/userSlice'
 import { MdCallEnd } from "react-icons/md"
 
 function IncomingVideocall() {
 
     const {showIncomingVideoCall} = useSelector((state: RootState) => state.user)
+    console.log('showIncomingVideoCall',showIncomingVideoCall);
+    
     const dispatch = useDispatch<AppDispatch>()
     const {socket} = useSocketContext()
 
@@ -35,15 +37,17 @@ function IncomingVideocall() {
         }
         console.log('Emitting accept-incoming-call with data:', {
           to: showIncomingVideoCall._id,
+          from: showIncomingVideoCall.trainerId,
           roomId: showIncomingVideoCall.roomId,
         });
       
         socket?.emit("accept-incoming-call", {
           to: showIncomingVideoCall._id,
+          from: showIncomingVideoCall.trainerId,
           roomId: showIncomingVideoCall.roomId,
         });
-        dispatch(setRoomId(showIncomingVideoCall.roomId));
-        dispatch(setShowVideoCall(true));
+        dispatch(setRoomIdUser(showIncomingVideoCall.roomId));
+        dispatch(setShowVideoCallUser(true));
       };
       
       

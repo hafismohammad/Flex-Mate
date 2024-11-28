@@ -7,6 +7,9 @@ import mongoose from 'mongoose';
 import BookingModel from '../models/booking';
 import { getReceiverSocketId, io } from '../socket/socket';
 
+import VideoCallModel from '../models/videoCallModel';
+import { IVideoCall } from '../interface/common';
+
 class MessageService {
     async sendMessage(
         senderId: string,
@@ -115,7 +118,40 @@ class MessageService {
 
         return allConversations
     }
-    
+
+
+    async  createVideoCallHistory(videoCall: any) {
+        await VideoCallModel.create(videoCall);
+      }
+      
+      async  getCallHistory(trainer_id: string) {
+        try {
+         console.log('hit service', trainer_id);
+         
+          const callHistory = await VideoCallModel.find({
+            trainerId: trainer_id,
+          }).populate('userId').sort({ startedAt: -1 })
+      
+          return callHistory;
+        } catch (error) {
+          console.error("Error fetching call history:", error);
+          throw new Error("Error fetching call history");
+        }
+      }
+         
+      async getCallHistoryUser(userId: string) {
+        try {
+          const callHistory = await VideoCallModel.find({ userId: userId })
+            .populate("trainerId")
+            .sort({ startedAt: -1 });
+      
+          return callHistory;
+        } catch (error) {
+          console.error("Error fetching call history:", error);
+          throw new Error("Error fetching call history");
+        }
+      }
+      
    
 
 }

@@ -7,6 +7,8 @@ import { AppDispatch, RootState } from "../../app/store";
 import ProfileIcon from '../../assets/profile-icon.png';
 import { logoutUser } from '../../actions/userAction';
 import userAxiosInstance from "../../../axios/userAxionInstance";
+import  { BsBell } from "react-icons/bs";
+
 
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -71,33 +73,45 @@ function Header() {
         </ul>
       </nav>
 
-      {/* Profile and Logout Menu */}
+
+  
       <div className="relative hidden md:block">
         {token ? (
-          <div>
-            <img
-              alt="user profile"
-              src={image || ProfileIcon}
-              className="h-10 w-10 cursor-pointer rounded-full object-cover"
-              onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-            />
-            {isProfileMenuOpen && (
-              <ul
-                role="menu"
-                className="absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white text-gray-800"
+        <div className="flex items-center justify-between space-x-4">
+        <div className="relative">
+          {/* <BsBell className="h-6 w-6 text-white cursor-pointer" /> */}
+          {/* <span className="absolute top-0 right-0 inline-flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-red-600 rounded-full">
+            3 
+          </span> */}
+        </div>
+      
+        {/* User Profile */}
+        <div className="relative">
+          <img
+            alt="user profile"
+            src={image || ProfileIcon}
+            className="h-10 w-10 cursor-pointer rounded-full object-cover"
+            onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+          />
+          {isProfileMenuOpen && (
+            <ul
+              role="menu"
+              className="absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white text-gray-800"
+            >
+              <li className="px-4 py-2 hover:bg-gray-100">
+                <Link to="/profile">My Profile</Link>
+              </li>
+              <li
+                className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                onClick={handleLogout}
               >
-                <li className="px-4 py-2 hover:bg-gray-100">
-                  <Link to="/profile">My Profile</Link>
-                </li>
-                <li
-                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                  onClick={handleLogout}
-                >
-                  Logout
-                </li>
-              </ul>
-            )}
-          </div>
+                Logout
+              </li>
+            </ul>
+          )}
+        </div>
+      </div>
+      
         ) : (
           <Link
             to="/login"

@@ -31,6 +31,7 @@ interface VideoCallPayload {
   userImage: string;
   trainerName: string;
   trainerImage: string;
+  bookingId: string
 }
 
 const trainer = localStorage.getItem("trainer");

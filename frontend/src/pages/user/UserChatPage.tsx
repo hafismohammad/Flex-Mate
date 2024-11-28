@@ -1,13 +1,13 @@
-import UserChat from "../../components/user/userChat"
+// import UserChat from "../../components/user/userChat"
 
 
 
-function userChatPage() {
-  return (
-    <div>
-        <UserChat />
-    </div>
-  )
-}
+// function userChatPage() {
+//   return (
+//     <div>
+//         <UserChat />
+//     </div>
+//   )
+// }
 
-export default userChatPage
+// export default userChatPage

@@ -38,15 +38,20 @@ export interface IBooking {
     startTime: string;
     endTime: string;
     amount: number | undefined;
-    paymentStatus: "Confirmed" | "Cancelled" ;
+   paymentStatus: "Confirmed" | "Cancelled" | "Completed";
     createdAt: Date; 
     updatedAt: Date; 
     payment_intent?: string;
   }
 
-  export interface ICategory {
-    specializationId:mongoose.Types.ObjectId;
-    name: string;
+  export interface IVideoCall extends Document {
+    trainerId: string
+    userId:string
+    roomId: string;
+    startedAt: Date;
+    duration: number; // in seconds
+    endedAt: Date | null;
     createdAt: Date;
-    isListed: boolean; 
-}
+    updatedAt: Date;
+  }
+  

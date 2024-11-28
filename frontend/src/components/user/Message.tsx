@@ -1,5 +1,5 @@
 import 'daisyui/dist/styled.css'
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { formatTime } from '../../utils/timeAndPriceUtils';
 import { useSocketContext } from '../../context/Socket';
 
@@ -12,13 +12,16 @@ interface MessageProps {
 }
 
 function Message({ sender, message, time, userImage, trainerImage, }: MessageProps)  {
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   let {socket}  = useSocketContext()
   useEffect(() => {
     // Import DaisyUI styles dynamically
     import('daisyui/dist/styled.css');
   }, []);
 
-
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, []);
 
 
   return (
@@ -36,6 +39,7 @@ function Message({ sender, message, time, userImage, trainerImage, }: MessagePro
       <div className="chat-footer opacity-50 text-xs flex gap-1 items-center">
         {formatTime(time)}
       </div>
+      <div ref={messagesEndRef} />
     </div>
   );
 }

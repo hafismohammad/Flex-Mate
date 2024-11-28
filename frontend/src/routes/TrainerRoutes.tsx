@@ -11,6 +11,7 @@ import TrainerProfileEditPage from "../pages/trainer/TrainerProfileEditPage";
 import CurrentSchedulesPage from "../pages/trainer/CurrentSchedulesPage";
 import ChatSideBar from "../components/trainer/ChatSideBar";
 import TrainerChat from "../components/trainer/TrainerChat";
+import WalletPage from "../pages/trainer/WalletPage";
 
 function TrainerRoutes() {
   return (
@@ -25,6 +26,7 @@ function TrainerRoutes() {
         <Route path="bookings" element={<ProtectRoute><BookingsPage /></ProtectRoute>} />
         <Route path="currentSchedules" element={<ProtectRoute><CurrentSchedulesPage /></ProtectRoute>} />
         <Route path="chat-sidebar" element={<ChatSideBar />} />
+        <Route path="wallet" element={<WalletPage />} />
       </Route>
     </Routes>
   );

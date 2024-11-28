@@ -17,8 +17,8 @@ interface Booking {
   sessionDates: { startDate: string };
   startTime: string;
   endTime: string;
-  bookingStatus: string
-  bookingDate: string
+  bookingStatus: string;
+  bookingDate: string;
 }
 
 function Bookings() {
@@ -28,7 +28,9 @@ function Bookings() {
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const response = await userAxiosInstance.get(`/api/user/bookings-details/${userInfo?.id}`);
+        const response = await userAxiosInstance.get(
+          `/api/user/bookings-details/${userInfo?.id}`
+        );
         setBookings(response.data);
       } catch (error) {
         console.error("Error fetching bookings:", error);
@@ -50,16 +52,16 @@ function Bookings() {
       if (result.isConfirmed) {
         try {
           await axios.patch(`${API_URL}/api/user/cancel-booking/${bookingId}`);
-  
+
           // Update booking status locally to 'Cancelled' instead of removing it
           setBookings((prev) =>
             prev.map((booking) =>
               booking._id === bookingId
-                ? { ...booking, bookingStatus: 'Cancelled' }
+                ? { ...booking, bookingStatus: "Cancelled" }
                 : booking
             )
           );
-  
+
           Swal.fire("Canceled!", "Your booking has been canceled.", "success");
         } catch (error) {
           console.error("Error canceling booking:", error);
@@ -68,7 +70,6 @@ function Bookings() {
       }
     });
   };
-  
 
   return (
     <div className="flex justify-center mt-5">
@@ -97,28 +98,53 @@ function Bookings() {
                 alt={`${booking.trainerName}'s profile`}
                 className="w-12 h-12 rounded-full"
               />
-              <span className="font-medium text-gray-800">{booking.trainerName}</span>
+              <span className="font-medium text-gray-800">
+                {booking.trainerName}
+              </span>
             </div>
-            <div className="text-gray-800 font-medium">{new Date(booking.bookingDate).toLocaleDateString()}</div>
-            <div className="text-gray-800 font-medium">{booking.sessionType}</div>
-            <div className="text-gray-800 font-medium">{booking.specialization}</div>
+            <div className="text-gray-800 font-medium">
+              {new Date(booking.bookingDate).toLocaleDateString()}
+            </div>
+            <div className="text-gray-800 font-medium">
+              {booking.sessionType}
+            </div>
+            <div className="text-gray-800 font-medium">
+              {booking.specialization}
+            </div>
             <div className="text-gray-800 font-medium">
               {new Date(booking.sessionDates.startDate).toLocaleDateString()}
             </div>
-            <div className="text-gray-800 font-medium">{formatTime(booking.startTime)}</div>
-            <div className="text-gray-800 font-medium">{formatTime(booking.endTime)}</div>
-            <div className={`${booking.bookingStatus === 'Confirmed' ? 'text-green-500 rounded-md font-medium' : ' text-red-500 font-medium rounded-md'}`}>{booking.bookingStatus}</div>
+            <div className="text-gray-800 font-medium">
+              {formatTime(booking.startTime)}
+            </div>
+            <div className="text-gray-800 font-medium">
+              {formatTime(booking.endTime)}
+            </div>
+            <div
+              className={
+                booking.bookingStatus === "Confirmed"
+                  ? "text-green-500 rounded-md font-medium"
+                  : booking.bookingStatus === "Cancelled"
+                  ? "text-red-500 rounded-md font-medium"
+                  : booking.bookingStatus === "Completed"
+                  ? "text-blue-500 rounded-md font-medium"
+                  : ""
+              }
+            >
+              {booking.bookingStatus}
+            </div>
+
             <div>
-             {
-              booking.bookingStatus !== 'Cancelled' ? (
+              {booking.bookingStatus !== "Cancelled" ? (
                 <button
-                onClick={() => handleCancelBooking(booking._id)}
-                className="bg-red-500 hover:bg-red-700 font-bold text-white px-6 py-2 rounded-lg"
-              >
-                Cancel
-              </button>
-              ) : ''
-             }
+                  onClick={() => handleCancelBooking(booking._id)}
+                  className="bg-red-500 hover:bg-red-700 font-bold text-white px-6 py-2 rounded-lg"
+                >
+                  Cancel
+                </button>
+              ) : (
+                ""
+              )}
             </div>
           </div>
         ))}

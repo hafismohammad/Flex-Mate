@@ -28,7 +28,6 @@ const useGetMessage = (token: string, id: string) => {
         const response = await axios.get(
           `${API_URL}/api/messages/${token}/${id}`
         );
-        console.log("res", response.data.message);
 
         setMessages(response.data);
       } catch (error) {

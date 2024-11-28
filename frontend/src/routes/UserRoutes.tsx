@@ -10,7 +10,7 @@ import FailedPaymentPage from '../pages/user/FailedPaymentPage';
 import UserProfilePage from '../pages/user/UserProfilePage';
 import UserLayout from '../components/user/UserLayout';
 import Sessions from '../components/user/Sessions';
-import UserChatPage from '../pages/user/UserChatPage';
+// import UserChatPage from '../pages/user/UserChatPage';
 import Bookings from '../components/user/Bookings';
 import AboutUsPage from '../pages/user/AboutUsPage';
 import ChatSideBar from '../components/user/ChatSideBar';
@@ -27,7 +27,7 @@ function UserRoutes() {
       <Route path='/trainer-profile/:trainerId' element={<TrainerProfileViewPage />} />
       <Route path='/paymentSuccess' element={<SuccessPaymentPage />} />
       <Route path='/paymentFailed' element={<FailedPaymentPage />} />
-      <Route path='/userChat/:trainerId' element={<UserChatPage />} />
+      {/* <Route path='/userChat/:trainerId' element={<UserChatPage />} /> */}
       <Route path='/aboutUs' element={<AboutUsPage />} />
       <Route path='/profile' element={<UserLayout />}>
         <Route index element={<UserProfilePage />} />

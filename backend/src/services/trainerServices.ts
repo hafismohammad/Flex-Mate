@@ -11,6 +11,7 @@ import sendOTPmail from "../config/email_config";
 import bcrypt from "bcryptjs";
 import { ISession } from "../interface/trainer_interface";
 import { createRecurringSessions } from "../utils/slotHelper";
+import { IBooking } from "../interface/common";
 
 class TrainerService {
   private trainerRepository: TrainerRepository;
@@ -410,6 +411,29 @@ class TrainerService {
   async fetchUser(userId: string) {
     return await this.trainerRepository.fetchUeserDetails(userId)
   }
+
+  
+  async sessionStatusChange(bookingId: string) {
+    try {
+    return await this.trainerRepository.updateSessionStatus(bookingId);
+    } catch (error) {
+      console.error('Error updating session status:', error);
+    }
+  }
+  
+  async getWallet(trainer_id: string) {
+    return await this.trainerRepository.fetchWalletData(trainer_id)
+  }
+
+  async withdraw (trainer_id:string, amount: number)  {
+    try {
+      return await this.trainerRepository.withdrawMoney(trainer_id, amount)
+
+    } catch (error) {
+      
+    }
+  }
+  
 }
 
 export default TrainerService;

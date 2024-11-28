@@ -69,7 +69,7 @@ function TrainerProfileView() {
           { userData: userInfo }
         );
         const stripe = await loadStripe(
-          "pk_test_51QFSikP9mn4OerLiFUemMPfvrAmFDjKKizT0flSQdVK36hHsqyjqwvTT00hrd3RLAzl9cqtWSWnOn2gd7ITftQTU00Lrwxv4SX"
+          (import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
         );
   
         if (stripe) {

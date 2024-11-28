@@ -2,12 +2,14 @@ import { Server } from "socket.io";
 import http from "http";
 import express from "express";
 import dotenv from "dotenv";
+import chatService from '../services/messageService';
+import { IVideoCall } from "../interface/common";
 
 dotenv.config();
 
 const app = express();
-
 const server = http.createServer(app);
+
 const io = new Server(server, {
   cors: {
     origin: process.env.CORS_ORIGIN,
@@ -15,11 +17,12 @@ const io = new Server(server, {
   },
 });
 
-// Store socket IDs mapped to user or trainer IDs
-const userSocketMap: Record<string, string> = {}; // { userId: socketId, trainerId: socketId }
+const userSocketMap: Record<string, string> = {}; 
+
+//  let userSocketMap: {[key: string]: any} = {}
 
 export const getReceiverSocketId = (receiverId: string) => {
-  console.log('server getReceiverSocketId');
+  console.log('Getting receiver socket ID for:', receiverId);
   return userSocketMap[receiverId];
 };
 
@@ -27,58 +30,41 @@ io.on("connection", (socket) => {
   const userId = socket.handshake.query.userId as string;
   // const trainerId = socket.handshake.query.trainerId as string;
 
-  // Map the socket to either the userId or trainerId if available
   if (userId) {
     userSocketMap[userId] = socket.id;
-    console.log(`User connected with ID: ${userId}`);
+    console.log(`User connected with ID: ${userId} and socket ID: ${socket.id}`);
   }
 
-  // if (trainerId) {
-  //   userSocketMap[trainerId] = socket.id;
-  //   console.log(`Trainer connected with ID: ${trainerId}`);
-  // }
-
-  // Emit online users (those with a socket connection)
-  // io.emit("getOnlineUsers", Object.keys(userSocketMap));
-
-  // Handle disconnection
   socket.on("disconnect", () => {
-    console.log("User disconnected", socket.id);
-
-    // Remove user or trainer from the map based on their ID
+    console.log(`Socket disconnected: ${socket.id}`);
     if (userId && userSocketMap[userId]) {
       delete userSocketMap[userId];
-      console.log(`User with ID: ${userId} disconnected`);
-    } 
-
-    // Emit updated online users list after a disconnection
-    // io.emit("getOnlineUsers", Object.keys(userSocketMap));
+      console.log(`User with ID: ${userId} disconnected and removed from socket map`);
+    }
   });
 
-  // io.on('connection', (socket) => {
-  //   console.log(`Socket connected:${socket.id}`);
-  
-  //   socket.on('sendMessage', (data) => {
-  
-  //     // Use receiverId as userId or any other logic to determine the right ID
-  //     if (userId) {
-  //       io.emit('messageUpdate',data) // Emit receiverId as userId
-  //       console.log(`Emitted messageUpdate for receiverId: ${data}`);
-  //     } else {
-  //       console.error("receiverId is missing in sendMessage data");
-  //     }
-  //   });
-  // });
-  
 
 
-  // Handle outgoing video call
+  
+    socket.on('sendMessage', (data) => {
+      if (userId) {
+        // console.log('sendMessage', data);
+        
+        io.emit('messageUpdate',data) 
+      } else {
+        console.error("receiverId is missing in sendMessage data");
+      }
+    });
+ 
+  
+
+  // Handle outgoing video calls
   socket.on("outgoing-video-call", (data) => {
-
     const userSocketId = getReceiverSocketId(data.to);
     if (userSocketId) {
       io.to(userSocketId).emit('incoming-video-call', {
         _id: data.to,
+        from: data.from,
         callType: data.callType,
         trainerName: data.trainerName,
         trainerImage: data.trainerImage,
@@ -89,63 +75,69 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on('accept-incoming-call', (data) => {
-    const friendSocketId = getReceiverSocketId(data.to);
-    console.log('Data received in accept-incoming-call:', data);
-    console.log('Resolved friendSocketId:', friendSocketId);
+  socket.on("accept-incoming-call", async (data) => {
+    console.log("accept-incoming-call", data);
   
-    if (!friendSocketId) {
-      console.error('No socket ID found for the receiver');
-    } else {
-      console.log('Emitting accepted-call to socket:', friendSocketId);
-      socket.to(friendSocketId).emit('accepted-call', data);
+    try {
+      const friendSocketId = await getReceiverSocketId(data.to);
+  
+      if (friendSocketId) {
+        const startedAt = new Date();
+
+        const videoCall = {
+          trainerId: data.from,
+          userId: data.to,
+          roomId: data.roomId,
+          duration: 0, // Duration will be updated later
+          startedAt,
+          endedAt: null, // Not ended yet
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+  
+        // Save call details to the database (simplified saving)
+        await chatService.createVideoCallHistory(videoCall);
+  
+        socket.to(friendSocketId).emit("accepted-call", { ...data, startedAt });
+      } else {
+        console.error(`No socket ID found for the receiver with ID: ${data.to}`);
+      }
+    } catch (error: any) {
+      console.error("Error in accept-incoming-call handler:", error.message);
     }
   });
   
 
-  socket.on('reject-call', async (data) => {
-    console.log('call rejected');
-    const friendSocketId = getReceiverSocketId(data.to) 
-    if (!friendSocketId) {
-      console.error('No socket ID found for the receiver');
-    }else {
-      socket.to(friendSocketId).emit('call-rejected')
+  socket.on('trainer-call-accept',async (data) => {
+    const trainerSocket = await getReceiverSocketId(data.trainerId)
+    
+    if(trainerSocket) {
+
+      socket.to(trainerSocket).emit('trianer-accept', data)
     }
   })
 
-  socket.on('leave-room', (data) => {
-    // console.log("Received leave-room event for Room ID:", data.roomId, "To:", data.to);
-    const friendSocketId = getReceiverSocketId(data.to)
+  // Handle call rejection
+  socket.on('reject-call', (data) => {
+    const friendSocketId = getReceiverSocketId(data.to);
     if (friendSocketId) {
-      // console.log('coming here')
-      socket.to(friendSocketId).emit('user-left');
+      socket.to(friendSocketId).emit('call-rejected');
+    } else {
+      console.error(`No socket ID found for the receiver with ID: ${data.to}`);
     }
+  });
+
+  socket.on("leave-room", (data) => {
+    const friendSocketId = getReceiverSocketId(data.to);
+    console.log('friendSocketId',friendSocketId, 'data', data.to);
+    if (friendSocketId) {
+      socket.to(friendSocketId).emit("user-left",data.to);
+    }
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
   });
 });
 
 export { app, io, server };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  

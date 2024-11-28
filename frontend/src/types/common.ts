@@ -39,3 +39,37 @@ export interface IBookingDetails {
   amount: string
   status: string
 }
+
+
+interface userId {
+  image: string
+  name: string
+}
+
+export interface IVideoCall extends Document {
+  trainerId: string
+  userId?:userId
+  roomId: string;
+  startedAt: Date;
+  duration: number; // in seconds
+  endedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface TrainerId {
+  profileImage: string;
+  name: string;
+}
+
+export interface IVideoCallUser extends Document {
+  trainerId: TrainerId; // Changed from string to TrainerId object
+  userId?: string; // Assuming userId can be a string
+  roomId: string;
+  startedAt: Date;
+  duration: number; // in seconds
+  endedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+

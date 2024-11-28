@@ -18,6 +18,7 @@ useEffect(() => {
 
         socket?.emit('outgoing-video-call', {
             to: videoCall.userID,
+            from: trainerInfo.id,
             trainerName: videoCall.trainerName,
             trainerImage: videoCall.trainerImage,
             callType: videoCall.callType,

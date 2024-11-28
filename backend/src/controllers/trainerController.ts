@@ -470,6 +470,33 @@ console.log('documents',documents);
       next(error)
     }
   }
+
+  async sessionStatusChange(req: Request, res: Response, next: NextFunction) {
+    try {
+      const {bookingId} = req.params
+      const newStatus = await this.trainerService.sessionStatusChange(bookingId)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async gatWalletData(req: Request, res: Response, next: NextFunction) {
+    try {
+      const trinerId = req.params.trainerId
+      const walletData = await this.trainerService.getWallet(trinerId)
+      res.status(200).json(walletData)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async withdraw(req: Request, res: Response) {
+    const {trainerId} = req.params
+    const {amount} = req.body
+
+    const withdrawed = await this.trainerService.withdraw(trainerId, amount)
+    res.status(200).json(withdrawed)
+  }
 }
 
 export default TrainerController;

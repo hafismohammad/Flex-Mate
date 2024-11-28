@@ -92,3 +92,20 @@ export interface KycDocument {
     isListed: boolean;
   }
 
+
+
+  export interface ITransaction {
+    amount: number;
+    transactionId: string;
+    transactionType: 'credit' | 'debit';
+    date?: Date;
+    bookingId?: string;
+  }
+  
+  export interface IWallet {
+    trainerId: string;
+    balance: number;
+    transactions: ITransaction[];
+    createdAt?: Date;
+    updatedAt: Date;
+  }
