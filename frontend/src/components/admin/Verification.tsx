@@ -75,8 +75,7 @@ function Verification() {
       </div>
 
       <div className="bg-white shadow-lg rounded-lg p-6">
-        <div className="grid grid-cols-6 text-lg font-semibold text-gray-600 mb-4 border-b border-gray-200 pb-2">
-          <div>Trainer ID</div>
+        <div className="grid grid-cols-5 text-lg font-semibold text-gray-600 mb-4 border-b border-gray-200 pb-2">
           <div>Name</div>
           <div>Email</div>
           <div>Date</div>
@@ -86,25 +85,26 @@ function Verification() {
 
         {filteredTrainers.length > 0 ? (
           filteredTrainers.map((trainer) => (
-            <div
-              key={trainer.id}
-              className="grid grid-cols-6 items-center p-4 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none"
-            >
-              <div className="text-gray-800 font-medium">34567</div>
-              <div className="text-gray-800">{trainer.name}</div>
-              <div className="text-gray-800">{trainer.email}</div>
-              <div className="text-gray-800">{new Date(trainer.kycSubmissionDate).toDateString()}</div>
-              <div className="text-orange-500 font-medium">{trainer.status}</div>
-              <div className="flex justify-center space-x-4">
-                <button 
-                  onClick={() => handleView(trainer.id)}
-                  className="flex items-center space-x-1 text-white bg-blue-600 hover:bg-blue-700 py-1 px-3 rounded-md font-semibold focus:outline-none focus:ring-2 focus:ring-red-500"
-                >
-                  <FaFileAlt />
-                  <span>View</span>
-                </button>
-              </div>
+            <div className="grid grid-cols-5 items-center p-2 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none">
+            <div className="text-gray-800 ">{trainer.name}</div>
+            <div className="text-gray-800  px-2 truncate max-w-[200px]">
+              {trainer.email}
             </div>
+            <div className="text-gray-800 ">
+              {new Date(trainer.kycSubmissionDate).toDateString()}
+            </div>
+            <div className="text-orange-500">{trainer.status}</div>
+            <div className="flex justify-center space-x-4">
+              <button
+                onClick={() => handleView(trainer.id)}
+                className="flex items-center space-x-1 text-white bg-blue-600 hover:bg-blue-700 py-1 px-3 rounded-md font-semibold focus:outline-none focus:ring-2 focus:ring-red-500"
+              >
+                <FaFileAlt />
+                <span>View</span>
+              </button>
+            </div>
+          </div>
+          
           ))
         ) : (
           <div className="text-gray-500 text-center py-6">

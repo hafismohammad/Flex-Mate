@@ -23,7 +23,11 @@ const initialState: AdminState = {
 const adminSlice = createSlice({
   name: 'admin',
   initialState,
-  reducers: {},
+  reducers: {
+    setLoading(state, action: PayloadAction<boolean>) {
+      state.loading = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       // Login admin cases
@@ -85,4 +89,5 @@ const adminSlice = createSlice({
   },
 });
 
+export const { setLoading} = adminSlice.actions;
 export default adminSlice.reducer;

@@ -1,3 +1,4 @@
+import sendMail from "../config/email_config";
 import AdminRepository from "../repositories/adminRepository";
 import {generateAccessToken, generateRefreshToken, verifyRefreshToken} from '../utils/jwtHelper'
 
@@ -93,18 +94,22 @@ class AdminService {
   async updateKycStatus(status: string, trainer_id: string, rejectionReason: string | null): Promise<void> {
     try {
       const updatedKyc = await this.adminRepository.updateKycStatus(status, trainer_id, rejectionReason);
-      console.log('KYC status updated:', updatedKyc);
+
+
   
       if (status === 'approved' || status === 'rejected') {
         await this.adminRepository.deleteKyc(trainer_id);
         console.log(`KYC data deleted for trainer ID: ${trainer_id}`);
       }
   
-      // If the status is 'rejected', save the rejection reason
-      if (status === 'rejected' && rejectionReason) {
-        await this.adminRepository.saveRejectionReason(trainer_id, rejectionReason);
-        console.log(`Rejection reason saved for trainer ID: ${trainer_id}`);
+
+      if(status === 'approved') {
+        await sendMail('approve',updatedKyc, 'content')
+      }else {
+
+        await sendMail('reject',updatedKyc.trainerMail, updatedKyc.reason)
       }
+  
     } catch (error) {
       console.error('Error updating KYC status:', error);
     }

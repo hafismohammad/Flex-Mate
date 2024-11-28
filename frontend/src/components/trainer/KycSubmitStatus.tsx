@@ -2,7 +2,7 @@
 
 function KycSubmitStatus() {
   return (
-    <div className="flex flex-col items-center justify-center  bg-gray-100">
+    <div className="flex flex-col items-center justify-center h-screen  bg-gray-100">
       <div className="max-w-2xl mx-auto p-8 bg-white rounded-lg shadow-lg text-center">
         <h1 className="text-3xl font-semibold text-green-600 mb-4">
           Your KYC information has been submitted successfully.

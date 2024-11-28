@@ -6,7 +6,7 @@ import {
   verifyRefreshToken,
 } from "../utils/jwtHelper";
 import UserRepository from "../repositories/userRepository";
-import sendOTPmail from "../config/email_config";
+import sendMail from "../config/email_config";
 import bcrypt from "bcryptjs";
 import stripe from "../config/stripeClient";
 import mongoose from "mongoose";
@@ -41,7 +41,7 @@ class UserService {
       console.log("Generated OTP is", this.OTP);
 
       // Send OTP to user's email
-      const isMailSent = await sendOTPmail(userData.email, this.OTP);
+      const isMailSent = await sendMail('otp',userData.email, this.OTP);
       if (!isMailSent) {
         throw new Error("Email not sent");
       }
@@ -123,7 +123,7 @@ class UserService {
 
       await this.userRepository.saveOTP(email, this.OTP, this.expiryOTP_time);
 
-      const isMailSent = await sendOTPmail(email, this.OTP);
+      const isMailSent = await sendMail('otp',email, this.OTP);
       if (!isMailSent) {
         throw new Error("Failed to resend OTP email.");
       }

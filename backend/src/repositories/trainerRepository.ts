@@ -125,6 +125,19 @@ class TrainerRepository {
     }
   }
 
+  async getOldImages(trainerId: string): Promise<any> {
+    try {
+      
+      // Query KYC data using the trainerId field
+      const kycData = await this.kycModel.findOne({trainerId: trainerId });
+      return kycData;
+    } catch (error) {
+      console.error("Error fetching old KYC images:", error);
+      throw new Error("Failed to fetch old KYC images");
+    }
+  }
+  
+
   async saveKyc(formData: any, documents: any): Promise<any> {
     try {
       // Convert each specialization ID to an ObjectId instance
@@ -168,9 +181,13 @@ class TrainerRepository {
     }
   }
 
-  async changeKycStatus(trainerId: string, profileImage: string) {
+
+  
+
+  async changeKycStatus(trainerId: string, profileImage: string | undefined): Promise<string | undefined> {
     try {
-      const trainer = await this.trainerModel.findByIdAndUpdate(
+      // Update the trainer's profile image and KYC status
+      const trainerUpdate = await this.trainerModel.findByIdAndUpdate(
         trainerId,
         {
           kycStatus: "submitted",
@@ -178,19 +195,25 @@ class TrainerRepository {
         },
         { new: true, runValidators: true }
       );
-
-      await this.kycModel.findByIdAndUpdate(
-        trainerId,
+  
+      if (!trainerUpdate) {
+        throw new Error("Trainer not found");
+      }
+  
+      // Update the corresponding KYC record
+      await this.kycModel.findOneAndUpdate(
+        { trainerId: trainerId },
         { kycStatus: "submitted" },
         { new: true, runValidators: true }
       );
-
-      return trainer?.kycStatus;
+  
+      return trainerUpdate.kycStatus;
     } catch (error) {
       console.error("Error changing trainer KYC status:", error);
       throw new Error("Failed to change trainer KYC status");
     }
   }
+  
 
   async updateKycStatus(trainerId: string) {
     try {
@@ -201,7 +224,7 @@ class TrainerRepository {
       );
 
       if (updatedTrainer) {
-        console.log("KYC status field removed successfully:", updatedTrainer);
+        console.log("KYC status field removed successfully:");
       } else {
         console.log("Trainer not found with the given ID:", trainerId);
       }

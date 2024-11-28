@@ -128,7 +128,7 @@ function ChatSideBar() {
 
   return (
     <div className="flex">
-      <div className="p-6 bg-gray-100 min-h-screen w-1/4">
+      <div className="p-6 bg-gray-100 min-h-screen w-1/4 ">
         <div className="flex justify-center gap-4">
           <button
             onClick={() => handleClick("chats")}

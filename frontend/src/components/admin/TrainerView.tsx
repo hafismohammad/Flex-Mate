@@ -2,8 +2,15 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { FaUser, FaFileAlt, FaCheck, FaTimes } from "react-icons/fa";
 
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import adminAxiosInstance from "../../../axios/adminAxiosInstance";
+import Swal from "sweetalert2";
+import { useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../app/store";
+import Loading from "../spinner/Loading";
+import {setLoading} from '../../features/admin/adminSlice'
+import { useDispatch } from "react-redux";
+
 
 interface Errors {
   rejectionReason?: string;
@@ -28,11 +35,15 @@ function TrainerView() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
 
-  const { trainerId } = useParams();
 
+  const {loading} = useSelector((state: RootState) => state.admin)
+  const { trainerId } = useParams();
+  const navigate = useNavigate()
+  const dispatch = useDispatch<AppDispatch>()
   useEffect(() => {
     const fetchTrainerDetails = async () => {
       try {
+        dispatch(setLoading(true));
         const response = await adminAxiosInstance.get(
           `/api/admin/trainers/kyc/${trainerId}`
         );
@@ -63,6 +74,8 @@ function TrainerView() {
         }
       } catch (error) {
         console.error("Error fetching trainer data:", error);
+      } finally {
+        dispatch(setLoading(false));
       }
     };
   
@@ -72,11 +85,31 @@ function TrainerView() {
 
   const handleApproveStatusChange = async (newStatus: string) => {
     try {
-      await adminAxiosInstance.patch(`/api/admin/updateKycStatus/${trainerId}`, { status: newStatus });
-      setTrainer((prevTrainer) => prevTrainer ? { ...prevTrainer, kycStatus: newStatus } : null);
+      Swal.fire({
+        title: "Are you sure?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+         try {
+          await adminAxiosInstance.patch(`/api/admin/kyc-status-update/${trainerId}`, { status: newStatus });
+          setTrainer((prevTrainer) => prevTrainer ? { ...prevTrainer, kycStatus: newStatus } : null);
+          navigate('/admin/verification')
+  
+            Swal.fire("Canceled!", "Trainer Approved.", "success");
+          } catch (error) {
+            console.error("Error canceling booking:", error);
+            Swal.fire("Error", "Could not cancel the booking.", "error");
+          }
+        }
+      });
+    
     } catch (error) {
       console.error("Error updating trainer status:", error);
-    }
+    } 
   };
 
   const handleRejectStatusChange = () => {
@@ -116,7 +149,8 @@ function TrainerView() {
     }
 
     try {
-      await adminAxiosInstance.patch(`/api/admin/updateKycStatus/${trainerId}`, {
+      dispatch(setLoading(true));
+      await adminAxiosInstance.patch(`/api/admin/kyc-status-update/${trainerId}`, {
         status: "rejected",
         rejectionReason,
       });
@@ -124,13 +158,18 @@ function TrainerView() {
         prevTrainer ? { ...prevTrainer, kycStatus: "rejected" } : null
       );
       closeModal();
+      navigate('/admin/verification')
     } catch (error) {
       console.error("Error updating trainer status with rejection reason:", error);
+    } finally {
+      dispatch(setLoading(false));
     }
   };
 
   return (
     <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6 mt-8">
+      {loading && <Loading />}
+
       <h2 className="text-2xl font-bold mb-6">Trainer Details</h2>
 
       {trainer ? (
@@ -215,6 +254,7 @@ function TrainerView() {
 
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+           {loading && <Loading />}
           <div className="bg-white rounded-lg p-6 w-full max-w-lg shadow-lg">
             <h3 className="text-2xl font-bold mb-4">Rejection Reason</h3>
             <form onSubmit={handleReasonSubmit}>

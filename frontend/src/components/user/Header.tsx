@@ -41,7 +41,8 @@ function Header() {
   }, [userInfo?.id]);
 
   return (
-    <header className="fixed top-0 left-0 w-full flex justify-between items-center bg-blue-800 text-white p-4 z-50 shadow-xl">
+<header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center bg-blue-800 text-white p-4 shadow-xl">
+
       <div>
         <Link to="/">
           <img src={LOGO} alt="Logo" className="w-max h-7" />

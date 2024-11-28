@@ -29,7 +29,7 @@ function KycRejectionStatus() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axiosInstance.get(`/api/trainer/rejectionReason/${trainerId}`);
+        const response = await axiosInstance.get(`/api/trainer/rejection-reason/${trainerId}`);
         setRejectionReason(response.data.reason)
       } catch (error) {
         console.error('Error fetching rejection data:', error);
@@ -45,7 +45,7 @@ function KycRejectionStatus() {
       {isResubmitted ? (
         <TrainerKyc />
       ) : (
-        <div className="flex items-center justify-center bg-gray-100">
+        <div className="flex items-center justify-center h-screen  bg-gray-100">
           <div className="max-w-4xl mx-auto p-10 bg-white rounded-lg shadow-md text-center">
             <h1 className="text-3xl font-semibold text-red-500 mb-4">
               Your KYC information has been rejected.

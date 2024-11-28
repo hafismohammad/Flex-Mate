@@ -9,9 +9,8 @@ import TrainerProfilePage from "../pages/trainer/TrainerProfilePage";
 import BookingsPage from "../pages/trainer/BookingsPage";
 import TrainerProfileEditPage from "../pages/trainer/TrainerProfileEditPage";
 import CurrentSchedulesPage from "../pages/trainer/CurrentSchedulesPage";
-import ChatSideBar from "../components/trainer/ChatSideBar";
-import TrainerChat from "../components/trainer/TrainerChat";
 import WalletPage from "../pages/trainer/WalletPage";
+import ChatSideBarPage from "../pages/trainer/ChatSideBarPage";
 
 function TrainerRoutes() {
   return (
@@ -25,8 +24,8 @@ function TrainerRoutes() {
         <Route path="editProfile" element={<ProtectRoute><TrainerProfileEditPage /></ProtectRoute>} />
         <Route path="bookings" element={<ProtectRoute><BookingsPage /></ProtectRoute>} />
         <Route path="currentSchedules" element={<ProtectRoute><CurrentSchedulesPage /></ProtectRoute>} />
-        <Route path="chat-sidebar" element={<ChatSideBar />} />
-        <Route path="wallet" element={<WalletPage />} />
+        <Route path="chat-sidebar" element={<ProtectRoute><ChatSideBarPage /></ProtectRoute>} />
+        <Route path="wallet" element={<ProtectRoute><WalletPage /></ProtectRoute>} />
       </Route>
     </Routes>
   );

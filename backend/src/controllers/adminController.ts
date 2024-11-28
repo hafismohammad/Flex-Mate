@@ -157,10 +157,6 @@ class AdminController {
       const trainer_id = req.params.trainer_id;
       const rejectionReason = req.body.rejectionReason || null;
 
-      // console.log('Status:', status);
-      // console.log('Trainer ID:', trainer_id);
-      // console.log('Rejection Reason:', rejectionReason);
-
       await this.adminService.updateKycStatus(status, trainer_id, rejectionReason);
 
       res.status(200).json({ message: 'Trainer status updated successfully', status });

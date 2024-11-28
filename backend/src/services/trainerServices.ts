@@ -12,6 +12,7 @@ import bcrypt from "bcryptjs";
 import { ISession } from "../interface/trainer_interface";
 import { createRecurringSessions } from "../utils/slotHelper";
 import { IBooking } from "../interface/common";
+import { deleteFromCloudinary, uploadToCloudinary } from "../config/cloudinary";
 
 class TrainerService {
   private trainerRepository: TrainerRepository;
@@ -61,7 +62,7 @@ class TrainerService {
 
       console.log(`OTP will expire at: ${this.expiryOTP_time}`);
 
-      // const isMailSent = await sendOTPmail(trainerData.email, this.OTP);
+      // const isMailSent = await sendOTPmail('otp',trainerData.email, this.OTP);
       // if (!isMailSent) {
       //   throw new Error("Email not sent");
       // }
@@ -149,7 +150,7 @@ class TrainerService {
         this.expiryOTP_time
       );
 
-      // const isMailSent = await sendOTPmail(email, this.OTP);
+      // const isMailSent = await sendOTPmail('otp',email, this.OTP);
       // if (!isMailSent) {
       //   throw new Error("Failed to resend OTP email.");
       // }
@@ -234,11 +235,57 @@ class TrainerService {
       throw error;
     }
   }
-
-  async kycSubmit(formData: any, documents: any): Promise<any> {
+  async kycSubmit(formData: any, files: { [fieldname: string]: Express.Multer.File[] }): Promise<any> {
     try {
-      await this.trainerRepository.saveKyc(formData, documents);
+      const documents: { [key: string]: string | undefined } = {};
+  
+      const kycData = await this.trainerRepository.getOldImages(formData.trainer_id)
 
+  
+      if (kycData) {
+        
+        if (kycData.aadhaarFrontImage) await deleteFromCloudinary(kycData.aadhaarFrontImage);
+        if (kycData.aadhaarBackImage) await deleteFromCloudinary(kycData.aadhaarBackImage);
+        if (kycData.certificate) await deleteFromCloudinary(kycData.certificate);
+      }
+
+      if (files.profileImage?.[0]) {
+        const profileImageUrl = await uploadToCloudinary(
+          files.profileImage[0].buffer,
+          "trainer_profileImage"
+        );
+        documents.profileImageUrl = profileImageUrl.secure_url;
+      }
+  
+      if (files.aadhaarFrontSide?.[0]) {
+        const aadhaarFrontSideUrl = await uploadToCloudinary(
+          files.aadhaarFrontSide[0].buffer,
+          "trainer_aadhaarFrontSide"
+        );
+        documents.aadhaarFrontSideUrl = aadhaarFrontSideUrl.secure_url;
+      }
+  
+      if (files.aadhaarBackSide?.[0]) {
+        const aadhaarBackSideUrl = await uploadToCloudinary(
+          files.aadhaarBackSide[0].buffer,
+          "trainer_aadhaarBackSide"
+        );
+        documents.aadhaarBackSideUrl = aadhaarBackSideUrl.secure_url;
+      }
+  
+      if (files.certificate?.[0]) {
+        const certificateUrl = await uploadToCloudinary(
+          files.certificate[0].buffer,
+          "trainer_certificate"
+        );
+        documents.certificateUrl = certificateUrl.secure_url;
+      }
+  
+      // Save KYC data in the repository
+       await this.trainerRepository.saveKyc(formData, documents);
+     
+  
+      // Change KYC status in the repository
       return await this.trainerRepository.changeKycStatus(
         formData.trainer_id,
         documents.profileImageUrl
@@ -248,6 +295,8 @@ class TrainerService {
       throw new Error("Failed to submit KYC data");
     }
   }
+  
+  
 
   async kycStatus(trainerId: string) {
     try {

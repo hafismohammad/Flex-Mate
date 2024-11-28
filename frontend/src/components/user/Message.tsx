@@ -1,7 +1,6 @@
 import 'daisyui/dist/styled.css'
 import { useEffect, useRef } from 'react';
 import { formatTime } from '../../utils/timeAndPriceUtils';
-import { useSocketContext } from '../../context/Socket';
 
 interface MessageProps {
   message: string;
@@ -13,7 +12,6 @@ interface MessageProps {
 
 function Message({ sender, message, time, userImage, trainerImage, }: MessageProps)  {
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  let {socket}  = useSocketContext()
   useEffect(() => {
     // Import DaisyUI styles dynamically
     import('daisyui/dist/styled.css');
@@ -26,6 +24,7 @@ function Message({ sender, message, time, userImage, trainerImage, }: MessagePro
 
   return (
     <div className={`chat ${sender === 'User' ? 'chat-end' : 'chat-start'}`}>
+      {/* {!sender && <} */}
       <div className="chat-image avatar">
         <div className="w-10 rounded-full">
           <img alt="Avatar" src={ sender === 'User'? userImage : trainerImage} />

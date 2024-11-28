@@ -64,7 +64,7 @@ class AdminRepository {
   async fetchKycData(trainerId: string) {
     try {
       const kycData = await KYCModel.findOne({ trainerId }).populate('specializationId').populate('trainerId')
-      console.log('kycData', kycData);
+     
       
       return kycData
        
@@ -77,6 +77,8 @@ class AdminRepository {
 
   async updateKycStatus(status: string, trainer_id: string, rejectionReason: string | null): Promise<any> {
     try {
+      console.log('update kyc status repo', rejectionReason);
+      
       const updatedTrainer = await this.trainerModel.findByIdAndUpdate(
         trainer_id,
         { kycStatus: status },
@@ -97,14 +99,27 @@ class AdminRepository {
   
           // Save the rejection reason if the status is 'rejected'
           if (status === 'rejected' && rejectionReason) {
-            await this.kycRejectionReasonModel.create({
+           const reason =  await this.kycRejectionReasonModel.create({
               trainerId: trainer_id,
               reason: rejectionReason,
             });
             console.log('Rejection reason saved successfully.');
+            const response = {
+              trainerMail : updatedTrainer.email,
+              reason: reason.reason
+            }
+            return response
+          } 
+
+          if(status === 'approved') {
+            console.log('approve hit with',updatedTrainer.email);
+            
+            if(updatedTrainer.email) {
+              return updatedTrainer.email
+            }
           }
+          
   
-          return updatedKyc;
         } else {
           console.log('KYC record not found for the given trainer ID:', trainer_id);
           return null;
@@ -180,12 +195,15 @@ class AdminRepository {
 
   async saveRejectionReason(trainerId: string, reason: string): Promise<void> {
     try {
-      await KycRejectionReasonModel.create({
+      console.log('save rejection reasonr');
+      
+       await this.kycRejectionReasonModel.create({
         trainerId: trainerId,
         reason: reason,
         date: new Date(),
       });
       console.log('Rejection reason saved successfully for trainer ID:', trainerId);
+      
     } catch (error) {
       console.error('Error saving rejection reason:', error);
       throw error;

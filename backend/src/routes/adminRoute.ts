@@ -17,7 +17,7 @@ router.post('/logout',  authMiddleware(['admin']), adminController.adminLogout.b
 router.post('/specialization', authMiddleware(['admin']), upload.single('image'), adminController.addSpecialization.bind(adminController))
 router.get('/trainers/kyc', authMiddleware(['admin']), adminController.getAllTrainersKycDatas.bind(adminController))
 router.get('/trainers/kyc/:trainer_id', authMiddleware(['admin']), adminController.trainersKycData.bind(adminController));
-router.patch('/updateKycStatus/:trainer_id', authMiddleware(['admin']), adminController.changeKycStatus.bind(adminController));
+router.patch('/kyc-status-update/:trainer_id', authMiddleware(['admin']), adminController.changeKycStatus.bind(adminController));
 router.get('/specialization', authMiddleware(['admin']), adminController.getAllSpecializations.bind(adminController))
 router.patch('/toggle-status/:spec_id', authMiddleware(['admin']), adminController.updateStatus.bind(adminController))
 router.get('/users', authMiddleware(['admin']), adminController.getAllUsers.bind(adminController))

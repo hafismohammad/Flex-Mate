@@ -30,17 +30,17 @@ function TrainersList() {
         // Filter trainers based on query parameters
         const filteredTrainers = trainers.filter((trainer) => {
           const matchesGender = selectedGender
-            ? trainer.gender.toLowerCase() === selectedGender
+            ? trainer.gender?.toLowerCase() === selectedGender
             : true;
           const matchesLanguage = selectedLanguage
             ? Array.isArray(trainer.language)
-              ? trainer.language.some(
+              ? trainer.language?.some(
                   (lang) => lang.toLowerCase() === selectedLanguage
                 )
-              : trainer.language.toLowerCase() === selectedLanguage
+              : trainer.language?.toLowerCase() === selectedLanguage
             : true;
           const matchesSpecialization = selectedSpecialization
-            ? trainer.specializations.some(
+            ? trainer.specializations?.some(
                 (spec) => spec._id === selectedSpecialization
               )
             : true;

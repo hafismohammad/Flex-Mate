@@ -166,48 +166,9 @@ class TrainerController {
   async kycSubmission(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { trainer_id, specialization, name, email, phone } = req.body;
-
-      console.log('-->>>',trainer_id, specialization, name, email, phone);
-      
-      const files = req.files as {
-        [fieldname: string]: Express.Multer.File[];
-      };
-
-      const documents: { [key: string]: string | undefined } = {};
-
-      if (files.profileImage && files.profileImage[0]) {
-        const profileImageUrl = await uploadToCloudinary(
-          files.profileImage[0].buffer,
-          "trainer_profileImage"
-        );
-        documents.profileImageUrl = profileImageUrl.secure_url;
-      }
-
-      if (files.aadhaarFrontSide && files.aadhaarFrontSide[0]) {
-        const aadhaarFrontSideUrl = await uploadToCloudinary(
-          files.aadhaarFrontSide[0].buffer,
-          "trainer_aadhaarFrontSidec"
-        );
-        documents.aadhaarFrontSideUrl = aadhaarFrontSideUrl.secure_url;
-      }
-
-      if (files.aadhaarBackSide && files.aadhaarBackSide[0]) {
-        const aadhaarBackSideUrl = await uploadToCloudinary(
-          files.aadhaarBackSide[0].buffer,
-          "trainer_aadhaarBackSide"
-        );
-        documents.aadhaarBackSideUrl = aadhaarBackSideUrl.secure_url;
-      }
-
-      if (files.certificate && files.certificate[0]) {
-        const certificateUrl = await uploadToCloudinary(
-          files.certificate[0].buffer,
-          "trainer_certificate"
-        );
-        documents.certificateUrl = certificateUrl.secure_url;
-      }
-
-      // Now you have the URLs in the `documents` object
+  
+      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+  
       const formData = {
         trainer_id,
         specialization,
@@ -215,24 +176,18 @@ class TrainerController {
         email,
         phone,
       };
-console.log('documents',documents);
-
-      // Pass formData and document URLs to your service for KYC submission
-      const kycStatus = await this.trainerService.kycSubmit(
-        formData,
-        documents
-      );
-
+  
+      // Pass formData and uploaded files to the service for KYC submission
+      const kycStatus = await this.trainerService.kycSubmit(formData, files);
+  
       // Return success response with KYC status
-      res
-        .status(200)
-        .json({ message: "KYC submitted successfully", kycStatus });
+      res.status(200).json({ message: "KYC submitted successfully", kycStatus });
     } catch (error) {
-      // Log and send error response
       console.error("Error in KYC submission:", error);
-     next(error)
+      next(error);
     }
   }
+  
 
   async logoutTrainer(req: Request, res: Response) {
     try {
@@ -288,7 +243,6 @@ console.log('documents',documents);
     try {
       const trainer_id = req.params.trainerId;
       const trainerData = req.body;
-  console.log('updateTrainer->>', trainerData);
   
       const documents: { [key: string]: string | undefined } = {};
   

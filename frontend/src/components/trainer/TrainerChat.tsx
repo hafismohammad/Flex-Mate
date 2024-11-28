@@ -12,6 +12,7 @@ import axiosInstance from '../../../axios/trainerAxiosInstance';
 import { User } from '../../types/user';
 import { Trainer } from '../../types/trainer';
 import { FaVideo, FaHistory } from "react-icons/fa";
+import MessageSkeleton from '../skeleton/MessageSkeleton';
 
 interface TrainerChatProps {
   userId: string;
@@ -128,7 +129,7 @@ function TrainerChat({ userId, bookingId }: TrainerChatProps) {
 
       <div className="px-4 flex-1 overflow-y-auto mt-2 overflow-x-hidden ">
         {loading ? (
-          <div>Loading...</div>
+            <div><MessageSkeleton /></div>
         ) : (
           localMessages.map((msg, index) => (
             <Message

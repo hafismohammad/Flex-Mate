@@ -11,6 +11,7 @@ import axios from "axios";
 import API_URL from "../../../axios/API_URL";
 import userAxiosInstance from "../../../axios/userAxionInstance";
 import { User } from "../../types/user";
+import MessageSkeleton from "../skeleton/MessageSkeleton";
 
 // const SOCKET_SERVER_URL = "http://localhost:3000"; // Replace with your server URL
 
@@ -97,7 +98,7 @@ const handleNewMessage = (newMessage: any) => {
       </div>
       <div className="px-4 flex-1 overflow-y-auto mt-2 overflow-x-hidden ">
         {loading ? (
-          <div>Loading...</div>
+          <div><MessageSkeleton /></div>
         ) : (
           localMessages.map((msg, index) => (
             <Message

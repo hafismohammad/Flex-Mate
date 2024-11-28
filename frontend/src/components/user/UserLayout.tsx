@@ -5,11 +5,12 @@ import Header from './Header';
 
 function UserLayout() {
   return (
-    <div className='flex h-screen bg-blue-50 mt-16'>
+    <div className="flex h-screen bg-blue-50">
       <UserProfileSideBar />
       <div className="flex-1">
         <Header />
-        <div className="p-4 overflow-y-auto h-full">
+        {/* Add padding-top to prevent content overlap with the fixed header */}
+        <div className="pt-16 p-4 overflow-y-auto h-full">
           <Outlet />
         </div>
       </div>

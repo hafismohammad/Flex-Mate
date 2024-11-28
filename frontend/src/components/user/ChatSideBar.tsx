@@ -145,7 +145,7 @@ function ChatSideBar() {
           </button>
         </div>
         {!isHistory ? (
-          <div className="bg-white shadow-lg rounded-lg p-4 mt-4">
+          <div className="bg-white shadow-lg rounded-lg p-4 mt-4 overflow-auto">
             {trainers.length > 0 ? (
               trainers.map((trainer) => (
                 <div

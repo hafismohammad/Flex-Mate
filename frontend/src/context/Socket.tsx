@@ -25,10 +25,12 @@ export const SocketContextProvider = ({
   const { trainerInfo } = useSelector((state: RootState) => state.trainer);
   const loggedUser = userInfo?.id || trainerInfo?.id || null;
   const dispatch = useDispatch<AppDispatch>();
+
   const newSocket = io("http://localhost:3000", {
     query: { userId: loggedUser },
     transports: ['websocket'],
   });
+  
   useEffect(() => {
     if (!loggedUser) {
       console.warn("No loggedUser; skipping socket initialization.");
