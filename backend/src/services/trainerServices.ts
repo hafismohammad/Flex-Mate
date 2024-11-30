@@ -321,6 +321,10 @@ class TrainerService {
     }
   }
 
+  async fetchTrainer(trainer_id: string) {
+    return await this.trainerRepository.getTrainerProfile(trainer_id)
+  }
+
   // Service Method
   async updateTrainer(trainer_id: string, trainerData: Partial<ITrainer>) {
     try {
@@ -462,13 +466,13 @@ class TrainerService {
   }
 
   
-  async sessionStatusChange(bookingId: string) {
-    try {
-    return await this.trainerRepository.updateSessionStatus(bookingId);
-    } catch (error) {
-      console.error('Error updating session status:', error);
-    }
-  }
+  // async sessionStatusChange(bookingId: string) {
+  //   try {
+  //   return await this.trainerRepository.updateSessionStatus(bookingId);
+  //   } catch (error) {
+  //     console.error('Error updating session status:', error);
+  //   }
+  // }
   
   async getWallet(trainer_id: string) {
     return await this.trainerRepository.fetchWalletData(trainer_id)
@@ -480,6 +484,16 @@ class TrainerService {
 
     } catch (error) {
       
+    }
+  }
+
+  async addPrescription(bookingId: string, prescription: string) {
+    try {
+      const prescriptionInfo = await this.trainerRepository.addPrescription(bookingId, prescription)
+      await this.trainerRepository.updateSessionStatus(bookingId);
+      return prescriptionInfo
+    } catch (error: any) {
+      throw new Error(error)
     }
   }
   

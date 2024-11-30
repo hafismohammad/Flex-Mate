@@ -52,7 +52,7 @@ function UserListing() {
   };
 
   const handleView = (user: User) => {
-    console.log(user);
+    console.log('user',user);
     
     setSelectedUser(user); 
     setIsModalOpen(true);

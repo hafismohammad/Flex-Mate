@@ -300,6 +300,7 @@ class UserRepository {
           trainerId: '$trainerDetails._id',
           trainerImage: '$trainerDetails.profileImage',
           trainerName: '$trainerDetails.name',
+          trainerEmail: '$trainerDetails.email',
           specialization: '$specialization', 
           sessionDates: {
             $cond: {
@@ -317,7 +318,8 @@ class UserRepository {
           endTime: '$endTime',
           sessionType: '$sessionType',
           bookingStatus: '$paymentStatus',
-          bookingDate: '$bookingDate'
+          bookingDate: '$bookingDate',
+          prescription: '$prescription'
         },
       },
       {
@@ -328,7 +330,6 @@ class UserRepository {
     ]);
     
     
-    // console.log(allBookings);
     
     return allBookings
   }

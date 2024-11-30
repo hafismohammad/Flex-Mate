@@ -24,7 +24,6 @@ function Message({ sender, message, time, userImage, trainerImage, }: MessagePro
 
   return (
     <div className={`chat ${sender === 'User' ? 'chat-end' : 'chat-start'}`}>
-      {/* {!sender && <} */}
       <div className="chat-image avatar">
         <div className="w-10 rounded-full">
           <img alt="Avatar" src={ sender === 'User'? userImage : trainerImage} />

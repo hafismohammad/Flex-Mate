@@ -20,6 +20,7 @@ interface TrainerState {
   videoCall:  VideoCallPayload | null;
   showVideoCallTrainer: boolean
   roomIdTrainer: null | string
+  showPrescription: boolean
 }
 
 interface VideoCallPayload {
@@ -47,7 +48,8 @@ const initialState: TrainerState = {
   error: null,
   videoCall: null,
   showVideoCallTrainer: false,
-  roomIdTrainer: null
+  roomIdTrainer: null,
+  showPrescription: false
 };
 
 const trainerSlice = createSlice({
@@ -81,10 +83,13 @@ const trainerSlice = createSlice({
       console.log('roomIdTrainer slice', state.roomIdTrainer);
       
     },
+    setPrescription(state, action: PayloadAction<boolean>) {
+      state.showPrescription = action.payload
+    },
     endCallTrainer: (state) => {
       state.videoCall = null;
       state.showVideoCallTrainer = false; 
-      state.roomIdTrainer = null;        
+      state.roomIdTrainer = null;   
       localStorage.removeItem("IncomingVideoCall"); 
     },
   },
@@ -204,5 +209,5 @@ const trainerSlice = createSlice({
 });
 
 // Export the actions and reducer
-export const { clearTrainer, setError, setLoading, setVideoCall, setShowVideoCall, setRoomId, endCallTrainer } = trainerSlice.actions;
+export const { clearTrainer, setError, setLoading, setVideoCall, setShowVideoCall, setRoomId, endCallTrainer, setPrescription } = trainerSlice.actions;
 export default trainerSlice.reducer;

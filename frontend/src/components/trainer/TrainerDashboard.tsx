@@ -61,39 +61,39 @@ function TrainerDashboard() {
   const totalUsers = new Set(bookingDetails.map((booking) => booking.userId))
     .size;
   const handleAction = async (bookingId: string) => {
-    try {
-      // Change session payment status to 'Completed'
-      const response = await axiosInstance.patch(
-        `/api/trainer/session-status-change/${bookingId}`
-      );
+    // try {
+    //   // Change session payment status to 'Completed'
+    //   const response = await axiosInstance.patch(
+    //     `/api/trainer/session-status-change/${bookingId}`
+    //   );
 
-      if (response.status === 200) {
-        // Update the booking details state with the new payment status
-        setBookingDetails((prevDetails) => {
-          return prevDetails.map((booking) => {
-            console.log("booking---", booking);
+    //   if (response.status === 200) {
+    //     // Update the booking details state with the new payment status
+    //     setBookingDetails((prevDetails) => {
+    //       return prevDetails.map((booking) => {
+    //         console.log("booking---", booking);
 
-            if (booking._id === bookingId) {
-              console.log("bookingId1", booking._id, "bookingId2", bookingId);
+    //         if (booking._id === bookingId) {
+    //           console.log("bookingId1", booking._id, "bookingId2", bookingId);
 
-              return { ...booking, paymentStatus: "Completed" }; // Update paymentStatus only
-            }
-            return booking;
-          });
-        });
+    //           return { ...booking, paymentStatus: "Completed" }; // Update paymentStatus only
+    //         }
+    //         return booking;
+    //       });
+    //     });
 
-        // Fetch updated wallet balance
-        const balanceResponse = await axiosInstance.get(
-          `/api/trainer/wallet-data/${trainerInfo.id}`
-        );
-        setWalletBalance(balanceResponse.data);
+    //     // Fetch updated wallet balance
+    //     const balanceResponse = await axiosInstance.get(
+    //       `/api/trainer/wallet-data/${trainerInfo.id}`
+    //     );
+    //     setWalletBalance(balanceResponse.data);
 
-        toast.success("Payment status updated to Completed!");
-      }
-    } catch (error) {
-      console.error("Error updating payment status:", error);
-      toast.error("Failed to update payment status.");
-    }
+    //     toast.success("Payment status updated to Completed!");
+    //   }
+    // } catch (error) {
+    //   console.error("Error updating payment status:", error);
+    //   toast.error("Failed to update payment status.");
+    // }
   };
 
   return (
@@ -131,21 +131,21 @@ function TrainerDashboard() {
         <h1 className="text-2xl font-bold text-gray-800">Upcoming Sessions</h1>
       </div>
       <div className="mt-10 bg-white shadow-md p-3">
-        <div className="grid grid-cols-7 gap-4 text-center text-lg font-bold border-b border-gray-200 pb-2">
+        <div className="grid grid-cols-6 gap-4 text-center text-lg font-bold border-b border-gray-200 pb-2">
           <div>User Name</div>
           <div>Date</div>
           <div>Time</div>
           <div>Session Type</div>
           <div>Specialization</div>
           <div>Status</div>
-          <div>Action</div>
+          {/* <div>Action</div> */}
         </div>
 
         {bookingDetails.length > 0 ? (
           bookingDetails.map((booking) => (
             <div
               key={booking._id}
-              className={`grid grid-cols-7 gap-4 items-center p-2 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none`}
+              className={`grid grid-cols-6 gap-4 items-center p-2 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none`}
             >
               <div className="text-center text-gray-800 font-medium">
                 {booking.userName}
@@ -177,7 +177,7 @@ function TrainerDashboard() {
                 {booking.paymentStatus}
               </div>
 
-              {booking.paymentStatus === "Confirmed" ? (
+              {/* {booking.paymentStatus === "Confirmed" ? (
                 <button
                   onClick={() => handleAction(booking._id)}
                   className="px-2 py-1 bg-blue-500 shadow-lg hover:bg-blue-700 rounded-lg text-white font-medium"
@@ -186,7 +186,7 @@ function TrainerDashboard() {
                 </button>
               ) : (
                 ""
-              )}
+              )} */}
             </div>
           ))
         ) : (

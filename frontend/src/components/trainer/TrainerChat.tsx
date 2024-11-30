@@ -112,7 +112,7 @@ function TrainerChat({ userId, bookingId }: TrainerChatProps) {
   }, [localMessages]);
 
   return (
-    <div className="w-full lg:max-w-full md:max-w-[450px] flex flex-col h-screen">
+    <div className="w-full lg:max-w-full md:max-w-[450px] flex flex-col h-[82vh] ">
       <div className=" bg-gray-500 px-4 py-2 mb-2 h-14 flex justify-between sticky top-0 z-10">
         <div className="flex items-start gap-5">
           <img className="h-10 w-10 rounded-full" src={userData?.image} alt="" />
@@ -145,7 +145,7 @@ function TrainerChat({ userId, bookingId }: TrainerChatProps) {
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="px-4 py-2 border-t border-gray-700 bg-gray-800 sticky bottom-0 z-10">
+      <div className="px-4 py-2 border-t border-gray-700 bg-gray-800 ">
         <MessageInputBar userId={userId} onNewMessage={handleNewMessage} />
       </div>
 

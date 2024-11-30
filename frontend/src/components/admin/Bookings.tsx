@@ -30,6 +30,8 @@ function Bookings() {
       return false;
     if (filterStatus === "confirmed" && booking.status !== "Confirmed")
       return false;
+    if (filterStatus === "completed" && booking.status !== "Completed")
+      return false
     if (
       filterSessionType === "single" &&
       booking.sessionType !== "Single Session"
@@ -73,6 +75,7 @@ function Bookings() {
             <option value="all">All</option>
             <option value="confirmed">Confirmed</option>
             <option value="cancelled">Cancelled</option>
+            <option value="completed">Completed</option>
           </select>
           <select
             onChange={(e) => sessionType(e.target.value)}
@@ -142,7 +145,7 @@ function Bookings() {
                     ? "text-green-600"
                     : booking.status === "Cancelled"
                     ? "text-red-600"
-                    : booking.status === "OnGoing"
+                    : booking.status === "Completed"
                     ? "text-blue-600"
                     : ""
                 }`}

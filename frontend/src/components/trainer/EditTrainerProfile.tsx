@@ -115,7 +115,6 @@ const EditTrainerProfile: React.FC = () => {
       console.log("File not received");
     }
   };
-console.log('formdata for spec', formData);
 
   const handleProfileUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

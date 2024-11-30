@@ -89,9 +89,9 @@ const handleNewMessage = (newMessage: any) => {
 
 
   return (
-    <div className="w-full lg:max-w-full md:max-w-[450px] flex flex-col h-screen">
+    <div className="w-full lg:max-w-full md:max-w-[450px] h-[82vh] flex flex-col ">
       <div className="bg-gray-500 px-4 py-2 mb-2 h-14 flex justify-between sticky top-0 z-10 ">
-       <div className="flex items-start gap-5">
+       <div className="flex items-start gap-5 ">
        <img className="h-10 w-10 rounded-full " src={trainerData?.profileImage} alt="profile" />
        <h1 className="text-lg font-medium text-white">{trainerData?.name}</h1>
        </div>

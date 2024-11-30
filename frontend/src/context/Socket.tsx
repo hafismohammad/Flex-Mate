@@ -4,7 +4,7 @@ import { Socket, io } from "socket.io-client";
 import { AppDispatch, RootState } from "../app/store";
 import { useDispatch } from "react-redux";
 import { endCallUser, setShowIncomingVideoCall, setRoomIdUser, setShowVideoCallUser, setVideoCallUser } from "../features/user/userSlice";
-import { endCallTrainer,setVideoCall, setShowVideoCall, setRoomId } from "../features/trainer/trainerSlice";
+import { endCallTrainer,setVideoCall, setShowVideoCall, setRoomId , setPrescription} from "../features/trainer/trainerSlice";
 import toast from "react-hot-toast";
 
 interface SocketContextType {
@@ -99,7 +99,8 @@ export const SocketContextProvider = ({
     })
 
     newSocket.on("call-rejected", () => { 
-      toast.error("Call ended or rejected");
+      toast.error("Call ended or rejected --------<<<>>>");
+      dispatch(setVideoCall(null))
       dispatch(endCallTrainer());
       dispatch(endCallUser());
     });
@@ -109,6 +110,7 @@ export const SocketContextProvider = ({
     
       // If the user who left is the logged-in user
       if (data === userInfo?.id) {
+        dispatch(setPrescription(true))
         dispatch(setShowVideoCallUser(false));
         dispatch(setRoomIdUser(null));
         dispatch(setVideoCallUser(null));
@@ -117,6 +119,8 @@ export const SocketContextProvider = ({
       
       // If the user who left is not the logged-in user (likely the other party in the call)
       else if (data === trainerInfo?.id) {
+        
+        dispatch(setPrescription(true))
         dispatch(setShowVideoCall(false));
         dispatch(setRoomId(null));
         dispatch(setVideoCall(null));

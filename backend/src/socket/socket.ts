@@ -121,6 +121,7 @@ io.on("connection", (socket) => {
   socket.on('reject-call', (data) => {
     const friendSocketId = getReceiverSocketId(data.to);
     if (friendSocketId) {
+      
       socket.to(friendSocketId).emit('call-rejected');
     } else {
       console.error(`No socket ID found for the receiver with ID: ${data.to}`);

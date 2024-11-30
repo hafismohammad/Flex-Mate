@@ -41,9 +41,10 @@ router.get('/shedules/:trainerId',  authMiddlewares(['trainer']), trainerControl
 router.delete('/sessions/:sessionId',  authMiddlewares(['trainer']), trainerController.deleteSessionSchedule.bind(trainerController))
 router.get('/booking-details/:trainerId',  authMiddlewares(['trainer']), trainerController.fetchBookingDetails.bind(trainerController))
 router.get('/users/:userId', authMiddlewares(['trainer']), trainerController.fetchUser.bind(trainerController))
-router.patch('/session-status-change/:bookingId', authMiddlewares(['trainer']), trainerController.sessionStatusChange.bind(trainerController))
+// router.patch('/session-status-change/:bookingId', authMiddlewares(['trainer']), trainerController.sessionStatusChange.bind(trainerController))
 router.get('/wallet-data/:trainerId', authMiddlewares(['trainer']), trainerController.gatWalletData.bind(trainerController))
 router.post('/withdraw/:trainerId', authMiddlewares(['trainer']), trainerController.withdraw.bind(trainerController))
+router.post('/prescriptions/:bookingId', authMiddlewares(['trainer']), trainerController.addPrescriptionInfo.bind(trainerController))
 
 
 

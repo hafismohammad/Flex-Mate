@@ -3,7 +3,8 @@
 import { NextFunction, Request, Response } from "express";
 import TrainerService from "../services/trainerServices";
 import { ITrainer } from "../interface/trainer_interface";
-import { uploadToCloudinary } from "../config/cloudinary";
+import { deleteFromCloudinary, uploadToCloudinary } from "../config/cloudinary";
+import TrainerRepository from "../repositories/trainerRepository";
 class TrainerController {
   private trainerService: TrainerService;
 
@@ -244,6 +245,10 @@ class TrainerController {
       const trainer_id = req.params.trainerId;
       const trainerData = req.body;
   
+      const existingTrainerProfile = await this.trainerService.fetchTrainer(trainer_id)
+      if(existingTrainerProfile) {
+         await deleteFromCloudinary(existingTrainerProfile)
+      }
       const documents: { [key: string]: string | undefined } = {};
   
       if (req.file) {
@@ -425,14 +430,14 @@ class TrainerController {
     }
   }
 
-  async sessionStatusChange(req: Request, res: Response, next: NextFunction) {
-    try {
-      const {bookingId} = req.params
-      const newStatus = await this.trainerService.sessionStatusChange(bookingId)
-    } catch (error) {
-      next(error)
-    }
-  }
+  // async sessionStatusChange(req: Request, res: Response, next: NextFunction) {
+  //   try {
+  //     const {bookingId} = req.params
+  //     const newStatus = await this.trainerService.sessionStatusChange(bookingId)
+  //   } catch (error) {
+  //     next(error)
+  //   }
+  // }
 
   async gatWalletData(req: Request, res: Response, next: NextFunction) {
     try {
@@ -444,12 +449,28 @@ class TrainerController {
     }
   }
 
-  async withdraw(req: Request, res: Response) {
+  async withdraw(req: Request, res: Response, next: NextFunction) {
+   try {
     const {trainerId} = req.params
     const {amount} = req.body
 
     const withdrawed = await this.trainerService.withdraw(trainerId, amount)
     res.status(200).json(withdrawed)
+   } catch (error) {
+    next(error)
+   }
+  }
+
+  async addPrescriptionInfo(req: Request, res: Response, next: NextFunction) {
+    try {
+      const {bookingId} = req.params
+      const prescriptions = req.body.data
+      const prescriptionInfo = await this.trainerService.addPrescription(bookingId, prescriptions)
+      console.log('prescriptionInfo',prescriptionInfo);
+      res.status(200).json({message: 'Prescription sent successfully'})
+    } catch (error) {
+      next(error)
+    }
   }
 }
 

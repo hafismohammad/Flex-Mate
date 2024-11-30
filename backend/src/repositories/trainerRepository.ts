@@ -256,6 +256,15 @@ class TrainerRepository {
     }
   }
 
+  async getTrainerProfile(trainer_id: string) {
+    try {
+      const trainerData = await this.trainerModel.findById(trainer_id) 
+      return trainerData?.profileImage
+    } catch (error) {
+      
+    }
+  }
+
   // Repository Method
   async updateTrainerData(trainer_id: string) {
     try {
@@ -522,6 +531,7 @@ class TrainerRepository {
             userId: "$userDetails._id",
             userName: "$userDetails.name",
             userImage: "$userDetails.image",
+            userMail: '$userDetails.email',
             trainerName: "$trainerDetails.name",
             sessionDate: {
               $ifNull: ["$sessionDetails.startDate", null], // If session is deleted, show as null
@@ -659,6 +669,17 @@ class TrainerRepository {
     } catch (error: any) {
       console.error("Error processing withdrawal:", error.message);
       throw new Error(error.message);
+    }
+  }
+  async addPrescription(bookingId: string, prescriptions: string) {
+    try {
+      const prescriptionInfo = await this.bookingModel.findByIdAndUpdate(bookingId,
+        {prescription: prescriptions},
+        { new: true, runValidators: true }
+      )
+      return prescriptionInfo
+    } catch (error) {
+      
     }
   }
 

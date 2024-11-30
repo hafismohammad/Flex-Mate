@@ -19,11 +19,15 @@ interface Booking {
   endTime: string;
   bookingStatus: string;
   bookingDate: string;
+  prescription?: string;
+  trainerEmail: string
 }
 
 function Bookings() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const { userInfo } = useSelector((state: RootState) => state.user);
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [prescriptionData, setPrescriptionData] = useState<Booking | null>(null)
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -71,6 +75,14 @@ function Bookings() {
     });
   };
 
+
+  const handleView = (booking: Booking) => {
+    setPrescriptionData(booking)
+    console.log('booking', booking);
+    
+    setIsModalOpen(true)
+  }
+
   return (
     <div className="flex justify-center mt-5">
       <div className="h-[80vh] bg-white w-full shadow-md rounded-md overflow-y-auto p-3">
@@ -90,7 +102,7 @@ function Bookings() {
         {bookings.map((booking) => (
           <div
             key={booking._id}
-            className="grid grid-cols-9 gap-2 items-center p-4 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none"
+            className="grid grid-cols-9 gap-2 items-center p-4 px-6 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none"
           >
             <div className="flex items-center space-x-2">
               <img
@@ -135,20 +147,94 @@ function Bookings() {
             </div>
 
             <div>
-              {booking.bookingStatus !== "Cancelled" ? (
+              {booking.bookingStatus === "Confirmed" && (
                 <button
                   onClick={() => handleCancelBooking(booking._id)}
-                  className="bg-red-500 hover:bg-red-700 font-bold text-white px-6 py-2 rounded-lg"
+                  className="bg-red-500 hover:bg-red-700 font-bold text-white px-5 py-1 rounded-lg"
                 >
                   Cancel
                 </button>
+              )}
+              {booking.bookingStatus === "Completed" && (
+                <button onClick={() => handleView(booking)} className="bg-blue-500 hover:bg-blue-700 font-bold text-white px-7 py-1 rounded-lg">
+                  View
+                </button>
+              )}
+            </div>
+
+            {/* <div>
+              {booking.bookingStatus !== "Cancelled"  && booking.bookingStatus !== 'Completed'? (
+               <div className="flex justify-center gap-2">
+                 <button
+                  onClick={() => handleCancelBooking(booking._id)}
+                  className="bg-red-500 hover:bg-red-700 font-bold text-white px-4 py-1 rounded-lg"
+                >
+                  Cancel
+                </button>
+                <button className="bg-blue-500 hover:bg-blue-700 font-bold text-white px-4 py-1 rounded-lg">View</button>
+               </div>
               ) : (
                 ""
               )}
-            </div>
+            </div> */}
           </div>
         ))}
       </div>
+     
+      {isModalOpen && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <div className="bg-white rounded-lg p-6 w-[800px] shadow-lg">
+      <h1 className="font-bold text-xl text-center mb-6">Prescription</h1>
+      <div className="p-4 bg-gray-100 rounded-lg shadow-md">
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
+            <img
+              src={prescriptionData?.trainerImage || "/default-profile.png"}
+              alt="Trainer Profile"
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="text-gray-800">
+            <p>
+              <strong>Name:</strong> {prescriptionData?.trainerName || "N/A"}
+            </p>
+            <p>
+              <strong>Email:</strong> {prescriptionData?.trainerEmail || "N/A"}
+            </p>
+            <p>
+              <strong>Specialization:</strong> {prescriptionData?.specialization || "N/A"}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <label className="block font-medium text-gray-700 mb-2">
+            Prescription
+          </label>
+          <div className="w-full border rounded-md p-3 text-gray-700 bg-gray-50">
+            {prescriptionData?.prescription
+              ? prescriptionData.prescription.split('\n').map((line, index) => (
+                  <p key={index}>{line.trim()}</p>
+                ))
+              : "No prescription available."}
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex justify-end gap-4 mt-6">
+          <button
+            onClick={() => setIsModalOpen(false)}
+            className="px-5 py-2 bg-red-500 hover:bg-red-700 rounded-md shadow-md text-white"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+
     </div>
   );
 }

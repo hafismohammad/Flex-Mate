@@ -42,6 +42,7 @@ export interface IBooking {
     createdAt: Date; 
     updatedAt: Date; 
     payment_intent?: string;
+    prescription?: string
   }
 
   export interface IVideoCall extends Document {

@@ -5,15 +5,15 @@ import { useSocketContext } from "../../context/Socket";
 import userAxiosInstance from "../../../axios/userAxionInstance";
 import UserChat from "./UserChat";
 import axios from "axios";
-import { IVideoCall, IVideoCallUser } from "../../types/common";
+import { IVideoCallUser } from "../../types/common";
 import API_URL from "../../../axios/API_URL";
-// import UserChat from "./UserChat";
 
 interface Trainer {
   trainerId: string;
   trainerName: string;
   trainerImage: string;
   hasNewMessage: boolean;
+  messageCount: number;
 }
 
 function ChatSideBar() {
@@ -27,13 +27,23 @@ function ChatSideBar() {
   const [isHistory, setIsHistory] = useState(false);
   const { socket } = useSocketContext();
 
+  // Helper to load message counts from local storage
+  const loadMessageCounts = () => {
+    const savedCounts = localStorage.getItem("messageCounts");
+    return savedCounts ? JSON.parse(savedCounts) : {};
+  };
+
+  // Helper to save message counts to local storage
+  const saveMessageCounts = (counts: Record<string, number>) => {
+    localStorage.setItem("messageCounts", JSON.stringify(counts));
+  };
+
   useEffect(() => {
     const fetchCallHistory = async () => {
       try {
         const response = await axios.get(
           `${API_URL}/api/messages/call-history-user/${userId}`
         );
-        console.log("response historuy", response.data);
 
         setCallHistory(response.data || []);
       } catch (error) {
@@ -49,12 +59,9 @@ function ChatSideBar() {
         const response = await userAxiosInstance.get(
           `/api/user/bookings-details/${userId}`
         );
-        const confirmedBookings = response.data.filter(
-          (booking: any) => booking.bookingStatus === "Confirmed"
-        );
 
         const seenTrainerIds = new Set();
-        const uniqueTrainers = confirmedBookings.filter((booking: any) => {
+        const uniqueTrainers = response.data.filter((booking: any) => {
           if (seenTrainerIds.has(booking.trainerId)) {
             return false;
           }
@@ -62,12 +69,15 @@ function ChatSideBar() {
           return true;
         });
 
+        const messageCounts = loadMessageCounts();
+
         setTrainers(
           uniqueTrainers.map((booking: any) => ({
             trainerId: booking.trainerId,
             trainerName: booking.trainerName,
             trainerImage: booking.trainerImage || "/default-avatar.png",
-            hasNewMessage: false,
+            hasNewMessage: !!messageCounts[booking.trainerId],
+            messageCount: messageCounts[booking.trainerId] || 0,
           }))
         );
       } catch (error) {
@@ -80,43 +90,68 @@ function ChatSideBar() {
 
   useEffect(() => {
     const handleNewMessage = (data: { userId: string; receiverId: string }) => {
+      // Check if the message is relevant to the current user
+      if (data.receiverId !== userId) return;
+  
       setTrainers((prevTrainers) => {
         const updatedTrainers = [...prevTrainers];
+        const messageCounts = loadMessageCounts();
+  
+        // Find the index of the trainer who sent the message
         const index = updatedTrainers.findIndex(
-          (trainer) =>
-            trainer.trainerId === data.userId && userId === data.receiverId
+          (trainer) => trainer.trainerId === data.userId
         );
-
+  
         if (index > -1) {
+          const trainerId = updatedTrainers[index].trainerId;
+  
+          // Increment and persist the message count
+          messageCounts[trainerId] = (messageCounts[trainerId] || 0) + 1;
+          saveMessageCounts(messageCounts);
+  
+          // Update the trainer with new message info
           updatedTrainers[index] = {
             ...updatedTrainers[index],
             hasNewMessage: true,
+            messageCount: messageCounts[trainerId],
           };
-
-          // Move trainer to the top of the list
+  
+          // Move the trainer to the top of the list
           const [trainer] = updatedTrainers.splice(index, 1);
           updatedTrainers.unshift(trainer);
         }
+  
         return updatedTrainers;
       });
     };
-
+  
+    // Listen for new message events from the socket
     socket?.on("messageUpdate", handleNewMessage);
-
+  
     return () => {
       socket?.off("messageUpdate", handleNewMessage);
     };
-  }, [socket, trainers]);
+  }, [socket, userId]);
+  
 
   const handleTrainerSelect = (trainerId: string) => {
     setSelectedTrainerId(trainerId);
-    setTrainers((prevTrainers) =>
-      prevTrainers.map((trainer) =>
-        trainer.trainerId === trainerId
-          ? { ...trainer, hasNewMessage: false }
-          : trainer
-      )
-    );
+
+    // Reset new message count for the selected trainer
+    setTrainers((prevTrainers) => {
+      const messageCounts = loadMessageCounts();
+
+      const updatedTrainers = prevTrainers.map((trainer) => {
+        if (trainer.trainerId === trainerId) {
+          messageCounts[trainerId] = 0; // Reset count
+          saveMessageCounts(messageCounts);
+          return { ...trainer, hasNewMessage: false, messageCount: 0 };
+        }
+        return trainer;
+      });
+
+      return updatedTrainers;
+    });
   };
 
   const handleClick = (type: string) => {
@@ -167,7 +202,7 @@ function ChatSideBar() {
                       <h3 className="font-semibold">{trainer.trainerName}</h3>
                       {trainer.hasNewMessage && (
                         <span className="text-sm text-red-500">
-                          New Message
+                          New Message ({trainer.messageCount})
                         </span>
                       )}
                     </div>
@@ -182,31 +217,31 @@ function ChatSideBar() {
           </div>
         ) : (
           <div className="bg-gray-50 p-4 rounded-lg mt-4">
-          {callHistory.length > 0 ? (
-            callHistory.map((call) => (
-            <div className="flex">
-                <div key={call.roomId} className="flex items-center mb-4">
-                <img
-                  className="h-10 w-10 rounded-full"
-                  src={call.trainerId.profileImage || "/default-avatar.png"}
-                  alt={call.trainerId?.name || "User"}
-                />
-                <div className="ml-4">
-                  <h3 className="font-semibold">
-                    {call.trainerId?.name || "Unknown User"}
-                  </h3>
-                  <p className="text-sm text-gray-500">In coming</p>
+            {callHistory.length > 0 ? (
+              callHistory.map((call) => (
+                <div className="flex">
+                  <div key={call.roomId} className="flex items-center mb-4">
+                    <img
+                      className="h-10 w-10 rounded-full"
+                      src={call.trainerId.profileImage || "/default-avatar.png"}
+                      alt={call.trainerId?.name || "User"}
+                    />
+                    <div className="ml-4">
+                      <h3 className="font-semibold">
+                        {call.trainerId?.name || "Unknown User"}
+                      </h3>
+                      <p className="text-sm text-gray-500">Incoming</p>
+                    </div>
+                  </div>
+                  <h1>{new Date(call.startedAt).toLocaleTimeString()}</h1>
                 </div>
+              ))
+            ) : (
+              <div className="text-center text-gray-600">
+                <p>No call history available.</p>
               </div>
-              <h1>{new Date(call.startedAt).toLocaleTimeString()}</h1>
-            </div>
-            ))
-          ) : (
-            <div className="text-center text-gray-600">
-              <p>No call history available.</p>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
         )}
       </div>
 
