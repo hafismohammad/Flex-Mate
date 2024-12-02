@@ -56,3 +56,9 @@ export interface IBooking {
     updatedAt: Date;
   }
   
+export  interface IReview {
+  userId: mongoose.Types.ObjectId
+  trainerId: mongoose.Types.ObjectId
+  rating: number
+  comment: string
+}

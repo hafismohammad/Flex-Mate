@@ -30,7 +30,10 @@ router.patch('/users',  authMiddlewares(['user']), userController.updateUserData
 router.patch('/profile-image/:userId',  authMiddlewares(['user']), upload.single('profileImage'), userController.uploadProfileImage.bind(userController))
 router.get('/bookings-details/:userId',  authMiddlewares(['user']), userController.getAllBookings.bind(userController))
 router.patch('/cancel-booking/:bookingId', userController.cancelBooking.bind(userController))
-
+router.post('/review', authMiddlewares(['user']), userController.addReview.bind(userController))
+router.get('/reviews/:trainerId', authMiddlewares(['user']), userController.getReivew.bind(userController))
+router.get('/bookings/:userId/:trainerId', authMiddlewares(['user']), userController.findbookings.bind(userController))
+router.patch('/edit-review', authMiddlewares(['user']), userController.editReview.bind(userController))
 
 
 export default router;

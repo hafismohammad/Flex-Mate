@@ -32,21 +32,24 @@ function UserChat({ trainerId }: TrainerChatProps) {
   const {  trainerInfo } = useSelector((state: RootState) => state.trainer);
   let {socket}  = useSocketContext()
 
-useEffect(() => {
-  const trainerData = async () => { 
-   const response =  await axios(`${API_URL}/api/user/trainers/${trainerId}`)
-    setTrainerData(response.data[0])
-  }
-  trainerData()
-},[socket,trainerData])
+  useEffect(() => {
+    const fetchTrainerData = async () => { 
+      const response =  await axios(`${API_URL}/api/user/trainers/${trainerId}`);
+      setTrainerData(response.data[0]);
+    }
+    fetchTrainerData();
+  }, [socket, trainerId]);
+  
 
-useEffect(() => {
-  const trainerData = async () => { 
-   const response =  await userAxiosInstance(`/api/user/users/${userInfo?.id}`)
-    setUserData(response.data)
-  }
-  trainerData()
-},[socket])
+  useEffect(() => {
+    if (!userInfo?.id) return;
+  
+    const fetchUserData = async () => { 
+      const response =  await userAxiosInstance(`/api/user/users/${userInfo.id}`);
+      setUserData(response.data);
+    }
+    fetchUserData();
+  }, [socket, userInfo?.id]);
 
 
 

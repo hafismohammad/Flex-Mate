@@ -90,7 +90,7 @@ function ChatSideBar() {
 
   useEffect(() => {
     const handleNewMessage = (data: { userId: string; receiverId: string }) => {
-      // Check if the message is relevant to the current user
+      
       if (data.receiverId !== userId) return;
   
       setTrainers((prevTrainers) => {

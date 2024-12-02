@@ -41,10 +41,10 @@ class UserService {
       console.log("Generated OTP is", this.OTP);
 
       // Send OTP to user's email
-      const isMailSent = await sendMail('otp',userData.email, this.OTP);
-      if (!isMailSent) {
-        throw new Error("Email not sent");
-      }
+      // const isMailSent = await sendMail('otp',userData.email, this.OTP);
+      // if (!isMailSent) {
+      //   throw new Error("Email not sent");
+      // }
 
       const OTP_createdTime = new Date();
       this.expiryOTP_time = new Date(OTP_createdTime.getTime() + 1 * 60 * 1000);
@@ -123,10 +123,10 @@ class UserService {
 
       await this.userRepository.saveOTP(email, this.OTP, this.expiryOTP_time);
 
-      const isMailSent = await sendMail('otp',email, this.OTP);
-      if (!isMailSent) {
-        throw new Error("Failed to resend OTP email.");
-      }
+      // const isMailSent = await sendMail('otp',email, this.OTP);
+      // if (!isMailSent) {
+      //   throw new Error("Failed to resend OTP email.");
+      // }
 
       console.log(`Resent OTP ${this.OTP} to ${email}`);
     } catch (error) {
@@ -439,6 +439,41 @@ class UserService {
     }
   }
   
+  async addReview(reviewComment: string, selectedRating: number, userId: string, trainerId: string) {
+    try {
+      return await this.userRepository.createReview(reviewComment, selectedRating, userId, trainerId)
+    } catch (error) {
+      throw new Error('Failed to create review');
+    }
+  }
+
+  async editReview(reviewComment: string, selectedRating: number,userReviewId: string) {
+    try {
+      return await this.userRepository.editReview(reviewComment, selectedRating, userReviewId)
+    } catch (error) {
+      throw new Error('Failed to create review');
+    }
+  }
+  async reviews(trainer_id: string) {
+    try {
+      return await this.userRepository.getReview(trainer_id)
+    } catch (error) {
+      throw new Error('failed to find review')    
+    }
+  }
+ async findBookings(user_id: string, trainerId: string) {
+  try {
+    const bookingData = await this.userRepository.findBookings(user_id, trainerId)
+    return bookingData?.paymentStatus
+    // if(bookingData.length === 0) {
+    //   return false
+    // } else {
+    //   return true
+    // }
+  } catch (error) {
+    throw new Error('failed to find booking') 
+  }
+ }
   
 }
 

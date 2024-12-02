@@ -307,16 +307,58 @@ class UserController {
     }
   }
 
-  async cancelBooking(req: Request, res: Response) {
+  async cancelBooking(req: Request, res: Response, next: NextFunction) {
     try {
         const { bookingId } = req.params;
         const bookingCancelled = await this.userService.cancelBooking(bookingId);
         res.status(200).json({ message: "Booking canceled and refund processed" });
     } catch (error) {
-        console.error("Error canceling booking:", error);
-        res.status(500).json({ message: "Error canceling booking", error });
+       next(error)
     }
 }
+  async addReview(req: Request, res: Response, next: NextFunction) {
+    try {
+      
+      const { reviewComment, selectedRating, userId, trainerId } = req.body;
+      const response = await this.userService.addReview(reviewComment, selectedRating, userId, trainerId )      
+      console.log(response);
+      let reviewId = response._id
+      res.status(200).json({message: 'Review created successfully',reviewId})
+    } catch (error) {
+      next(error)
+    }
+  }
+  async editReview(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { reviewComment, selectedRating, userReviewId} = req.body;
+      const response = await this.userService.editReview(reviewComment, selectedRating ,userReviewId)      
+      res.status(200).json({message: 'Review edited successfully'})
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async getReivew(req: Request, res: Response, next: NextFunction) {
+    try {
+
+      const {trainerId} = req.params
+      const reviews =await this.userService.reviews(trainerId)
+      res.status(200).json(reviews)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async findbookings(req: Request, res: Response, next: NextFunction) {
+    try {
+      const {userId, trainerId} = req.params
+      const bookingStatus = await this.userService.findBookings(userId, trainerId)
+      res.status(200).json(bookingStatus)
+    } catch (error) {
+      next(error)
+    }
+  }
+
 }
 
 export default UserController;

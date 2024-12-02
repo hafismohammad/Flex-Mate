@@ -8,6 +8,7 @@ import SessionModel from "../models/sessionModel";
 import BookingModel from "../models/booking";
 import { User } from "../interface/user_interface";
 import { ISpecialization } from "../interface/trainer_interface";
+import ReviewModel from "../models/reviewMolel";
 
 class UserRepository {
   private userModel = UserModel;
@@ -16,7 +17,8 @@ class UserRepository {
   private specializationModel = SpecializationModel;
   private sessionModel = SessionModel;
   private bookingModel = BookingModel;
-  // Check if user already exists by email
+  private reviewModel =  ReviewModel
+
   async existsUser(email: string): Promise<IUser | null> {
     try {
       return await this.userModel.findOne({ email });
@@ -343,6 +345,118 @@ class UserRepository {
         throw error;
     }
 }
+
+async createReview(
+  reviewComment: string, selectedRating: number, userId: string, trainerId: string
+) {
+  try {
+    const data = {
+      userId: new mongoose.Types.ObjectId(userId), 
+      trainerId: new mongoose.Types.ObjectId(trainerId), 
+      rating: selectedRating,
+      comment: reviewComment,
+    };
+
+    const addReview = await this.reviewModel.create(data); 
+
+    return addReview; 
+  } catch (error) {
+    console.error('Error creating review:', error);
+    throw new Error('Failed to create review');
+  }
+}
+
+async editReview(
+  reviewComment: string, selectedRating: number, userReviewId: string
+) {
+  try {
+console.log('userReviewId',userReviewId);
+
+
+    // const data = {
+    //   userId: new mongoose.Types.ObjectId(userId), 
+    //   trainerId: new mongoose.Types.ObjectId(trainerId), 
+    //   rating: selectedRating,
+    //   comment: reviewComment,
+    // };
+
+    const review = await this.reviewModel.findByIdAndUpdate(
+      userReviewId,
+      { comment: reviewComment, rating: selectedRating }, 
+      { new: true }
+    );
+    
+    console.log(review);
+    
+
+    // return addReview; 
+
+    
+  } catch (error) {
+    console.error('Error creating review:', error);
+    throw new Error('Failed to create review');
+  }
+}
+
+
+async getReview(trainer_id: string) {
+  try {
+    const reviews = await this.reviewModel.aggregate([
+      {
+        $match: { trainerId: new mongoose.Types.ObjectId(trainer_id) }
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'userDetails'
+        }
+      },
+      {
+        $unwind: {
+          path: '$userDetails'
+        }
+      },
+      {
+        $project: {
+          review_id: '$_id',
+          comment: '$comment',
+          rating: '$rating',
+          userName: '$userDetails.name',
+          userImage: '$userDetails.image',
+          userId: '$userDetails._id',
+          createdAt: 1 
+        }
+      },
+      {
+        $sort: {
+          createdAt: -1 
+        }
+      }
+    ]);
+
+    return reviews;
+  } catch (error) {
+    console.error('Error finding review:', error);
+    throw new Error('Failed to find review');
+  }
+}
+
+
+async findBookings(user_id: string, trainer_id: string) {
+  try {
+    const bookingData = await this.bookingModel.findOne({userId: user_id, trainerId: trainer_id})
+    
+    return bookingData   
+    // const bookingDataCount = await this.bookingModel.countDocuments({userId :user_id})
+    // return bookingDataCount    
+  } catch (error) {
+    console.error('Error finding bookings:', error);
+    throw new Error('Failed to find bookings');
+  }
+}
+
 }
 
 export default UserRepository;

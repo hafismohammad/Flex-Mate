@@ -187,41 +187,7 @@ function ChatSideBar() {
     } catch (error) {}
   };
 
-  // const handleAction = async (bookingId: string) => {
-  //   try {
-  //     // Change session payment status to 'Completed'
-  //     const response = await axiosInstance.patch(
-  //       `/api/trainer/session-status-change/${bookingId}`
-  //     );
 
-  //     if (response.status === 200) {
-  //       // Update the booking details state with the new payment status
-  //       setBookingDetails((prevDetails) => {
-  //         return prevDetails.map((booking) => {
-  //           console.log("booking---", booking);
-
-  //           if (booking._id === bookingId) {
-  //             console.log("bookingId1", booking._id, "bookingId2", bookingId);
-
-  //             return { ...booking, paymentStatus: "Completed" }; // Update paymentStatus only
-  //           }
-  //           return booking;
-  //         });
-  //       });
-
-  //       // Fetch updated wallet balance
-  //       const balanceResponse = await axiosInstance.get(
-  //         `/api/trainer/wallet-data/${trainerInfo.id}`
-  //       );
-  //       setWalletBalance(balanceResponse.data);
-
-  //       toast.success("Payment status updated to Completed!");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error updating payment status:", error);
-  //     toast.error("Failed to update payment status.");
-  //   }
-  // };
 
   return (
     <div className="flex ">

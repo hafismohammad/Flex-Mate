@@ -73,3 +73,13 @@ export interface IVideoCallUser extends Document {
   updatedAt: Date;
 }
 
+
+
+export interface IReview {
+  review_id: string
+  comment: string
+  rating: number
+  userName: string
+  userImage: string
+  userId : string
+}
