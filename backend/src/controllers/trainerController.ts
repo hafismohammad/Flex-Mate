@@ -472,6 +472,16 @@ class TrainerController {
       next(error)
     }
   }
+
+  async getNotifications(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { trainerId } = req.params;
+      const notifications = await this.trainerService.getNotifications(trainerId);
+      res.status(200).json(notifications);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default TrainerController;

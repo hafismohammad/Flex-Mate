@@ -27,6 +27,7 @@ export interface ILoginUser {
 }
 
 export interface IBooking {
+    _id?: mongoose.Types.ObjectId;
     sessionId: mongoose.Types.ObjectId;
     trainerId: mongoose.Types.ObjectId;
     userId: mongoose.Types.ObjectId | undefined; 
@@ -61,4 +62,14 @@ export  interface IReview {
   trainerId: mongoose.Types.ObjectId
   rating: number
   comment: string
+}
+export interface INotificationContent {
+  content: string;
+  bookingId: mongoose.Types.ObjectId;
+  read: boolean;
+}
+
+export interface INotification {
+  receiverId: mongoose.Types.ObjectId;
+  notifications: INotificationContent[];
 }

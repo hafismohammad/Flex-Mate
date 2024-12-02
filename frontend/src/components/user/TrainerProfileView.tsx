@@ -202,13 +202,13 @@ console.log('userReviewId',userReviewId);
         `/api/user/bookings/${userInfo?.id}/${trainerId}`
       );
       setBookingStatus(response.data);
-      console.log('response.data',response.data);
       
     };
 
     findBooking();
   }, []);
 
+  console.log('bookingStatus',bookingStatus);
   
 
   return (
@@ -534,7 +534,7 @@ console.log('userReviewId',userReviewId);
         </div>
       )}
       <div className="flex justify-center">
-        <h1 className="text-2xl mt-5 font-bold"> What clients are saying</h1>
+        <h1 className="text-2xl mt-5 font-bold"> {bookingStatus === 'Completed' ?'What clients are saying': ''}</h1>
       </div>
       {bookingStatus === 'Completed' ? (
         <div className="flex justify-end mr-10">

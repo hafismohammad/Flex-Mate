@@ -466,14 +466,6 @@ class TrainerService {
   }
 
   
-  // async sessionStatusChange(bookingId: string) {
-  //   try {
-  //   return await this.trainerRepository.updateSessionStatus(bookingId);
-  //   } catch (error) {
-  //     console.error('Error updating session status:', error);
-  //   }
-  // }
-  
   async getWallet(trainer_id: string) {
     return await this.trainerRepository.fetchWalletData(trainer_id)
   }
@@ -496,6 +488,16 @@ class TrainerService {
       throw new Error(error)
     }
   }
+
+  async getNotifications(trainerId: string) {
+    try {
+      console.log('services');
+      
+      return await this.trainerRepository.fetchNotifications(trainerId)
+    } catch (error) {
+      throw new Error('failed to find notifications')
+    }
+   }
   
 }
 

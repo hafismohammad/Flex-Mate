@@ -35,7 +35,6 @@ function TrainerDashboard() {
   const [bookingDetails, setBookingDetails] = useState<BookingDetail[]>([]);
   const [walletBalcance, setWalletBalance] = useState<IWallet | null>(null);
   const { trainerInfo } = useSelector((state: RootState) => state.trainer);
-  console.log("bookingdetails", bookingDetails);
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -58,43 +57,8 @@ function TrainerDashboard() {
   }, []);
 
   const totalSessions = bookingDetails.length;
-  const totalUsers = new Set(bookingDetails.map((booking) => booking.userId))
-    .size;
-  const handleAction = async (bookingId: string) => {
-    // try {
-    //   // Change session payment status to 'Completed'
-    //   const response = await axiosInstance.patch(
-    //     `/api/trainer/session-status-change/${bookingId}`
-    //   );
+  const totalUsers = new Set(bookingDetails.map((booking) => booking.userId)).size;
 
-    //   if (response.status === 200) {
-    //     // Update the booking details state with the new payment status
-    //     setBookingDetails((prevDetails) => {
-    //       return prevDetails.map((booking) => {
-    //         console.log("booking---", booking);
-
-    //         if (booking._id === bookingId) {
-    //           console.log("bookingId1", booking._id, "bookingId2", bookingId);
-
-    //           return { ...booking, paymentStatus: "Completed" }; // Update paymentStatus only
-    //         }
-    //         return booking;
-    //       });
-    //     });
-
-    //     // Fetch updated wallet balance
-    //     const balanceResponse = await axiosInstance.get(
-    //       `/api/trainer/wallet-data/${trainerInfo.id}`
-    //     );
-    //     setWalletBalance(balanceResponse.data);
-
-    //     toast.success("Payment status updated to Completed!");
-    //   }
-    // } catch (error) {
-    //   console.error("Error updating payment status:", error);
-    //   toast.error("Failed to update payment status.");
-    // }
-  };
 
   return (
     <div className="p-8 bg-gray-100 min-h-screen">

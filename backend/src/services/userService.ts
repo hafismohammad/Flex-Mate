@@ -314,7 +314,6 @@ class UserService {
       const trainer = await this.getTrainer(trainerId.toString());
   
       const sessionData = await stripe.checkout.sessions.retrieve(stripe_session_id);
-      console.log('sessionData', sessionData);
   
       if (!trainer || trainer.length === 0) {
         throw new Error("Trainer not found.");
@@ -344,7 +343,10 @@ class UserService {
         throw new Error("Booking already exists.");
       }
   
-      await this.userRepository.createBooking(bookingDetails);
+    const bookingData =  await this.userRepository.createBooking(bookingDetails);
+
+      await this.userRepository.createNotification(bookingData)
+      
       return bookingDetails;
     } catch (error) {
       console.error("Error fetching booking details:", error);
@@ -472,6 +474,14 @@ class UserService {
     // }
   } catch (error) {
     throw new Error('failed to find booking') 
+  }
+ }
+
+ async getNotifications(userId: string) {
+  try {
+    return await this.userRepository.fetchNotifications(userId)
+  } catch (error) {
+    throw new Error('failed to find notifications')
   }
  }
   

@@ -14,6 +14,7 @@ import moment from "moment";
 import BookingModel from "../models/booking";
 import UserModel from "../models/userModel";
 import WalletModel, { ITransaction } from "../models/walletModel";
+import NotificationModel from "../models/notificationModel";
 
 class TrainerRepository {
   private specializationModel = SpecializationModel;
@@ -24,6 +25,7 @@ class TrainerRepository {
   private sessionModel = SessionModel;
   private bookingModel = BookingModel;
   private walletModel = WalletModel;
+  private notificationModel = NotificationModel
 
   // Method to find all specializations
   async findAllSpecializations() {
@@ -679,6 +681,22 @@ class TrainerRepository {
       )
       return prescriptionInfo
     } catch (error) {
+      
+    }
+  }
+
+  async fetchNotifications(trainerId: string) {
+    try {
+      console.log(
+        'triaenrid', trainerId
+      );
+      
+      const notifications = await this.notificationModel.findOne({receiverId: trainerId}).sort({createdAt: -1})
+      // console.log('notifications',notifications)
+      return notifications
+    } catch (error) {
+      console.error('Error finding notifications');
+      throw new Error('Failed to find notifications')
       
     }
   }

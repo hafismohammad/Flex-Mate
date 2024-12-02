@@ -233,7 +233,6 @@ class UserController {
   async createBooking(req: Request, res: Response, next: NextFunction) {
     try {
       const { sessionId, userId , stripe_session_id} = req.body;
-    console.log('stripe_session_id',stripe_session_id);
     
       const bookingDetails = await this.userService.findBookingDetails(
         sessionId,
@@ -354,6 +353,16 @@ class UserController {
       const {userId, trainerId} = req.params
       const bookingStatus = await this.userService.findBookings(userId, trainerId)
       res.status(200).json(bookingStatus)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async getNotifications(req: Request, res: Response, next: NextFunction) {
+    try {
+      const {userId} = req.params
+      const notifications = await this.userService.getNotifications(userId)
+      res.status(200).json(notifications)
     } catch (error) {
       next(error)
     }

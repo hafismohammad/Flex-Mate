@@ -1,4 +1,4 @@
-import { IUser, IOtp, IBooking } from "../interface/common";
+import { IUser, IOtp, IBooking, INotificationContent, INotification } from "../interface/common";
 import UserModel from "../models/userModel";
 import OtpModel from "../models/otpModel";
 import mongoose from "mongoose";
@@ -9,6 +9,7 @@ import BookingModel from "../models/booking";
 import { User } from "../interface/user_interface";
 import { ISpecialization } from "../interface/trainer_interface";
 import ReviewModel from "../models/reviewMolel";
+import NotificationModel from "../models/notificationModel";
 
 class UserRepository {
   private userModel = UserModel;
@@ -18,6 +19,7 @@ class UserRepository {
   private sessionModel = SessionModel;
   private bookingModel = BookingModel;
   private reviewModel =  ReviewModel
+  private notificationModel = NotificationModel
 
   async existsUser(email: string): Promise<IUser | null> {
     try {
@@ -202,7 +204,6 @@ class UserRepository {
 
   async findExistingBooking(bookingDetails: IBooking) {
     try {
-      console.log('findExistingBooking');
       
       const existingBooking = await this.bookingModel.findOne({
         sessionId: bookingDetails.sessionId,
@@ -220,17 +221,76 @@ class UserRepository {
     }
   }
 
+
+
   async createBooking(bookingDetails: IBooking) {
     try {
       // Create a new booking using the Booking model
       const newBooking = await this.bookingModel.create(bookingDetails);
-      console.log("Booking created successfully:", newBooking);
+      // console.log("Booking created successfully:", newBooking);
       return newBooking;
     } catch (error) {
       console.error("Error creating booking:", error);
       throw new Error("Failed to create booking.");
     }
   }
+
+  async createNotification(bookingDetails: IBooking) {
+    try {
+      if (!bookingDetails.trainerId || !bookingDetails.userId) {
+        throw new Error("Trainer ID or User ID is missing.");
+      }
+  
+      const trainerNotificationContent: INotificationContent = {
+        content: `New booking for ${bookingDetails.sessionType} (${bookingDetails.specialization}) on ${bookingDetails.startDate.toDateString()} at ${bookingDetails.startTime}. Amount: $${bookingDetails.amount}.`,
+        bookingId: new mongoose.Types.ObjectId(bookingDetails.sessionId),
+        read: false,
+      };
+      
+      const userNotificationContent: INotificationContent = {
+        content: `Your ${bookingDetails.sessionType} (${bookingDetails.specialization}) on ${bookingDetails.startDate.toDateString()} at ${bookingDetails.startTime} is confirmed. Amount: $${bookingDetails.amount}.`,
+        bookingId: new mongoose.Types.ObjectId(bookingDetails.sessionId),
+        read: false,
+      };
+      
+  
+      // Add or update the trainer's notification
+      const existingTrainerNotification = await this.notificationModel.findOne({
+        receiverId: bookingDetails.trainerId,
+      });
+  
+      if (existingTrainerNotification) {
+        existingTrainerNotification.notifications.push(trainerNotificationContent);
+        await existingTrainerNotification.save();
+      } else {
+        const newTrainerNotification: INotification = {
+          receiverId: bookingDetails.trainerId,
+          notifications: [trainerNotificationContent],
+        };
+        await this.notificationModel.create(newTrainerNotification);
+      }
+  
+      // Add or update the user's notification
+      const existingUserNotification = await this.notificationModel.findOne({
+        receiverId: bookingDetails.userId,
+      });
+  
+      if (existingUserNotification) {
+        existingUserNotification.notifications.push(userNotificationContent);
+        await existingUserNotification.save();
+      } else {
+        const newUserNotification: INotification = {
+          receiverId: bookingDetails.userId,
+          notifications: [userNotificationContent],
+        };
+        await this.notificationModel.create(newUserNotification);
+      }
+    } catch (error: any) {
+      console.error("Error creating notification:", error);
+      throw new Error("Failed to create notification.");
+    }
+  }
+  
 
   async fetchUser(userId: string) {
     try {
@@ -446,14 +506,29 @@ async getReview(trainer_id: string) {
 
 async findBookings(user_id: string, trainer_id: string) {
   try {
-    const bookingData = await this.bookingModel.findOne({userId: user_id, trainerId: trainer_id})
+    const bookingData = await this.bookingModel.findOne({
+      userId: user_id,
+      trainerId: trainer_id,
+      paymentStatus: "Completed",
+    });
     
-    return bookingData   
-    // const bookingDataCount = await this.bookingModel.countDocuments({userId :user_id})
-    // return bookingDataCount    
+    
+    return bookingData    
   } catch (error) {
     console.error('Error finding bookings:', error);
     throw new Error('Failed to find bookings');
+  }
+}
+
+async fetchNotifications(userId: string) {
+  try {
+    const notifications = await this.notificationModel.findOne({receiverId: userId}).sort({createdAt: -1})
+    console.log('notifications',notifications)
+    return notifications
+  } catch (error) {
+    console.error('Error finding notifications');
+    throw new Error('Failed to find notifications')
+    
   }
 }
 

@@ -8,14 +8,13 @@ import { RootState } from './app/store';
 import { useSelector } from 'react-redux';
 import OutgoingVideocallPage from './pages/trainer/OutgoingVideocallPage';
 import IncomingVideocallPage from './pages/user/IncomingVideocallPage';
-import TrainerVideoCall from './components/trainer/VideoCall';
-import VideoCall from './components/user/VideoCall';
+import VideCallPageTrainer from './pages/trainer/VideCallPageTrainer';
+import VideoCallPage from './pages/user/VideoCallPage';
 
 const App: React.FC = () => {
   const {videoCall, showVideoCallTrainer} = useSelector((state: RootState) => state.trainer)
   const {showIncomingVideoCall, showVideoCallUser} = useSelector((state: RootState) => state.user)
 
-console.log('App <--', showVideoCallTrainer);
 
 
   
@@ -24,8 +23,8 @@ console.log('App <--', showVideoCallTrainer);
       <Router>
           {videoCall && <OutgoingVideocallPage />}
           {showIncomingVideoCall?._id && <IncomingVideocallPage />}
-          {showVideoCallTrainer && <TrainerVideoCall />}
-          {showVideoCallUser && <VideoCall />}
+          {showVideoCallTrainer && < VideCallPageTrainer/>}
+          {showVideoCallUser && <VideoCallPage />}
         <Routes>          
           <Route path="/*" element={<UserRoutes />} />
           <Route path="/admin/*" element={<AdminRoutes />} />

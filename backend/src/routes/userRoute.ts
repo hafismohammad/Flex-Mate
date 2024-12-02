@@ -34,6 +34,7 @@ router.post('/review', authMiddlewares(['user']), userController.addReview.bind(
 router.get('/reviews/:trainerId', authMiddlewares(['user']), userController.getReivew.bind(userController))
 router.get('/bookings/:userId/:trainerId', authMiddlewares(['user']), userController.findbookings.bind(userController))
 router.patch('/edit-review', authMiddlewares(['user']), userController.editReview.bind(userController))
+router.get('/notifications/:userId', authMiddlewares(['user']), userController.getNotifications.bind(userController))
 
 
 export default router;
