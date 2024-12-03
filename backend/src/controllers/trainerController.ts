@@ -482,6 +482,16 @@ class TrainerController {
       next(error);
     }
   }
+
+  async clearNotifications(req: Request, res: Response, next: NextFunction) {
+    try {
+      const {trainerId} = req.params
+      await this.trainerService.clearNotifications(trainerId)
+      res.status(200).json({message:'Notifications cleared successfully'})
+    } catch (error) {
+      next(error)
+    }
+  }
 }
 
 export default TrainerController;

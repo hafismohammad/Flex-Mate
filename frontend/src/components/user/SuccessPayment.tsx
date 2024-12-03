@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { FaCheckCircle } from 'react-icons/fa';
 import userAxiosInstance from '../../../axios/userAxionInstance';
+import { useSocketContext } from '../../context/Socket';
 
 function SuccessPayment() {
   const navigate = useNavigate();
@@ -10,32 +11,49 @@ function SuccessPayment() {
   const sessionId = queryParams.get('session_id');
   const userId = queryParams.get('user_id');
   const stripe_session_id = queryParams.get('stripe_session_id')
-
+  const { socket } = useSocketContext();
+  
   useEffect(() => {
+    let isMounted = true; 
+  
     const createBooking = async () => {
-      // Check if the booking has already been created
+      if (!isMounted) return;
+  
       const bookingCreated = localStorage.getItem('bookingCreated');
-
+  
       if (sessionId && userId && !bookingCreated) {
         try {
-          console.log('Creating booking...');
-          await userAxiosInstance.post('/api/user/bookings', { sessionId, userId, stripe_session_id });
-          console.log('Booking created successfully');
-          // Set flag in local storage after successful booking
+          const response = await userAxiosInstance.post('/api/user/bookings', { sessionId, userId, stripe_session_id });
+  
+          // const notificationData = {
+          //   receiverId: response.data.trainerId,
+          //   content: `New booking for ${response.data.sessionType} (${response.data.specialization}) on ${new Date(response.data.startDate).toDateString()} at ${response.data.startTime}. Amount: $${response.data.amount}.`,
+          //   sessionType: response.data.sessionType,
+          //   specialization: response.data.specialization,
+          //   bookingDate: response.data.bookingDate,
+          //   startDate: response.data.startDate,
+          //   startTime: response.data.startTime,
+          //   sessionId: response.data.sessionId,
+          // };
+  
+          // console.log("Emitting notification:", notificationData);
+          // socket?.emit("sendNotification", notificationData);
+  
           localStorage.setItem('bookingCreated', 'true');
         } catch (error) {
           console.error('Error creating booking:', error);
         }
       }
     };
-
+  
     createBooking();
-
-    // Clean up function to reset the local storage flag when leaving the page
+  
     return () => {
+      isMounted = false; // Cleanup on unmount
       localStorage.removeItem('bookingCreated');
     };
-  }, [sessionId, userId]);
+  }, [sessionId, userId, socket]);
+  
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-blue-50 px-4">

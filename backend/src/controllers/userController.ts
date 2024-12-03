@@ -239,6 +239,9 @@ class UserController {
         userId,
         stripe_session_id
       );
+      // console.log('bookingDetails',bookingDetails);
+      
+      res.status(200).json(bookingDetails)
     } catch (error) {
       console.log("Error in create booking");
       next(error)
@@ -363,6 +366,31 @@ class UserController {
       const {userId} = req.params
       const notifications = await this.userService.getNotifications(userId)
       res.status(200).json(notifications)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async clearNotifications(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log('clear-notifications');
+      
+      const {userId} = req.params
+      await this.userService.clearNotifications(userId)
+      res.status(200).json({message: 'Notifications cleared successfully'})
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async resetPassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { userId } = req.params;
+      const {  currentPassword,  newPassword, } = req.body; 
+      console.log(newPassword);
+      
+        await this.userService.resetPassword(userId, currentPassword, newPassword) 
+        res.status(200).json({message: 'Password changed successfully'})     
     } catch (error) {
       next(error)
     }

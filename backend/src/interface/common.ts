@@ -67,6 +67,7 @@ export interface INotificationContent {
   content: string;
   bookingId: mongoose.Types.ObjectId;
   read: boolean;
+  createdAt: Date;
 }
 
 export interface INotification {

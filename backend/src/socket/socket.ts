@@ -136,6 +136,20 @@ io.on("connection", (socket) => {
     }
   });
 
+  // socket.on("sendNotification", (data) => {
+  //   console.log('hit sendNotification');
+    
+  //   const receiverSocketId = getReceiverSocketId(data.receiverId);
+  
+  //   if (receiverSocketId) {
+  //     console.log("Sending notification to:", receiverSocketId);
+  //     io.to(receiverSocketId).emit("receiveNotification", data);
+  //   } else {
+  //     console.warn("Receiver not connected:", data.receiverId);
+  //   }
+  // });
+  
+
   socket.on("disconnect", () => {
     console.log("User disconnected:", socket.id);
   });

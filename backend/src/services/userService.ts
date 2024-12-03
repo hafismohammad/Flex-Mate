@@ -347,7 +347,7 @@ class UserService {
 
       await this.userRepository.createNotification(bookingData)
       
-      return bookingDetails;
+      return bookingData;
     } catch (error) {
       console.error("Error fetching booking details:", error);
       throw new Error("Failed to fetch booking details.");
@@ -433,6 +433,8 @@ class UserService {
       } else {
         throw new Error("Refund failed or is incomplete");
       }
+
+      await this.userRepository.cancelNotification(bookingData)
   
       return bookingData;
     } catch (error) {
@@ -484,7 +486,37 @@ class UserService {
     throw new Error('failed to find notifications')
   }
  }
-  
+
+ async clearNotifications(userId: string) {
+  try {
+    return await this.userRepository.deleteUserNotifications(userId)
+  } catch (error) {
+    throw new Error('failed to delete notifications')
+  }
+ }
+ 
+ async resetPassword(userId: string, currentPassword: string, newPassword: string) {
+  try {
+    const userData = await this.userRepository.fetchUser(userId)
+    if(!userData?.password) {
+      throw new Error('userData password is null')
+    }
+    const isPasswordMatch = bcrypt.compare(userData?.password, currentPassword)
+    if(!isPasswordMatch) {
+      throw new Error('Old password is not correct')
+    } else {
+      const hashedPassword = await bcrypt.hash(newPassword, 10)
+      userData.password = hashedPassword
+      userData.save()
+    }
+
+    
+    
+  } catch (error) {
+    
+  }
+ }
+
 }
 
 export default UserService;

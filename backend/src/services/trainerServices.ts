@@ -498,6 +498,14 @@ class TrainerService {
       throw new Error('failed to find notifications')
     }
    }
+
+   async clearNotifications(trainerId: string) {
+    try {
+      return await this.trainerRepository.deleteTrainerNotifications(trainerId)
+    } catch (error) {
+      throw new Error('failed to delete notifications')
+    }
+   }
   
 }
 

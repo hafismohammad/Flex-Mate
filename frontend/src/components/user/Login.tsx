@@ -21,7 +21,6 @@ const Login = () => {
   const navigate = useNavigate();
 
   const { userInfo, error } = useSelector((state: RootState) => state.user);
-console.log('userInfo', userInfo);
 
   const validate = (): Errors => {
     const newErrors: Errors = {};

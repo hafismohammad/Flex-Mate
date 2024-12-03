@@ -35,6 +35,8 @@ router.get('/reviews/:trainerId', authMiddlewares(['user']), userController.getR
 router.get('/bookings/:userId/:trainerId', authMiddlewares(['user']), userController.findbookings.bind(userController))
 router.patch('/edit-review', authMiddlewares(['user']), userController.editReview.bind(userController))
 router.get('/notifications/:userId', authMiddlewares(['user']), userController.getNotifications.bind(userController))
+router.delete('/clear-notifications/:userId', authMiddlewares(['user']), userController.clearNotifications.bind(userController))
+router.patch('/reset-password/:userId', authMiddlewares(['user']), userController.resetPassword.bind(userController))
 
 
 export default router;

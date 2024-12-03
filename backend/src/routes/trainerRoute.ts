@@ -45,7 +45,8 @@ router.get('/users/:userId', authMiddlewares(['trainer']), trainerController.fet
 router.get('/wallet-data/:trainerId', authMiddlewares(['trainer']), trainerController.gatWalletData.bind(trainerController))
 router.post('/withdraw/:trainerId', authMiddlewares(['trainer']), trainerController.withdraw.bind(trainerController))
 router.post('/prescriptions/:bookingId', authMiddlewares(['trainer']), trainerController.addPrescriptionInfo.bind(trainerController))
-router.get('/notifications/:trainerId', trainerController.getNotifications.bind(trainerController));
+router.get('/notifications/:trainerId', authMiddlewares(['trainer']), trainerController.getNotifications.bind(trainerController));
+router.delete('/clear-notifications/:trainerId', authMiddlewares(['trainer']), trainerController.clearNotifications.bind(trainerController))
 
 
 

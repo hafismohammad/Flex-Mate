@@ -245,12 +245,14 @@ class UserRepository {
         content: `New booking for ${bookingDetails.sessionType} (${bookingDetails.specialization}) on ${bookingDetails.startDate.toDateString()} at ${bookingDetails.startTime}. Amount: $${bookingDetails.amount}.`,
         bookingId: new mongoose.Types.ObjectId(bookingDetails.sessionId),
         read: false,
+        createdAt: new Date()
       };
       
       const userNotificationContent: INotificationContent = {
         content: `Your ${bookingDetails.sessionType} (${bookingDetails.specialization}) on ${bookingDetails.startDate.toDateString()} at ${bookingDetails.startTime} is confirmed. Amount: $${bookingDetails.amount}.`,
         bookingId: new mongoose.Types.ObjectId(bookingDetails.sessionId),
         read: false,
+        createdAt: new Date()
       };
       
   
@@ -406,6 +408,58 @@ class UserRepository {
     }
 }
 
+async cancelNotification(bookingDetails: IBooking) {
+  if (!bookingDetails.trainerId || !bookingDetails.userId) {
+    throw new Error("Trainer ID or User ID is missing.");
+  }
+
+  const trainerNotificationContent: INotificationContent = {
+    content: `Booking for ${bookingDetails.sessionType} (${bookingDetails.specialization}) on ${new Date(bookingDetails.startDate).toDateString()} at ${bookingDetails.startTime} has been cancelled.`,
+    bookingId: new mongoose.Types.ObjectId(bookingDetails.sessionId),
+    read: false,
+    createdAt: new Date()
+  };
+
+  const userNotificationContent: INotificationContent = {
+    content: `Your booking for ${bookingDetails.sessionType} (${bookingDetails.specialization}) on ${new Date(bookingDetails.startDate).toDateString()} at ${bookingDetails.startTime} has been cancelled.`,
+    bookingId: new mongoose.Types.ObjectId(bookingDetails.sessionId),
+    read: false,
+    createdAt: new Date()
+  };
+
+  // Add or update the trainer's notification
+  const existingTrainerNotification = await this.notificationModel.findOne({
+    receiverId: bookingDetails.trainerId,
+  });
+
+  if (existingTrainerNotification) {
+    existingTrainerNotification.notifications.push(trainerNotificationContent);
+    await existingTrainerNotification.save();
+  } else {
+    const newTrainerNotification: INotification = {
+      receiverId: bookingDetails.trainerId,
+      notifications: [trainerNotificationContent],
+    };
+    await this.notificationModel.create(newTrainerNotification);
+  }
+
+  // Add or update the user's notification
+  const existingUserNotification = await this.notificationModel.findOne({
+    receiverId: bookingDetails.userId,
+  });
+
+  if (existingUserNotification) {
+    existingUserNotification.notifications.push(userNotificationContent);
+    await existingUserNotification.save();
+  } else {
+    const newUserNotification: INotification = {
+      receiverId: bookingDetails.userId,
+      notifications: [userNotificationContent],
+    };
+    await this.notificationModel.create(newUserNotification);
+  }
+}
+
 async createReview(
   reviewComment: string, selectedRating: number, userId: string, trainerId: string
 ) {
@@ -522,13 +576,27 @@ async findBookings(user_id: string, trainer_id: string) {
 
 async fetchNotifications(userId: string) {
   try {
-    const notifications = await this.notificationModel.findOne({receiverId: userId}).sort({createdAt: -1})
-    console.log('notifications',notifications)
-    return notifications
+    const notificationsDoc = await this.notificationModel.findOne({ receiverId: userId });
+    
+    if (notificationsDoc && notificationsDoc.notifications) {
+      notificationsDoc.notifications.sort((a, b) => {
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
+    }
+
+    return notificationsDoc;
   } catch (error) {
     console.error('Error finding notifications');
-    throw new Error('Failed to find notifications')
-    
+    throw new Error('Failed to find notifications');
+  }
+}
+
+async deleteUserNotifications(userId: string) {
+  try {
+    await this.notificationModel.deleteOne({receiverId: userId})
+  } catch (error) {
+    console.error('Error delete notifications');
+    throw new Error('Failed to delete notifications');
   }
 }
 

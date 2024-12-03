@@ -687,17 +687,28 @@ class TrainerRepository {
 
   async fetchNotifications(trainerId: string) {
     try {
-      console.log(
-        'triaenrid', trainerId
-      );
-      
-      const notifications = await this.notificationModel.findOne({receiverId: trainerId}).sort({createdAt: -1})
-      // console.log('notifications',notifications)
-      return notifications
+      const notificationsDoc = await this.notificationModel.findOne({ receiverId: trainerId });
+    
+      if (notificationsDoc && notificationsDoc.notifications) {
+        notificationsDoc.notifications.sort((a, b) => {
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+      }
+  
+      return notificationsDoc;
     } catch (error) {
       console.error('Error finding notifications');
       throw new Error('Failed to find notifications')
       
+    }
+  }
+
+  async deleteTrainerNotifications(trainerId: string) {
+    try {
+      await this.notificationModel.deleteOne({receiverId: trainerId})
+    } catch (error) {
+      console.error('Error delete notifications');
+      throw new Error('Failed to delete notifications');
     }
   }
 

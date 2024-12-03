@@ -8,6 +8,7 @@ import ProfileIcon from "../../assets/profile-icon.png";
 import { logoutUser } from "../../actions/userAction";
 import userAxiosInstance from "../../../axios/userAxionInstance";
 import { BsBell } from "react-icons/bs";
+import toast, { Toaster } from "react-hot-toast";
 
 interface INotificationContent {
   content: string;
@@ -23,17 +24,15 @@ export interface INotification {
   updatedAt?: string;
 }
 
-
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [image, setImage] = useState<string | null>(null);
   const [notificationsData, setNotificationsData] = useState<INotification>({
-  receiverId: "",
-  notifications: [],
-});
-
+    receiverId: "",
+    notifications: [],
+  });
 
   const { userInfo, token } = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch<AppDispatch>();
@@ -77,8 +76,27 @@ function Header() {
     fetchNotifications();
   }, [userInfo?.id]);
 
+  const handleClear = async () => {
+    try {
+      
+      const response = await userAxiosInstance.delete(`/api/user/clear-notifications/${userInfo?.id}`);
+      if (response.status === 200) {
+        toast.success(response.data.message)
+        setNotificationsData((prev) => ({
+          ...prev,
+          notifications:[]
+        }))
+      } else {
+        console.error("Failed to clear notifications. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error clearing notifications:", error);
+    }
+  };
+  
   return (
     <header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center bg-blue-800 text-white p-4 shadow-xl">
+      <Toaster />
       <div>
         <Link to="/">
           <img src={LOGO} alt="Logo" className="w-max h-7" />
@@ -135,16 +153,13 @@ function Header() {
               </span>
             </div>
 
-            {/* Notification Popup */}
-           {/* Notification Popup */}
-{/* Notification Popup */}
-{isNotificationOpen && (
+            {isNotificationOpen && (
   <div className="absolute top-10 right-0 w-[320px] bg-white shadow-lg rounded-md p-4">
     <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">
       Notifications
     </h3>
-    {/* Ensure notificationsData.notifications exists */}
-    {notificationsData.notifications?.length ? (
+    {notificationsData?.notifications?.length ? (
+    <>
       <ul className="space-y-3 mt-2 max-h-[200px] overflow-y-auto">
         {notificationsData.notifications.map((notification, index) => (
           <li
@@ -157,19 +172,15 @@ function Header() {
           </li>
         ))}
       </ul>
+      <div onClick={handleClear} className="flex justify-end">
+        <button className="text-gray-800">Clear</button>
+      </div>
+    </>
     ) : (
       <p className="text-sm text-gray-500">No new notifications</p>
     )}
-    {/* <button
-      className="w-full mt-2 py-1 text-sm text-center text-blue-600 hover:underline"
-      onClick={() => navigate("/notifications")}
-    >
-      View All
-    </button> */}
   </div>
 )}
-
-
 
             {/* User Profile */}
             <div className="relative">

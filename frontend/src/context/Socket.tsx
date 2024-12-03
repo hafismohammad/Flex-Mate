@@ -126,8 +126,11 @@ export const SocketContextProvider = ({
         dispatch(setVideoCall(null));
       }
     });
-    
 
+
+    // newSocket.on("receiveNotification", (data: Notification) => {
+    //   console.log("Notification received:", data);
+    // })
     // Cleanup event listeners on socket change or component unmount
     return () => {
       console.log("Cleaning up socket event listeners...");
