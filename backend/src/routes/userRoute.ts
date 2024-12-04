@@ -32,6 +32,7 @@ router.get('/bookings-details/:userId',  authMiddlewares(['user']), userControll
 router.patch('/cancel-booking/:bookingId', userController.cancelBooking.bind(userController))
 router.post('/review', authMiddlewares(['user']), userController.addReview.bind(userController))
 router.get('/reviews/:trainerId', authMiddlewares(['user']), userController.getReivew.bind(userController))
+router.get('/reviews-summary/:trainerId', authMiddlewares(['user']), userController.getReivewSummary.bind(userController))
 router.get('/bookings/:userId/:trainerId', authMiddlewares(['user']), userController.findbookings.bind(userController))
 router.patch('/edit-review', authMiddlewares(['user']), userController.editReview.bind(userController))
 router.get('/notifications/:userId', authMiddlewares(['user']), userController.getNotifications.bind(userController))

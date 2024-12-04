@@ -65,13 +65,12 @@ function Wallet() {
   
     try {
       const response = await axiosInstance.post(`/api/trainer/withdraw/${trainerInfo.id}`, {
-        amount: parseFloat(amount), // Convert to number
+        amount: parseFloat(amount), 
       });
   
       if (response.status === 200) {
         toast.success("Money withdrawal successfully.");
   
-        // Update wallet state with the new balance and transaction
         setWalletData((prev) =>
           prev
             ? {
@@ -80,10 +79,10 @@ function Wallet() {
                 transactions: [
                   ...prev.transactions,
                   {
-                    transactionId: `txn_${Date.now()}`, // Temporary unique ID
+                    transactionId: `txn_${Date.now()}`,
                     amount: parseFloat(amount),
                     transactionType: "debit",
-                    date: new Date(), // Use a Date object instead of ISO string
+                    date: new Date(),
                   },
                 ],
               }
@@ -109,7 +108,6 @@ function Wallet() {
 
   return (
     <>
-      {/* Wallet Balance */}
       <div className="flex items-center justify-center bg-gray-100 mt-4 mb-5">
         <Toaster />
         <div className="h-[20vh] w-[90%] bg-white p-5 shadow-lg">
@@ -127,7 +125,6 @@ function Wallet() {
         </div>
       </div>
 
-      {/* Filter Options */}
       <div className="flex items-center justify-center">
         <div className="flex justify-end gap-5">
           {["all", "credit", "debit"].map((type) => (
@@ -135,7 +132,7 @@ function Wallet() {
               key={type}
               onClick={() => {
                 setFilter(type as "all" | "credit" | "debit");
-                setCurrentPage(1); // Reset to the first page
+                setCurrentPage(1); 
               }}
               className={`py-1 px-3 rounded-sm shadow-md ${
                 filter === type ? "bg-blue-500 text-white" : "bg-white text-black"
@@ -147,7 +144,6 @@ function Wallet() {
         </div>
       </div>
 
-      {/* Transactions Table */}
       <div className="flex items-center justify-center bg-gray-100 mt-4 mb-5">
         <div className="h-auto w-[90%] bg-white p-5 shadow-lg">
           {currentTransactions && currentTransactions.length > 0 ? (
@@ -181,7 +177,6 @@ function Wallet() {
         </div>
       </div>
 
-      {/* Pagination Controls */}
       <div className="flex justify-center mt-4">
         <button
           onClick={prevPage}

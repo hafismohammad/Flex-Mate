@@ -83,3 +83,9 @@ export interface IReview {
   userImage: string
   userId : string
 }
+
+export interface AvgRatingAndReviews {
+  totalReviews: number;
+  averageRating: number;
+}
+

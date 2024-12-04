@@ -5,6 +5,7 @@ import TrainerModel from "../models/trainerModel";
 import UserModel from "../models/userModel";
 import KycRejectionReasonModel from "../models/kycRejectionReason";
 import BookingModel from "../models/booking";
+import { MonthlyStats } from "../interface/admin_interface";
 
 class AdminRepository {
   private adminModel = AdminModel;
@@ -302,6 +303,161 @@ class AdminRepository {
       throw error;
     }
   }
+
+  async getAllStatistics() {
+    const totalTrainers = await this.trainerModel.countDocuments();
+    const totalUsers = await this.userModel.countDocuments();
+    const activeUsers = await this.userModel.countDocuments({ isBlocked: false });
+    const activeTrainers = await this.trainerModel.countDocuments({ isBlocked: false });
+  
+    const revenueData = await BookingModel.aggregate([
+      { $match: { paymentStatus: "Confirmed" } },
+      {
+        $group: {
+          _id: null,
+          amount: { $sum: "$amount" },
+          trainerRevenue: { $sum: { $multiply: ["$amount", 0.9] } },
+          adminRevenue: { $sum: { $multiply: ["$amount", 0.1] } }
+        }
+      }
+    ]);
+    // console.log("Revenue Data:", revenueData);
+    
+    
+
+    
+
+  
+    const amount = revenueData.length > 0 ? revenueData[0].amount : 0;
+    const trainerRevenue = revenueData.length > 0 ? revenueData[0].trainerRevenue : 0;
+    const adminRevenue = revenueData.length > 0 ? revenueData[0].adminRevenue : 0;
+  
+    // Get current date and calculate the start date (12 months ago)
+    const currentDate = new Date();
+    const startDate = new Date();
+    startDate.setMonth(currentDate.getMonth() - 12); // 12 months ago
+  
+    const usersAndDoctorsRegistrationData = await Promise.all([
+      this.userModel.aggregate([
+        { $match: { createdAt: { $gte: startDate } } },
+        {
+          $group: {
+            _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
+            count: { $sum: 1 }
+          }
+        },
+        { $sort: { "_id.year": 1, "_id.month": 1 } }
+      ]),
+  
+      this.trainerModel.aggregate([
+        { $match: { createdAt: { $gte: startDate } } },
+        {
+          $group: {
+            _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
+            count: { $sum: 1 }
+          }
+        },
+        { $sort: { "_id.year": 1, "_id.month": 1 } }
+      ])
+    ]);
+  
+    // Initialize monthly statistics map
+    const monthlyStatistics: { [key: string]: MonthlyStats } = {};
+  
+    // Initialize each month with zero values for the last 12 months
+    for (let monthOffset = 0; monthOffset < 12; monthOffset++) {
+      const monthDate = new Date();
+      monthDate.setMonth(currentDate.getMonth() - monthOffset);
+      const year = monthDate.getFullYear();
+      const month = monthDate.getMonth() + 1; // Months are 0-indexed
+      const key = `${year}-${month < 10 ? '0' : ''}${month}`;
+  
+      monthlyStatistics[key] = {
+        users: 0,
+        trainer: 0,
+        revenue: 0,
+        amount: 0,
+        trainerRevenue: 0,
+        adminRevenue: 0
+      };
+    }
+  // console.log('monthlyStatistics',monthlyStatistics);
+  
+    // Fill in registration data for users
+    usersAndDoctorsRegistrationData[0].forEach(userData => {
+      const key = `${userData._id.year}-${userData._id.month < 10 ? '0' : ''}${userData._id.month}`;
+      if (monthlyStatistics[key]) {
+        monthlyStatistics[key].users = userData.count;
+      }
+    });
+  
+    // Fill in registration data for trainers
+    usersAndDoctorsRegistrationData[1].forEach(trainerData => {
+      const key = `${trainerData._id.year}-${trainerData._id.month < 10 ? '0' : ''}${trainerData._id.month}`;
+      if (monthlyStatistics[key]) {
+        monthlyStatistics[key].trainer = trainerData.count;
+      }
+    });
+  
+    // Revenue by month for completed appointments
+    const revenueByMonth = await BookingModel.aggregate([
+      { $match: { paymentStatus: "Completed", bookingDate: { $gte: startDate } } },
+      {
+        $group: {
+          _id: {
+            year: { $year: "$bookingDate" },   // Separate year and month
+            month: { $month: "$bookingDate" }  // Separate month
+        },
+          amount: { $sum: "$amount" },
+          trainerRevenue: { $sum: { $multiply: ["$amount", 0.9] } },
+          adminRevenue: { $sum: { $multiply: ["$amount", 0.1] } }
+        }
+      },
+      { $sort: { "_id.year": 1, "_id.month": 1 } }
+    ]);
+  console.log('revenueByMonth',revenueByMonth);
+  
+    revenueByMonth.forEach(revenueData => {
+      const key = `${revenueData._id.year}-${revenueData._id.month < 10 ? '0' : ''}${revenueData._id.month}`;
+      if (monthlyStatistics[key]) {
+        monthlyStatistics[key].revenue = revenueData.amount;
+        monthlyStatistics[key].amount = revenueData.amount;
+        monthlyStatistics[key].trainerRevenue = revenueData.trainerRevenue;
+        monthlyStatistics[key].adminRevenue = revenueData.adminRevenue;
+      }
+  });
+  
+  
+    // Convert the object into an array for easier use in charts
+    const userTrainerChartData = Object.keys(monthlyStatistics).map(key => {
+      const [year, month] = key.split('-');
+      return {
+        year: parseInt(year, 10),
+        month: parseInt(month, 10),
+        users: monthlyStatistics[key].users,
+        trainer: monthlyStatistics[key].trainer,
+        revenue: monthlyStatistics[key].revenue,
+        amount: monthlyStatistics[key].amount,
+        trainerRevenue: monthlyStatistics[key].trainerRevenue,
+        adminRevenue: monthlyStatistics[key].adminRevenue
+      };
+    });
+  
+    console.log("userDoctorChartData", userTrainerChartData);
+  
+    return {
+      totalTrainers,
+      totalUsers,
+      activeTrainers,
+      activeUsers,
+      totalRevenue: amount,
+      trainerRevenue,  // Revenue credited to trainers
+      adminRevenue,   // Revenue credited to admin
+      userTrainerChartData  // Data for the user/doctor registration chart
+    };
+  }
+  
+
 }
 
 

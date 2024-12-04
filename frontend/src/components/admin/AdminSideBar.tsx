@@ -8,7 +8,7 @@ import {
   FaListAlt,
   FaTimes,
   FaChartPie,
-
+  FaExchangeAlt ,
   FaSignOutAlt,
   FaCheckCircle,
   FaUsers,
@@ -93,14 +93,14 @@ const navigate = useNavigate()
             </span>
           </Link>
           <Link
-            to="/admin/userListing"
+            to="/admin/user-listing"
             className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
           >
             <FaUsers size={20} />
             <span className={`ml-2 ${!isSidebarOpen && "hidden"}`}>Users</span>
           </Link>
           <Link
-            to="/admin/trainerListing"
+            to="/admin/trainer-listing"
             className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
           >
             <FaUsers size={20} />
@@ -108,6 +108,15 @@ const navigate = useNavigate()
               Trainers
             </span>
           </Link>
+          {/* <Link
+            to="/admin/transactions"
+            className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
+          >
+            <FaExchangeAlt  size={20} />
+            <span className={`ml-2 ${!isSidebarOpen && "hidden"}`}>
+              Transactions
+            </span>
+          </Link> */}
           <Link
             to="/admin/login"
             className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"

@@ -143,6 +143,13 @@ class AdminService {
     return await this.adminRepository.fetchAllBookings()
   }
 
+  async getDashboardData() {
+    try {
+      return await this.adminRepository.getAllStatistics()
+    } catch (error) {
+      
+    }
+  }
 }
 
 export default AdminService;

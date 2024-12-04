@@ -8,6 +8,7 @@ import TrianerVerificationViewPage from "../pages/admin/TrianerVerificationViewP
 import UserListingPage from "../pages/admin/UserListingPage";
 import TrainerListingPage from "../pages/admin/TrainerListingPage";
 import Bookings from "../components/admin/Bookings";
+import TransactionsPage from "../pages/admin/TransactionsPage";
 
 function AdminRoutes() {
   return (
@@ -18,10 +19,11 @@ function AdminRoutes() {
           <Route index element={<AdminDashboard />} />
           <Route path="/verification" element={<Verification />} />
           <Route path="/specializations" element={<SpecializationsPage />} />
-          <Route path="/trainerView/:trainerId" element={<TrianerVerificationViewPage />} />
-          <Route path="/userListing" element={<UserListingPage />}/>
-          <Route path="/trainerListing" element={<TrainerListingPage />}/>
+          <Route path="/trainer-view/:trainerId" element={<TrianerVerificationViewPage />} />
+          <Route path="/user-listing" element={<UserListingPage />}/>
+          <Route path="/trainer-listing" element={<TrainerListingPage />}/>
           <Route path="/bookings" element={<Bookings />}/>
+          {/* <Route path="/transactions" element={<TransactionsPage />}/> */}
         </Route>
       </Routes>
     </div>

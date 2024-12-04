@@ -71,7 +71,6 @@ function UserProfile() {
     try {
       e.preventDefault();
   
-      // Validation
       if (confirmPassword !== newPassword) {
         toast.error('New password and confirm password do not match!');
         return;
@@ -92,7 +91,6 @@ function UserProfile() {
         newPassword,
       };
   
-      // Make API call
       const response = await userAxiosInstance.patch(`/api/user/reset-password/${userInfo?.id}`, data);
   
       if (response.status === 200) {
@@ -101,11 +99,11 @@ function UserProfile() {
     } catch (error: any) {
       console.error(error);
   
-      // Improved error handling
-      const errorMessage = error?.response?.data?.message || 'Something went wrong. Please try again.';
+      const errorMessage = error?.response?.data?.message || error?.message || 'Something went wrong. Please try again.';
       toast.error(errorMessage);
     }
   };
+  
 
   const togglePasswordVisibility = (field: string) => {
     setPasswordVisibility((prev: any) => ({

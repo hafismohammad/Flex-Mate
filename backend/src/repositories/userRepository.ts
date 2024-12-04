@@ -557,6 +557,36 @@ async getReview(trainer_id: string) {
   }
 }
 
+async getAvgReviewsRating(trainer_id: string) {
+  try {
+    const avgRatingAndReivews = await this.reviewModel.aggregate([
+      {
+        $match: { trainerId: new mongoose.Types.ObjectId(trainer_id) } // Match reviews for the specific trainer
+      },
+      {
+        $group: {
+          _id: null,
+          averageRating: { $avg: "$rating" },
+          totalReviews: { $sum: 1 } 
+        }
+      },
+      {
+        $project: {
+          _id: 0, 
+          averageRating: { $floor: "$averageRating" }, 
+          totalReviews: 1 
+        }
+      }
+    ]);
+
+   return avgRatingAndReivews
+    
+  } catch (error) {
+    console.error("Error finding review avg summary:", error);
+    throw new Error("Failed to find review avg summary");
+  }
+}
+
 
 async findBookings(user_id: string, trainer_id: string) {
   try {

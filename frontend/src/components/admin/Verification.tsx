@@ -58,7 +58,7 @@ function Verification() {
   );
 
   const handleView = (trainerId: string) => {
-    navigate(`/admin/trainerView/${trainerId}`);
+    navigate(`/admin/trainer-view/${trainerId}`);
   };
 
   return (

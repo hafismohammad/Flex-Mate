@@ -274,7 +274,6 @@ class UserController {
   async uploadProfileImage(req: Request, res: Response, next: NextFunction) {
     try {
       const user_id = req.params.userId;
-      console.log("hjjjj", user_id);
 
       if (req.file) {
         const profileImageUrl = await uploadToCloudinary(
@@ -342,10 +341,20 @@ class UserController {
 
   async getReivew(req: Request, res: Response, next: NextFunction) {
     try {
-
+      
       const {trainerId} = req.params
       const reviews =await this.userService.reviews(trainerId)
       res.status(200).json(reviews)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async getReivewSummary(req: Request, res: Response, next: NextFunction) {
+    try {
+      const {trainerId} = req.params
+      const reviewsAndAvgRating = await this.userService.getReivewSummary(trainerId)
+      res.status(200).json(reviewsAndAvgRating)
     } catch (error) {
       next(error)
     }

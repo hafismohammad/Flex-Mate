@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { TrainerProfile } from "../../types/trainer";
 import LOGO from "../../assets/LOGO-2.png";
 import DatePicker from "react-datepicker";
-import { ISessionSchedule } from "../../types/common";
+import { AvgRatingAndReviews, ISessionSchedule } from "../../types/common";
 import {
   formatPriceToINR,
   numberOfSessions,
@@ -25,11 +25,13 @@ import Review from "./Review";
 function TrainerProfileView() {
   const [trainer, setTrainer] = useState<TrainerProfile | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
-  const [filteredSessions, setFilteredSessions] = useState<ISessionSchedule[]>([]);
   const [isSingleSession, setIsSingleSession] = useState(true);
-  const [sessionSchedules, setSessionSchedules] = useState<ISessionSchedule[]>([]);
+  const [sessionSchedules, setSessionSchedules] = useState<ISessionSchedule[]>(
+    []
+  );
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
-  const [selectedSession, setSelectedSession] =useState<ISessionSchedule | null>(null);
+  const [selectedSession, setSelectedSession] =
+    useState<ISessionSchedule | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedRating, setSelectedRating] = useState<number>(0);
@@ -38,9 +40,15 @@ function TrainerProfileView() {
   const [bookingStatus, setBookingStatus] = useState<string | null>(null);
   const [hasUserReviewed, setHasUserReviewed] = useState<boolean>(false);
   const [userReviewId, setUserReviewId] = useState<string | null>(null);
+  const [avgRatingAndTotalReviews, setAvgRatingAndTotalReviews] = useState<
+    AvgRatingAndReviews[]
+  >([]);
+
+  // const [filteredSessions, setFilteredSessions] = useState<ISessionSchedule[]>([]);
+
   const { userInfo } = useSelector((state: RootState) => state.user);
-  const navigate = useNavigate();
   const { trainerId } = useParams<{ trainerId: string }>();
+  const navigate = useNavigate();
 
   if (!trainerId) {
     return <div>No trainer ID found</div>;
@@ -121,7 +129,7 @@ function TrainerProfileView() {
           selectedDate.toLocaleDateString() &&
         session.isBooked == false
     );
-    setFilteredSessions(filtered);
+    // setFilteredSessions(filtered);
   }, [selectedDate, isSingleSession, sessionSchedules, trainerId]);
 
   const sessionDates = Array.from(
@@ -149,14 +157,13 @@ function TrainerProfileView() {
 
   const handleEditReview = () => {
     setIsReviewModalOpen(true);
-  }
+  };
 
   const handleStarClick = (rating: any) => {
     setSelectedRating(rating);
   };
 
   const handleReviewSubmit = async () => {
-    
     const data = {
       reviewComment,
       selectedRating,
@@ -165,7 +172,7 @@ function TrainerProfileView() {
     };
 
     const response = await userAxiosInstance.post(`/api/user/review`, data);
-    
+
     setUserReviewId(response.data.reviewId);
     setIsReviewModalOpen(false);
     setReviewComment(null);
@@ -175,18 +182,19 @@ function TrainerProfileView() {
       toast.success(response.data.message);
     }
   };
-console.log('userReviewId',userReviewId);
+  // console.log("userReviewId", userReviewId);
 
   const handleReviewEdit = async () => {
-
-    
     const data = {
       reviewComment,
       selectedRating,
-      userReviewId
+      userReviewId,
     };
 
-    const response = await userAxiosInstance.patch(`/api/user/edit-review`, data);
+    const response = await userAxiosInstance.patch(
+      `/api/user/edit-review`,
+      data
+    );
     setIsReviewModalOpen(false);
     setReviewComment(null);
     setSelectedRating(0);
@@ -202,14 +210,21 @@ console.log('userReviewId',userReviewId);
         `/api/user/bookings/${userInfo?.id}/${trainerId}`
       );
       setBookingStatus(response.data);
-      
     };
 
     findBooking();
   }, []);
 
-  console.log('bookingStatus',bookingStatus);
-  
+  useEffect(() => {
+    const getAvgRatingAndTotalReviews = async () => {
+      const response = await userAxiosInstance.get(
+        `/api/user/reviews-summary/${trainerId}`
+      );
+      setAvgRatingAndTotalReviews(response.data);
+    };
+    getAvgRatingAndTotalReviews();
+  }, [trainerId]);
+  // console.log("avgRatingAndTotalReviews", avgRatingAndTotalReviews[0]);
 
   return (
     <div className="mb-40">
@@ -244,17 +259,28 @@ console.log('userReviewId',userReviewId);
         <div className="mx-8 md:mx-auto mt-8 md:ml-36 ">
           {/* Rating and Reviews */}
           <div>
-            <h1 className="text-6xl font-semibold">5.0</h1>
+            <h1 className="text-6xl font-semibold">
+              {avgRatingAndTotalReviews[0]?.averageRating
+                ? `${avgRatingAndTotalReviews[0].averageRating}.0`
+                : "0.0"}
+            </h1>
           </div>
           <div className="flex justify-start mt-2">
             <div className="text-blue-500 text-3xl">
-              <span>★</span>
-              <span>★</span>
-              <span>★</span>
-              <span>★</span>
-              <span>★</span>
+              {[...Array(5)].map((_, index) => (
+                <span key={index}>
+                  {index < avgRatingAndTotalReviews[0]?.averageRating
+                    ? "★"
+                    : "☆"}
+                </span>
+              ))}
             </div>
-            <h2 className="ml-2 text-blue-500 text-2xl">2 reviews</h2>
+
+            {avgRatingAndTotalReviews.length > 0 && (
+              <h2 className="ml-2 text-blue-500 text-2xl">
+                {avgRatingAndTotalReviews[0].totalReviews} reviews
+              </h2>
+            )}
           </div>
           <button
             className="bg-gradient-to-b from-blue-500 to-blue-500 text-white font-bold py-2 px-4 w-64 mt-7 rounded-2xl shadow-md"
@@ -534,35 +560,45 @@ console.log('userReviewId',userReviewId);
         </div>
       )}
       <div className="flex justify-center">
-        <h1 className="text-2xl mt-5 font-bold"> {bookingStatus === 'Completed' ?'What clients are saying': ''}</h1>
+        <h1 className="text-2xl mt-5 font-bold">
+          {" "}
+          {bookingStatus === "Completed" ? "What clients are saying" : ""}
+        </h1>
       </div>
-      {bookingStatus === 'Completed' ? (
+      {bookingStatus === "Completed" ? (
         <div className="flex justify-end mr-10">
-        
           {!hasUserReviewed ? (
             <button
-            onClick={handleAddReview}
+              onClick={handleAddReview}
               className="bg-red-500 px-3 py-2 text-white"
             >
               Add Review
             </button>
-          ): (
+          ) : (
             <button
-            onClick={handleEditReview}
-            className="bg-red-500 px-3 py-2 text-white"
+              onClick={handleEditReview}
+              className="bg-red-500 px-3 py-2 text-white"
             >
-            Edit Review
-          </button>
+              Edit Review
+            </button>
           )}
         </div>
-      ): ''}
-      <Review trainerId={trainerId} reload={reload} currentUeser={userInfo?.id}   onReviewCheck={(hasReview) => setHasUserReviewed(hasReview)} />
-
+      ) : (
+        ""
+      )}
+      <Review
+        trainerId={trainerId}
+        reload={reload}
+        currentUeser={userInfo?.id}
+        onReviewCheck={(hasReview) => setHasUserReviewed(hasReview)}
+      />
 
       {isReviewModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white rounded-lg p-6 md:p-8 w-full max-w-2xl shadow-lg h-[55vh] overflow-y-auto relative">
-            <h1 className="font-bold text-2xl">{hasUserReviewed ? 'Edit  Review' : 'Write a Review'}</h1>
+            <h1 className="font-bold text-2xl">
+              {hasUserReviewed ? "Edit  Review" : "Write a Review"}
+            </h1>
             <h1 className="font-medium mt-3">Select Your Rating</h1>
             <div className="text-yellow-600 text-lg">
               <div className="flex items-center mt-2">
@@ -600,21 +636,21 @@ console.log('userReviewId',userReviewId);
               >
                 Close
               </button>
-             {!hasUserReviewed ? (
-               <button
-               onClick={handleReviewSubmit}
-               className="bg-blue-500 px-3 py-2 rounded-md text-white"
-             >
-               Submit
-             </button>
-             ): (
-              <button
-              onClick={handleReviewEdit}
-              className="bg-blue-500 px-3 py-2 rounded-md text-white"
-            >
-              Submit
-            </button>
-             )}
+              {!hasUserReviewed ? (
+                <button
+                  onClick={handleReviewSubmit}
+                  className="bg-blue-500 px-3 py-2 rounded-md text-white"
+                >
+                  Submit
+                </button>
+              ) : (
+                <button
+                  onClick={handleReviewEdit}
+                  className="bg-blue-500 px-3 py-2 rounded-md text-white"
+                >
+                  Submit
+                </button>
+              )}
             </div>
           </div>
         </div>

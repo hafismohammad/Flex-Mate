@@ -458,6 +458,7 @@ class UserService {
       throw new Error('Failed to create review');
     }
   }
+
   async reviews(trainer_id: string) {
     try {
       return await this.userRepository.getReview(trainer_id)
@@ -465,15 +466,21 @@ class UserService {
       throw new Error('failed to find review')    
     }
   }
+
+  async getReivewSummary(trainer_id: string) {
+    try {      
+
+      const avgReviewsRating = await this.userRepository.getAvgReviewsRating(trainer_id)
+      return avgReviewsRating
+    } catch (error) {
+      throw new Error('failed to find review summary')   
+    }
+  }
+ 
  async findBookings(user_id: string, trainerId: string) {
   try {
     const bookingData = await this.userRepository.findBookings(user_id, trainerId)
     return bookingData?.paymentStatus
-    // if(bookingData.length === 0) {
-    //   return false
-    // } else {
-    //   return true
-    // }
   } catch (error) {
     throw new Error('failed to find booking') 
   }
@@ -497,25 +504,29 @@ class UserService {
  
  async resetPassword(userId: string, currentPassword: string, newPassword: string) {
   try {
-    const userData = await this.userRepository.fetchUser(userId)
-    if(!userData?.password) {
-      throw new Error('userData password is null')
-    }
-    const isPasswordMatch = bcrypt.compare(userData?.password, currentPassword)
-    if(!isPasswordMatch) {
-      throw new Error('Old password is not correct')
-    } else {
-      const hashedPassword = await bcrypt.hash(newPassword, 10)
-      userData.password = hashedPassword
-      userData.save()
+    const userData = await this.userRepository.fetchUser(userId);
+
+    if (!userData?.password) {
+      throw new Error('User password is null');
     }
 
-    
-    
+    const isPasswordMatch = await bcrypt.compare(currentPassword, userData.password);
+
+    if (!isPasswordMatch) {
+      throw new Error('Old password is not correct');
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    userData.password = hashedPassword;
+    await userData.save();
+
+    return { message: 'Password reset successfully' };
   } catch (error) {
-    
+    console.error('Failed to reset password:', error);
+    throw new Error('Failed to reset password');
   }
- }
+}
+
 
 }
 
