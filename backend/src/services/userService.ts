@@ -182,7 +182,6 @@ class UserService {
 
       throw new Error("Invalid email or password");
     } catch (error) {
-      console.error("Login error:", error);
       throw error;
     }
   }
@@ -208,7 +207,6 @@ class UserService {
         throw new Error("Invalid token payload structure");
       }
     } catch (error) {
-      console.error("Error generating token:", error);
       throw error;
     }
   }
@@ -289,7 +287,7 @@ class UserService {
         line_items: lineItems,
         mode: 'payment',
         success_url: `http://localhost:5173/paymentSuccess?session_id=${sessionData._id}&user_id=${userId}&stripe_session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `http://localhost:5173/paymentFailed`,
+        // cancel_url: `http://localhost:5173/paymentFailed`,
       });
   
       return session;  
@@ -339,8 +337,8 @@ class UserService {
   
       const existingBooking = await this.userRepository.findExistingBooking(bookingDetails);
       if (existingBooking) {
-        console.log("Booking already exists.");
-        throw new Error("Booking already exists.");
+        console.log("Booking already exists:", existingBooking);
+        return existingBooking; // Return the existing booking and stop further execution
       }
   
     const bookingData =  await this.userRepository.createBooking(bookingDetails);
@@ -416,7 +414,7 @@ class UserService {
       if (refundPercentage === 0) {
         bookingData.paymentStatus = 'Cancelled';
         await bookingData.save();
-        console.log('booking cancelled without refund:', bookingData);
+        // console.log('booking cancelled without refund:', bookingData);
         return bookingData;
       }
   
@@ -434,9 +432,10 @@ class UserService {
         throw new Error("Refund failed or is incomplete");
       }
 
-      await this.userRepository.cancelNotification(bookingData)
+      const cancelNotification =  await this.userRepository.cancelNotification(bookingData)
+
   
-      return bookingData;
+      return cancelNotification;
     } catch (error) {
       console.error("Error in cancelBooking service:", error);
       throw error;

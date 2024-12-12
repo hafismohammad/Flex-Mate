@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { logoutUser } from "../../actions/userAction";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../app/store";
@@ -7,6 +7,7 @@ import userAxiosInstance from "../../../axios/userAxionInstance";
 import toast from "react-hot-toast";
 import profileDummy from "../../assets/profile-dummy.webp";
 import Loading from "../spinner/Loading";
+import { useNotification } from "../../context/NotificationContext ";
 
 function UserProfileSideBar() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -15,10 +16,14 @@ function UserProfileSideBar() {
 
   const { userInfo } = useSelector((state: RootState) => state.user);
   const navigate = useNavigate();
+  const location = useLocation()
   const dispatch = useDispatch<AppDispatch>();
+  const {clearUserNotifications, addUserNotification} = useNotification()
 
   const handleLogout = () => {
+    console.log("Clearing notifications... in handleLogout"); 
     dispatch(logoutUser());
+    clearUserNotifications()
     navigate("/login");
   };
 
@@ -73,6 +78,8 @@ function UserProfileSideBar() {
     }
   };
 
+  const isActive = (path: string) => location.pathname === path
+
   return (
     <div className="w-[17%] bg-blue-500 h-[70vh] mt-28 ml-10 flex flex-col items-center">
       <nav className="flex flex-col space-y-4 w-full">
@@ -114,32 +121,32 @@ function UserProfileSideBar() {
         <div className="w-full flex flex-col space-y-2 mt-6">
           <Link
             to="/profile"
-            className="flex items-center pl-8 p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
+            className={`flex items-center pl-8 p-2 ${isActive('/profile') ? ' bg-gray-700 text-white' : 'hover:text-white rounded-md transition'}  `}
           >
             <span>Profile</span>
           </Link>
           <Link
             to="/profile/sessions"
-            className="flex items-center pl-8 p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
+            className={`flex items-center pl-8 p-2 ${isActive('/profile/sessions') ? ' bg-gray-700 text-white' : 'hover:text-white rounded-md transition'}  `}
           >
             <span>Sessions</span>
           </Link>
           <Link
             to="/profile/bookings"
-            className="flex items-center pl-8 p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
+            className={`flex items-center pl-8 p-2 ${isActive('/profile/bookings') ? ' bg-gray-700 text-white' : 'hover:text-white rounded-md transition'}  `}
           >
             <span>Bookings</span>
           </Link>
 
           <Link
             to="/profile/message"
-            className="flex items-center pl-8 p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
+            className={`flex items-center pl-8 p-2 ${isActive('/profile/message') ? ' bg-gray-700 text-white' : 'hover:text-white rounded-md transition'}  `}
           >
             <span>Message</span>
           </Link>
 
           <div
-            className="flex items-center pl-8 p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
+            className={`flex items-center pl-8 p-2 text-gray-800 hover:bg-gray-700 hover:text-white rounded-md transition`}
             onClick={handleLogout}
           >
             <span>Logout</span>

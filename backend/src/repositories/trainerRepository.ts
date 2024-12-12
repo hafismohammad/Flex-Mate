@@ -516,7 +516,7 @@ class TrainerRepository {
         {
           $lookup: {
             from: "specializations",
-            localField: "sessionDetails.specializationId", // Assuming this is the field in `sessionDetails`
+            localField: "sessionDetails.specializationId", 
             foreignField: "_id",
             as: "specializationDetails",
           },
@@ -524,7 +524,7 @@ class TrainerRepository {
         {
           $unwind: {
             path: "$specializationDetails",
-            preserveNullAndEmptyArrays: true, // Preserve if specialization details are not found
+            preserveNullAndEmptyArrays: true, 
           },
         },
         {
@@ -556,6 +556,7 @@ class TrainerRepository {
             },
             amount: "$amount",
             paymentStatus: "$paymentStatus",
+            prescription: "$prescription",
             specialization: {
               id: "$specializationDetails._id",
               name: "$specializationDetails.name",
@@ -706,6 +707,21 @@ class TrainerRepository {
   async deleteTrainerNotifications(trainerId: string) {
     try {
       await this.notificationModel.deleteOne({receiverId: trainerId})
+    } catch (error) {
+      console.error('Error delete notifications');
+      throw new Error('Failed to delete notifications');
+    }
+  }
+
+
+  async updatePrescriptionContect(bookingId: string, newPrescription: string) {
+    try {
+      console.log('hit repo=====++++++', newPrescription, bookingId);
+      
+      
+     const data = await this.bookingModel.findByIdAndUpdate(bookingId, {prescription: newPrescription})
+console.log('data',data);
+
     } catch (error) {
       console.error('Error delete notifications');
       throw new Error('Failed to delete notifications');

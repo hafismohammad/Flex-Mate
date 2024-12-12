@@ -216,7 +216,7 @@ function ChatSideBar() {
             )}
           </div>
         ) : (
-          <div className="bg-gray-50 p-4 rounded-lg mt-4">
+          <div className="bg-gray-50 p-4 rounded-lg mt-4 max-w-[450px] max-h-[420px] overflow-y-auto shadow-lg">
             {callHistory.length > 0 ? (
               callHistory.map((call) => (
                 <div className="flex">
@@ -230,10 +230,12 @@ function ChatSideBar() {
                       <h3 className="font-semibold">
                         {call.trainerId?.name || "Unknown User"}
                       </h3>
+                      <h1 className="text-sm text-gray-500">{new Date(call.startedAt).toLocaleTimeString()}</h1>
                       <p className="text-sm text-gray-500">Incoming</p>
+
                     </div>
                   </div>
-                  <h1>{new Date(call.startedAt).toLocaleTimeString()}</h1>
+                  {/* <h1>-{new Date(call.startedAt).toLocaleTimeString()}</h1> */}
                 </div>
               ))
             ) : (

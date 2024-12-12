@@ -332,7 +332,6 @@ class AdminRepository {
     const trainerRevenue = revenueData.length > 0 ? revenueData[0].trainerRevenue : 0;
     const adminRevenue = revenueData.length > 0 ? revenueData[0].adminRevenue : 0;
   
-    // Get current date and calculate the start date (12 months ago)
     const currentDate = new Date();
     const startDate = new Date();
     startDate.setMonth(currentDate.getMonth() - 12); // 12 months ago
@@ -361,15 +360,13 @@ class AdminRepository {
       ])
     ]);
   
-    // Initialize monthly statistics map
     const monthlyStatistics: { [key: string]: MonthlyStats } = {};
   
-    // Initialize each month with zero values for the last 12 months
     for (let monthOffset = 0; monthOffset < 12; monthOffset++) {
       const monthDate = new Date();
       monthDate.setMonth(currentDate.getMonth() - monthOffset);
       const year = monthDate.getFullYear();
-      const month = monthDate.getMonth() + 1; // Months are 0-indexed
+      const month = monthDate.getMonth() + 1; 
       const key = `${year}-${month < 10 ? '0' : ''}${month}`;
   
       monthlyStatistics[key] = {
@@ -383,7 +380,6 @@ class AdminRepository {
     }
   // console.log('monthlyStatistics',monthlyStatistics);
   
-    // Fill in registration data for users
     usersAndDoctorsRegistrationData[0].forEach(userData => {
       const key = `${userData._id.year}-${userData._id.month < 10 ? '0' : ''}${userData._id.month}`;
       if (monthlyStatistics[key]) {
@@ -391,7 +387,6 @@ class AdminRepository {
       }
     });
   
-    // Fill in registration data for trainers
     usersAndDoctorsRegistrationData[1].forEach(trainerData => {
       const key = `${trainerData._id.year}-${trainerData._id.month < 10 ? '0' : ''}${trainerData._id.month}`;
       if (monthlyStatistics[key]) {
@@ -399,14 +394,13 @@ class AdminRepository {
       }
     });
   
-    // Revenue by month for completed appointments
     const revenueByMonth = await BookingModel.aggregate([
       { $match: { paymentStatus: "Completed", bookingDate: { $gte: startDate } } },
       {
         $group: {
           _id: {
-            year: { $year: "$bookingDate" },   // Separate year and month
-            month: { $month: "$bookingDate" }  // Separate month
+            year: { $year: "$bookingDate" },   
+            month: { $month: "$bookingDate" }  
         },
           amount: { $sum: "$amount" },
           trainerRevenue: { $sum: { $multiply: ["$amount", 0.9] } },
@@ -415,7 +409,7 @@ class AdminRepository {
       },
       { $sort: { "_id.year": 1, "_id.month": 1 } }
     ]);
-  console.log('revenueByMonth',revenueByMonth);
+  // console.log('revenueByMonth',revenueByMonth);
   
     revenueByMonth.forEach(revenueData => {
       const key = `${revenueData._id.year}-${revenueData._id.month < 10 ? '0' : ''}${revenueData._id.month}`;
@@ -451,8 +445,8 @@ class AdminRepository {
       activeTrainers,
       activeUsers,
       totalRevenue: amount,
-      trainerRevenue,  // Revenue credited to trainers
-      adminRevenue,   // Revenue credited to admin
+      trainerRevenue,  
+      adminRevenue,  
       userTrainerChartData  // Data for the user/doctor registration chart
     };
   }

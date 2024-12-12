@@ -322,7 +322,7 @@ class TrainerController {
         endTime,
         price,
       } = req.body;
-      const trainerId = req.params.tranerId;
+      const trainerId = req.params.trainerId;
  
       
 
@@ -439,7 +439,7 @@ class TrainerController {
   //   }
   // }
 
-  async gatWalletData(req: Request, res: Response, next: NextFunction) {
+  async getWalletData(req: Request, res: Response, next: NextFunction) {
     try {
       const trinerId = req.params.trainerId
       const walletData = await this.trainerService.getWallet(trinerId)
@@ -475,8 +475,12 @@ class TrainerController {
 
   async getNotifications(req: Request, res: Response, next: NextFunction) {
     try {
+      console.log('hit controller');
+      
       const { trainerId } = req.params;
       const notifications = await this.trainerService.getNotifications(trainerId);
+      console.log('notifications',notifications);
+      
       res.status(200).json(notifications);
     } catch (error) {
       next(error);
@@ -492,6 +496,38 @@ class TrainerController {
       next(error)
     }
   }
+
+  async updatePrescription(req: Request, res: Response, next: NextFunction) {
+    try {
+      const {bookingId} = req.params
+      const newPrescription = req.body.data
+      await this.trainerService.updatePrescription(bookingId, newPrescription)
+      res.status(200).json({message: 'Prescription updated successfully'})
+    } catch (error) {
+      next(error)
+    }
+  } 
+
+  // async updatePrescription(req: Request, res: Response, next: NextFunction) {
+  //   try {
+  //     const { bookingId } = req.params;
+  //     const newPrescription= req.body.data;
+  
+  //     if (!bookingId || !newPrescription) {
+  //        res.status(400).json({ message: "Missing required fields." });
+  //     }
+  
+  //     const result = await this.trainerService.updatePrescription(bookingId, newPrescription);
+  
+  //     // Success response
+  //     res.status(200).json({
+  //       message: "Prescription updated successfully",
+  //       data: result,
+  //     });
+  //   } catch (error) {
+  //     next(error); 
+  //   }
+  // }
 }
 
 export default TrainerController;

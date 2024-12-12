@@ -111,7 +111,7 @@ function CurrentSchedules() {
         sessionData
       );
       const newSchedule = response.data.createdSessionData;
-      console.log("newSchedule", newSchedule);
+      // console.log("newSchedule", newSchedule);
 
       setSessionSchedules((prevSchedules) =>
         Array.isArray(newSchedule)
@@ -167,7 +167,7 @@ function CurrentSchedules() {
       setLoading(true); // Start loading
       try {
         const response = await axiosInstance.get(
-          `${API_URL}/api/trainer/shedules/${trainerId}`
+          `${API_URL}/api/trainer/schedules/${trainerId}`
         );
         const schedules = response.data.sheduleData;
         // console.log("schedules", schedules);
@@ -282,32 +282,37 @@ function CurrentSchedules() {
       {/* {!sessionSchedules && <Loading />} */}
 
       {specModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg p-6 h-[65vh] w-full max-w-lg shadow-lg">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-              Select Specialization
-            </h2>
-
-            <div className="flex flex-col gap-3 max-h-[50vh] overflow-y-auto">
-              {spec.map((specialization) => (
-                <button
-                  key={specialization._id}
-                  onClick={() => handleSpecClick(specialization._id)} // Replace with your desired function
-                  className="p-4 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-lg shadow-sm text-left"
-                >
-                  {specialization.name}
-                </button>
-              ))}
-            </div>
-
-            <button
-              onClick={() => setSpecModal(false)}
-              className="mt-6 bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600"
-            >
-              Close
-            </button>
-          </div>
-        </div>
+   <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+   <div className="bg-white rounded-lg p-6 h-[65vh] w-full max-w-lg shadow-lg flex flex-col justify-between">
+     <div>
+       <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+         Select Specialization
+       </h2>
+ 
+       <div className="flex flex-col gap-3 max-h-[50vh] overflow-y-auto">
+         {spec.map((specialization) => (
+           <button
+             key={specialization._id}
+             onClick={() => handleSpecClick(specialization._id)} 
+             className="p-4 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-lg shadow-sm text-left"
+           >
+             {specialization.name}
+           </button>
+         ))}
+       </div>
+     </div>
+ 
+     <div className="flex justify-end mt-4">
+       <button
+         onClick={() => setSpecModal(false)}
+         className="bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600"
+       >
+         Close
+       </button>
+     </div>
+   </div>
+ </div>
+ 
       )}
 
       <SessionModal

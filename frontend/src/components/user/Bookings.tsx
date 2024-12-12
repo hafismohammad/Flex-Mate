@@ -7,10 +7,13 @@ import axiosInstance from "../../../axios/trainerAxiosInstance";
 import userAxiosInstance from "../../../axios/userAxionInstance";
 import Swal from "sweetalert2";
 import { formatTime } from "../../utils/timeAndPriceUtils";
+import { useSocketContext } from "../../context/Socket";
 
 interface Booking {
   _id: string;
+  trainerId: string
   trainerName: string;
+  userId: string
   trainerImage: string;
   sessionType: string;
   specialization: string;
@@ -26,8 +29,14 @@ interface Booking {
 function Bookings() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const { userInfo } = useSelector((state: RootState) => state.user);
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [prescriptionData, setPrescriptionData] = useState<Booking | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [prescriptionData, setPrescriptionData] = useState<Booking | null>(null);
+  
+  const {socket} = useSocketContext()
+  
+  // Pagination States
+  const [currentPage, setCurrentPage] = useState(1);
+  const [bookingsPerPage] = useState(4); 
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -35,6 +44,7 @@ function Bookings() {
         const response = await userAxiosInstance.get(
           `/api/user/bookings-details/${userInfo?.id}`
         );
+        
         setBookings(response.data);
       } catch (error) {
         console.error("Error fetching bookings:", error);
@@ -43,49 +53,87 @@ function Bookings() {
     fetchBookings();
   }, [userInfo]);
 
-  const handleCancelBooking = async (bookingId: string) => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "This session will be cancelled!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, cancel it!",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          await axios.patch(`${API_URL}/api/user/cancel-booking/${bookingId}`);
 
-          // Update booking status locally to 'Cancelled' instead of removing it
-          setBookings((prev) =>
-            prev.map((booking) =>
-              booking._id === bookingId
-                ? { ...booking, bookingStatus: "Cancelled" }
-                : booking
-            )
-          );
-
-          Swal.fire("Canceled!", "Your booking has been canceled.", "success");
-        } catch (error) {
-          console.error("Error canceling booking:", error);
-          Swal.fire("Error", "Could not cancel the booking.", "error");
+// Handle Booking Cancellation
+const handleCancelBooking = async (bookingId: string) => {
+  Swal.fire({
+    title: "Are you sure?",
+    text: "This session will be cancelled!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Yes, cancel it!",
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        const bookingToCancel = bookings.find((booking) => booking._id === bookingId);
+        console.log('bookingToCancel',bookingToCancel);
+        
+        if (!bookingToCancel) {
+          Swal.fire("Error", "Booking not found.", "error");
+          return;
         }
+
+       const response = await axios.patch(`${API_URL}/api/user/cancel-booking/${bookingId}`);
+       
+       console.log('Response Data:1', response.data); 
+     
+       console.log('response2', response.data);
+       // Update booking status locally to 'Cancelled' instead of removing it
+       setBookings((prev) =>
+        prev.map((booking) =>
+          booking._id === bookingId
+       ? { ...booking, bookingStatus: "Cancelled" }
+       : booking
+      )
+    );
+    
+    console.log('Response Data:3', response.data); 
+    
+    console.log('response4', response.data);
+    const bookingDetails = bookingToCancel
+    const trainerNotification  = {
+      recetriverId: bookingToCancel.trainerId,
+      content: `Booking for ${bookingDetails.sessionType} (${bookingDetails.specialization}) on ${new Date(bookingDetails.sessionDates.startDate).toDateString()} at ${bookingDetails.startTime} has been cancelled.`,
+    }
+        const userNotification = {
+          userId: bookingToCancel.userId,
+          content: `Your booking for ${bookingDetails.sessionType} (${bookingDetails.specialization}) on ${new Date(bookingDetails.sessionDates.startDate).toDateString()} at ${bookingDetails.startTime} has been cancelled.`,
+        }
+        console.log('userNotification',userNotification);
+        
+        socket?.emit('cancelTrainerNotification', trainerNotification);
+        socket?.emit('cancelUserNotification', userNotification);
+
+        Swal.fire("Canceled!", "Your booking has been canceled.", "success");
+      } catch (error) {
+        console.error("Error canceling booking:", error);
+        Swal.fire("Error", "Could not cancel the booking.", "error");
       }
-    });
+    }
+  });
+};
+
+
+  // Handle Prescription View
+  const handleView = (booking: Booking) => {
+    setPrescriptionData(booking);
+    // console.log('booking', booking);
+    setIsModalOpen(true);
   };
 
+  // Pagination Logic: Get the current bookings slice
+  const indexOfLastBooking = currentPage * bookingsPerPage;
+  const indexOfFirstBooking = indexOfLastBooking - bookingsPerPage;
+  const currentBookings = bookings.slice(indexOfFirstBooking, indexOfLastBooking);
 
-  const handleView = (booking: Booking) => {
-    setPrescriptionData(booking)
-    console.log('booking', booking);
-    
-    setIsModalOpen(true)
-  }
+  // Change Page
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   return (
     <div className="flex justify-center mt-5">
-      <div className="h-[80vh] bg-white w-full shadow-md rounded-md overflow-y-auto p-3">
+      <div className="h-[80vh] bg-white w-full shadow-md rounded-md p-3">
         <h1 className="p-2 font-bold text-2xl mb-5">Bookings</h1>
         <div className="grid grid-cols-9 gap-2 text-lg font-bold text-gray-600 mb-4 border-b border-gray-200 pb-2">
           <div>Trainer</div>
@@ -99,7 +147,7 @@ function Bookings() {
           <div>Action</div>
         </div>
 
-        {bookings.map((booking) => (
+        {currentBookings.map((booking) => (
           <div
             key={booking._id}
             className="grid grid-cols-9 gap-2 items-center p-4 px-6 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none"
@@ -161,80 +209,75 @@ function Bookings() {
                 </button>
               )}
             </div>
-
-            {/* <div>
-              {booking.bookingStatus !== "Cancelled"  && booking.bookingStatus !== 'Completed'? (
-               <div className="flex justify-center gap-2">
-                 <button
-                  onClick={() => handleCancelBooking(booking._id)}
-                  className="bg-red-500 hover:bg-red-700 font-bold text-white px-4 py-1 rounded-lg"
-                >
-                  Cancel
-                </button>
-                <button className="bg-blue-500 hover:bg-blue-700 font-bold text-white px-4 py-1 rounded-lg">View</button>
-               </div>
-              ) : (
-                ""
-              )}
-            </div> */}
           </div>
         ))}
-      </div>
-     
-      {isModalOpen && (
-  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-    <div className="bg-white rounded-lg p-6 w-[800px] shadow-lg">
-      <h1 className="font-bold text-xl text-center mb-6">Prescription</h1>
-      <div className="p-4 bg-gray-100 rounded-lg shadow-md">
-        <div className="flex items-center gap-4">
-          <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
-            <img
-              src={prescriptionData?.trainerImage || "/default-profile.png"}
-              alt="Trainer Profile"
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="text-gray-800">
-            <p>
-              <strong>Name:</strong> {prescriptionData?.trainerName || "N/A"}
-            </p>
-            <p>
-              <strong>Email:</strong> {prescriptionData?.trainerEmail || "N/A"}
-            </p>
-            <p>
-              <strong>Specialization:</strong> {prescriptionData?.specialization || "N/A"}
-            </p>
-          </div>
-        </div>
 
-        <div className="mt-4">
-          <label className="block font-medium text-gray-700 mb-2">
-            Prescription
-          </label>
-          <div className="w-full border rounded-md p-3 text-gray-700 bg-gray-50">
-            {prescriptionData?.prescription
-              ? prescriptionData.prescription.split('\n').map((line, index) => (
-                  <p key={index}>{line.trim()}</p>
-                ))
-              : "No prescription available."}
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex justify-end gap-4 mt-6">
+        {/* Pagination */}
+        <div className="flex justify-center gap-6 items-center mt-10">
           <button
-            onClick={() => setIsModalOpen(false)}
-            className="px-5 py-2 bg-red-500 hover:bg-red-700 rounded-md shadow-md text-white"
+            onClick={() => paginate(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded-md"
           >
-            Close
+            Prev
+          </button>
+          <span className="font-bold text-gray-800">
+            Page {currentPage} of {Math.ceil(bookings.length / bookingsPerPage)}
+          </span>
+          <button
+            onClick={() => paginate(currentPage + 1)}
+            disabled={currentPage === Math.ceil(bookings.length / bookingsPerPage)}
+            className="bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded-md"
+          >
+            Next
           </button>
         </div>
       </div>
-    </div>
-  </div>
-)}
 
+      {/* Prescription Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg p-6 w-[800px] shadow-lg">
+            <h1 className="font-bold text-xl text-center mb-6">Prescription</h1>
+            <div className="p-4 bg-gray-100 rounded-lg shadow-md">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
+                  <img
+                    src={prescriptionData?.trainerImage || "/default-profile.png"}
+                    alt="Trainer Profile"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="text-gray-800">
+                  <p>
+                    <strong>Name:</strong> {prescriptionData?.trainerName || "N/A"}
+                  </p>
+                  <p>
+                    <strong>Email:</strong> {prescriptionData?.trainerEmail || "N/A"}
+                  </p>
+                  <p>
+                    <strong>Specialization:</strong> {prescriptionData?.specialization || "N/A"}
+                  </p>
+                </div>
+              </div>
 
+              <div className="mt-4">
+                <label className="block font-medium text-gray-700 mb-2">Prescription</label>
+                <p>{prescriptionData?.prescription || "No prescription provided."}</p>
+              </div>
+            </div>
+
+            <div className="mt-6 text-end">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="bg-red-500 hover:bg-red-700 font-bold text-white py-2 px-6 rounded-lg"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

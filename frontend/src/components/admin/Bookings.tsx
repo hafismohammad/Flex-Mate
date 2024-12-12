@@ -8,6 +8,8 @@ function Bookings() {
   const [filterSessionType, setFilterSessionType] = useState<string>("all");
   const [filterStatus, setFilterStatus] = useState<string>();
   const [filterStartDate, setFilterStartDate] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const bookingsPerPage = 12;
 
   useEffect(() => {
     const fetchAllBookings = async () => {
@@ -23,6 +25,22 @@ function Bookings() {
 
   const sessionType = (type: string) => {
     setFilterSessionType(type);
+  };
+
+  const indexOfLastBooking = currentPage * bookingsPerPage;
+  const indexOfFirstBooking = indexOfLastBooking - bookingsPerPage;
+  const currentBooking = bookings.slice(indexOfFirstBooking, indexOfLastBooking)
+
+  const nextPage = () => {
+    if (currentPage < Math.ceil(filteredBookings.length / bookingsPerPage)) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+  
+  const prevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
   };
 
   const filteredBookings = bookings.filter((booking) => {
@@ -102,8 +120,8 @@ function Bookings() {
           <div>Status</div>
         </div>
 
-        {filteredBookings.length > 0 ? (
-          filteredBookings.map((booking) => (
+        {currentBooking.length > 0 ? (
+          currentBooking.map((booking) => (
             <div
               key={booking._id}
               className="grid grid-cols-9 gap-2 items-center text-sm p-2 hover:bg-gray-50 transition-colors border-b border-gray-200 last:border-none"
@@ -160,6 +178,27 @@ function Bookings() {
           </div>
         )}
       </div>
+
+      <div className="flex justify-center ml-32 mt-4 w-[75%]">
+        <button
+          onClick={prevPage}
+          disabled={currentPage === 1}
+          className="bg-gray-300 text-gray-700 px-4 py-2 rounded-l hover:bg-gray-400 disabled:opacity-50"
+        >
+          Previous
+        </button>
+        <span className="px-4 py-2 text-gray-700">
+          Page {currentPage} of {Math.ceil(bookings.length / bookingsPerPage)}
+        </span>
+        <button
+          onClick={nextPage}
+          disabled={currentPage === Math.ceil(bookings.length / bookingsPerPage)}
+          className="bg-gray-300 text-gray-700 px-4 py-2 rounded-r hover:bg-gray-400 disabled:opacity-50"
+        >
+          Next
+        </button>
+      </div>
+      
     </div>
   );
 }

@@ -34,6 +34,9 @@ interface BookingDetail {
 function TrainerDashboard() {
   const [bookingDetails, setBookingDetails] = useState<BookingDetail[]>([]);
   const [walletBalcance, setWalletBalance] = useState<IWallet | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const bookingsPerPage = 7;
+
   const { trainerInfo } = useSelector((state: RootState) => state.trainer);
 
   useEffect(() => {
@@ -59,10 +62,25 @@ function TrainerDashboard() {
   const totalSessions = bookingDetails.length;
   const totalUsers = new Set(bookingDetails.map((booking) => booking.userId)).size;
 
+  const indexOfLastBooking = currentPage * bookingsPerPage;
+  const indexOfFirstBooking = indexOfLastBooking - bookingsPerPage;
+  const currentBooking = bookingDetails.slice(indexOfFirstBooking, indexOfLastBooking)
+
+  const nextPage = () => {
+    if (currentPage < Math.ceil(bookingDetails.length / bookingsPerPage)) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+  
+  const prevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
 
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
-      <Toaster />
+      {/* <Toaster /> */}
       <div className="flex justify-center gap-32">
         <div className="bg-blue-100 h-[100px] w-[260px] shadow-md flex items-center px-4">
           <img className="h-16 w-16 mr-4" src={booking} alt="" />
@@ -105,8 +123,8 @@ function TrainerDashboard() {
           {/* <div>Action</div> */}
         </div>
 
-        {bookingDetails.length > 0 ? (
-          bookingDetails.map((booking) => (
+        {currentBooking.length > 0 ? (
+          currentBooking.map((booking) => (
             <div
               key={booking._id}
               className={`grid grid-cols-6 gap-4 items-center p-2 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none`}
@@ -158,6 +176,26 @@ function TrainerDashboard() {
             No upcoming sessions
           </div>
         )}
+      </div>
+
+      <div className="flex justify-center ml-32 mt-4 w-[75%]">
+        <button
+          onClick={prevPage}
+          disabled={currentPage === 1}
+          className="bg-gray-300 text-gray-700 px-4 py-2 rounded-l hover:bg-gray-400 disabled:opacity-50"
+        >
+          Previous
+        </button>
+        <span className="px-4 py-2 text-gray-700">
+          Page {currentPage} of {Math.ceil(bookingDetails.length / bookingsPerPage)}
+        </span>
+        <button
+          onClick={nextPage}
+          disabled={currentPage === Math.ceil(bookingDetails.length / bookingsPerPage)}
+          className="bg-gray-300 text-gray-700 px-4 py-2 rounded-r hover:bg-gray-400 disabled:opacity-50"
+        >
+          Next
+        </button>
       </div>
     </div>
   );

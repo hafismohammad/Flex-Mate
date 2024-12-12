@@ -8,7 +8,7 @@ import { AppDispatch, RootState } from "../../app/store";
 import { logoutTrainer } from "../../actions/trainerAction";
 import axiosInstance from "../../../axios/trainerAxiosInstance";
 import toast, { Toaster } from "react-hot-toast";
-import { useSocketContext } from "../../context/Socket";
+import { useNotification } from "../../context/NotificationContext ";
 
 interface Notification {
   content: string;
@@ -19,26 +19,31 @@ interface Notification {
 const TrainerLayout: React.FC = () => {
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const {socket} = useSocketContext()
-
+  const {
+    trainerNotifications,
+    addTrainerNotification,
+    clearTrainerNotifications,
+    updateTrainerNotificationReadStatus
+  } = useNotification();
   const { trainerInfo } = useSelector((state: RootState) => state.trainer);
+
 
   // Logout handler
   const handleLogout = () => {
     dispatch(logoutTrainer());
+    clearTrainerNotifications()
     navigate("/trainer/login");
   };
 
   // Toggle dropdowns
   const toggleProfileDropdown = () => {
-    setIsProfileDropdownOpen(!isProfileDropdownOpen);
+    setIsProfileDropdownOpen((prev) => !prev);
   };
 
   const toggleNotificationDropdown = () => {
-    setIsNotificationOpen(!isNotificationOpen);
+    setIsNotificationOpen((prev) => !prev);
   };
 
   // Fetch notifications
@@ -49,7 +54,14 @@ const TrainerLayout: React.FC = () => {
           const response = await axiosInstance.get(
             `/api/trainer/notifications/${trainerInfo.id}`
           );
-          setNotifications(response.data.notifications || []);
+          // console.log("response.data", response.data);
+
+          const serverNotifications = response.data.notifications || [];
+          console.log("serverNotifications", serverNotifications);
+
+          serverNotifications.forEach((notif: { content: string }) => {
+            addTrainerNotification(notif.content);
+          });
         }
       } catch (error) {
         console.error("Failed to fetch notifications:", error);
@@ -58,47 +70,30 @@ const TrainerLayout: React.FC = () => {
     fetchNotifications();
   }, [trainerInfo?.id]);
 
-  // useEffect(() => {
-  //   if (socket) {
-  //     // Listener for real-time notifications
-  //     socket.on("receiveNotification", (data: Notification) => {
-  //       console.log("Notification received:", data);
-  
-  //       // Update the state with the new notification
-  //       setNotifications((prev) => {
-  //         // Avoid duplicates by checking if a notification with the same content and timestamp exists
-  //         const isDuplicate = prev.some(
-  //           (notif) => notif.content === data.content && notif.createdAt === data.createdAt
-  //         );
-  
-  //         // Only add the notification if it's not a duplicate
-  //         if (!isDuplicate) {
-  //           return [...prev, data];
-  //         }
-  
-  //         return prev; // No changes if it's a duplicate
-  //       });
-  //     });
-  
-  //     // Cleanup listener on component unmount
-  //     return () => {
-  //       socket.off("receiveNotification");
-  //     };
-  //   }
-  // }, [socket]);
-  
-
-
+  // Clear notifications
   const handleClear = async () => {
-    const response = await axiosInstance.delete(`/api/trainer/clear-notifications/${trainerInfo.id}`)
-    if(response.status === 200) {
-      toast.success(response.data.message)
-      setNotifications((prev) => ({
-        ...prev,
-        notifications:[]
-      }))
+    try {
+      const response = await axiosInstance.delete(
+        `/api/trainer/clear-notifications/${trainerInfo?.id}`
+      );
+
+      if (response.status === 200) {
+        clearTrainerNotifications();
+        toast.success(response.data.message);
+      } else {
+        toast.error("Failed to clear notifications.");
+      }
+    } catch (error) {
+      console.error("Error clearing notifications:", error);
+      toast.error("An error occurred while clearing notifications.");
     }
-  }
+  };
+
+  const handleReadUnread = (notificationId: string) => {
+    console.log('notificainoid',notificationId);
+    updateTrainerNotificationReadStatus(notificationId);
+    
+  };
 
   return (
     <div className="flex h-screen">
@@ -114,7 +109,7 @@ const TrainerLayout: React.FC = () => {
                 onClick={toggleNotificationDropdown}
               />
               <span className="absolute top-0 right-0 inline-flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-red-600 rounded-full">
-                {notifications.length || 0}
+                {trainerNotifications.length}
               </span>
 
               {isNotificationOpen && (
@@ -122,24 +117,43 @@ const TrainerLayout: React.FC = () => {
                   <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">
                     Notifications
                   </h3>
-                  {notifications.length > 0 ? (
-                   <>
-                    <ul className="space-y-3 mt-2 max-h-64 overflow-y-auto">
-                      {notifications.map((notification, index) => (
-                        <li
-                          key={index}
-                          className={`text-sm text-gray-700 border-b pb-2 ${
-                            notification.read ? "opacity-50" : ""
-                          }`}
+                  {trainerNotifications.length > 0 ? (
+                    <>
+                      <ul className="space-y-3 mt-2 max-h-64 overflow-y-auto">
+                        {trainerNotifications.length > 0 ? (
+                          <>
+                            {trainerNotifications.map((notification, index) => (
+                              <li
+                                key={index}
+                                onClick={() => handleReadUnread(notification.id)}
+                                className={`text-sm text-gray-700 border-b pb-2 ${
+                                  notification.read
+                                    ? "opacity-50 bg-gray-100"
+                                    : "bg-yellow-100"
+                                }`}
+                              >
+                                {typeof notification.message === "string"
+                                  ? notification.message
+                                  : "Invalid message"}
+                              </li>
+                            ))}
+                          </>
+                        ) : (
+                          <p className="text-sm text-gray-500">
+                            No new notifications
+                          </p>
+                        )}
+                      </ul>
+
+                      <div className="flex justify-end mt-2">
+                        <button
+                          onClick={handleClear}
+                          className="px-3 py-1 text-sm text-white bg-blue-500 rounded-md hover:bg-blue-600"
                         >
-                          {notification.content}
-                        </li>
-                      ))}
-                    </ul>
-                    <div className="flex justify-end">
-                      <button onClick={handleClear} className="text-gray-800">Clear</button>
-                    </div>
-                   </>
+                          Clear
+                        </button>
+                      </div>
+                    </>
                   ) : (
                     <p className="text-sm text-gray-500">
                       No new notifications

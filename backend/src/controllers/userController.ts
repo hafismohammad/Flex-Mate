@@ -233,13 +233,14 @@ class UserController {
   async createBooking(req: Request, res: Response, next: NextFunction) {
     try {
       const { sessionId, userId , stripe_session_id} = req.body;
-    
+      console.log('createBooking+++');
+      
       const bookingDetails = await this.userService.findBookingDetails(
         sessionId,
         userId,
         stripe_session_id
       );
-      // console.log('bookingDetails',bookingDetails);
+      console.log('bookingDetails',bookingDetails);
       
       res.status(200).json(bookingDetails)
     } catch (error) {
@@ -307,16 +308,22 @@ class UserController {
       next(error)
     }
   }
-
   async cancelBooking(req: Request, res: Response, next: NextFunction) {
     try {
         const { bookingId } = req.params;
-        const bookingCancelled = await this.userService.cancelBooking(bookingId);
-        res.status(200).json({ message: "Booking canceled and refund processed" });
+        const cancelNotification = await this.userService.cancelBooking(bookingId);
+        console.log('cancelNotification', cancelNotification);
+        
+        res.status(200).json({
+            message: "Booking canceled and refund processed",
+            data: cancelNotification
+        });
     } catch (error) {
-       next(error)
+       next(error);
     }
 }
+
+
   async addReview(req: Request, res: Response, next: NextFunction) {
     try {
       

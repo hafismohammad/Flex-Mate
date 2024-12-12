@@ -139,7 +139,7 @@ const EditTrainerProfile: React.FC = () => {
 
     try {
       const response = await axiosInstance.patch(
-        `/api/trainer/updateTrainerData/${trainerId}`,
+        `/api/trainer/update-trainer/${trainerId}`,
         updatedData,
         {
           headers: {

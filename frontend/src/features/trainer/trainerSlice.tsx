@@ -9,6 +9,12 @@ import {
   submitKyc
 } from "../../actions/trainerAction";
 
+interface Notification {
+  content: string;
+  read: boolean;
+  createdAt: string;
+}
+
 interface TrainerState {
   trainerInfo: null | any;
   trainerToken: null | string;
@@ -21,6 +27,7 @@ interface TrainerState {
   showVideoCallTrainer: boolean
   roomIdTrainer: null | string
   showPrescription: boolean
+  notificationTrainer: Notification[];
 }
 
 interface VideoCallPayload {
@@ -49,7 +56,8 @@ const initialState: TrainerState = {
   videoCall: null,
   showVideoCallTrainer: false,
   roomIdTrainer: null,
-  showPrescription: false
+  showPrescription: false,
+  notificationTrainer: []
 };
 
 const trainerSlice = createSlice({
@@ -83,6 +91,13 @@ const trainerSlice = createSlice({
       console.log('roomIdTrainer slice', state.roomIdTrainer);
       
     },
+    setNotificactionTrainer(state, action: PayloadAction<Notification[]>) {
+      state.notificationTrainer = [...state.notificationTrainer, ...action.payload];
+      console.log('action',action.payload);
+      
+      console.log("notificationTrainer slice", state.notificationTrainer);
+    },
+    
     setPrescription(state, action: PayloadAction<boolean>) {
       state.showPrescription = action.payload
     },
@@ -92,6 +107,7 @@ const trainerSlice = createSlice({
       state.roomIdTrainer = null;   
       localStorage.removeItem("IncomingVideoCall"); 
     },
+  
   },
   extraReducers: (builder) => {
     builder
@@ -209,5 +225,5 @@ const trainerSlice = createSlice({
 });
 
 // Export the actions and reducer
-export const { clearTrainer, setError, setLoading, setVideoCall, setShowVideoCall, setRoomId, endCallTrainer, setPrescription } = trainerSlice.actions;
+export const { clearTrainer, setError, setLoading, setVideoCall, setShowVideoCall, setRoomId, endCallTrainer, setPrescription, setNotificactionTrainer } = trainerSlice.actions;
 export default trainerSlice.reducer;

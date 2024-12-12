@@ -44,19 +44,15 @@ io.on("connection", (socket) => {
   });
 
 
-
-  
     socket.on('sendMessage', (data) => {
       if (userId) {
         // console.log('sendMessage', data);
-        
         io.emit('messageUpdate',data) 
       } else {
         console.error("receiverId is missing in sendMessage data");
       }
     });
  
-  
 
   // Handle outgoing video calls
   socket.on("outgoing-video-call", (data) => {
@@ -136,18 +132,70 @@ io.on("connection", (socket) => {
     }
   });
 
-  // socket.on("sendNotification", (data) => {
-  //   console.log('hit sendNotification');
+  socket.on("newBookingNotification", (data) => {
+    console.log('hit sendNotification',data);
+
     
-  //   const receiverSocketId = getReceiverSocketId(data.receiverId);
+    const receiverSocketId = getReceiverSocketId(data.receiverId);
+  
+    if (receiverSocketId) {
+      console.log("Sending notification to:", receiverSocketId);
+      console.log('receiveNewBooking',data);
+      
+      io.to(receiverSocketId).emit("receiveNewBooking", data.content);
+    } else {
+      console.warn("Receiver not connected:", data.receiverId);
+    }
+  });
+  
+
+  socket.on('cancelTrainerNotification', (data) => {
+    // console.log('hit cancel notification', data);
+  
+    const receiverSocketId = getReceiverSocketId(data.recetriverId);
+    console.log('receiverSocketId trainer', receiverSocketId);
+  
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("receiveCancelNotificationForTrainer", data.content);
+      console.log("Notification sent to client:", data);
+    } else {
+      console.warn("No receiverSocketId found for receiverId:", data.receiverId);
+    }
+  });
+
+  socket.on('cancelUserNotification', (data) => {
+console.log('cancelUserNotification',data);
+
+    const receiverSocketId = getReceiverSocketId(data.userId);
+    console.log('receiverSocketId user---', receiverSocketId);
+  
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("receiveCancelNotificationForUser", data.content);
+      console.log("Notification sent to client:", data);
+    } else {
+      console.warn("No receiverSocketId found for receiverId:", data.receiverId);
+    }
+  });
+  
+
+
+  // socket.on('cancelNotificationForUser', (data) => {
+  //   // console.log('hit cancel notification', data);
+  
+  //   const receiverSocketId = getReceiverSocketId(data.userId);
+  //   // console.log("Receiver Socket ID:", receiverSocketId);
   
   //   if (receiverSocketId) {
-  //     console.log("Sending notification to:", receiverSocketId);
-  //     io.to(receiverSocketId).emit("receiveNotification", data);
+  //     // console.log("Sending notification to ******:", receiverSocketId);
+  //     io.to(receiverSocketId).emit("receiveCancelNotificationForUser", data);
   //   } else {
-  //     console.warn("Receiver not connected:", data.receiverId);
+  //     console.log("No socket ID found for receiver:", data.userId);
   //   }
   // });
+  
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
+  });
   
 
   socket.on("disconnect", () => {

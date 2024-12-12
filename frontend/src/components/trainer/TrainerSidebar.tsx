@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom"; 
+import { Link, useNavigate, useLocation } from "react-router-dom"; 
 import LOGO from "../../assets/LOGO-2.png";
 import { useDispatch } from "react-redux";
-import {logoutTrainer} from '../../actions/trainerAction'
+import { logoutTrainer } from "../../actions/trainerAction";
 import { IoChatbubbleEllipsesSharp } from "react-icons/io5";
 import { FaAddressBook } from "react-icons/fa6";
-
 import {
   FaBars,
   FaListAlt,
@@ -17,37 +16,42 @@ import {
 } from "react-icons/fa";
 import { AppDispatch } from "../../app/store";
 import { useSocketContext } from "../../context/Socket";
+import { useNotification } from "../../context/NotificationContext ";
 
 function TrainerSidebar() {
-  const {socket} = useSocketContext()
+  const { socket } = useSocketContext();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const [hasMessage, setHasMessage] = useState(false)
-
+  const location = useLocation(); 
+  const [hasMessage, setHasMessage] = useState(false);
+  const {clearTrainerNotifications} = useNotification()
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
   const handleLogout = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault(); 
+    console.log('hit logout');
+    clearTrainerNotifications()
     dispatch(logoutTrainer());
+    
     navigate('/trainer/login'); 
   };
 
   useEffect(() => {
-    
     socket?.on('messageUpdate', (data) => {
-      console.log('messageUpdate ---',data);
-      if(data) {
-        setHasMessage(true)
+      if (data) {
+        setHasMessage(true);
       }
-    })
-  },[socket])
+    });
+  }, [socket]);
 
   const handleClick = () => {
-    setHasMessage(false)
-  }
+    setHasMessage(false);
+  };
+
+  const isActive = (path: string) => location.pathname === path; // Check active route
 
   return (
     <div className={`h-screen bg-blue-800 text-white flex flex-col p-4 shadow-md transition-all duration-300 ${isSidebarOpen ? "w-64" : "w-16"} sticky top-0`}>
@@ -67,7 +71,9 @@ function TrainerSidebar() {
       <nav className="flex flex-col space-y-4">
         <Link
           to="/trainer"
-          className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
+          className={`flex items-center p-2 rounded-md transition ${
+            isActive("/trainer") ? "bg-gray-700 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"
+          }`}
         >
           <FaChartPie size={20} />
           <span className={`ml-2 ${!isSidebarOpen && "hidden"}`}>
@@ -77,41 +83,45 @@ function TrainerSidebar() {
 
         <Link
           to="/trainer/currentSchedules"
-          className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
+          className={`flex items-center p-2 rounded-md transition ${
+            isActive("/trainer/currentSchedules") ? "bg-gray-700 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"
+          }`}
         >
           <FaListAlt size={20} />
           <span className={`ml-2 ${!isSidebarOpen && "hidden"}`}>
-          Current Schedules 
+            Current Schedules
           </span>
         </Link>
 
         <Link
           to="/trainer/bookings"
-          className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
+          className={`flex items-center p-2 rounded-md transition ${
+            isActive("/trainer/bookings") ? "bg-gray-700 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"
+          }`}
         >
           <FaAddressBook size={20} />
           <span className={`ml-2 ${!isSidebarOpen && "hidden"}`}>
-            Bookings 
+            Bookings
           </span>
         </Link>
 
         <Link
           to="/trainer/chat-sidebar"
-          className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
+          className={`flex items-center p-2 rounded-md transition ${
+            isActive("/trainer/chat-sidebar") ? "bg-gray-700 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"
+          }`}
         >
           <IoChatbubbleEllipsesSharp size={20} />
           <span onClick={handleClick} className={`ml-2 mr-2 ${!isSidebarOpen && "hidden"}`}>
-           Message 
+            Message
           </span>
-         {/* {hasMessage === true ?
-          <div className="px-2 py-2 rounded-full bg-red-500" />
-          : ''
-         } */}
         </Link>
         
         <Link
           to="/trainer/profile"
-          className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
+          className={`flex items-center p-2 rounded-md transition ${
+            isActive("/trainer/profile") ? "bg-gray-700 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"
+          }`}
         >
           <FaUser size={20} />
           <span className={`ml-2 ${!isSidebarOpen && "hidden"}`}>Profile</span>
@@ -119,16 +129,20 @@ function TrainerSidebar() {
 
         <Link
           to="/trainer/wallet"
-          className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
+          className={`flex items-center p-2 rounded-md transition ${
+            isActive("/trainer/wallet") ? "bg-gray-700 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"
+          }`}
         >
           <FaWallet size={20} />
-          <span className={`ml-2 ${!isSidebarOpen && "hidden"}`}>wallet</span>
-        </Link>    
-        
+          <span className={`ml-2 ${!isSidebarOpen && "hidden"}`}>Wallet</span>
+        </Link>
+
         <a
-          href="#" // Using <a> to trigger the logout action
+          href="#"
           onClick={handleLogout}
-          className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition cursor-pointer"
+          className={`flex items-center p-2 rounded-md transition ${
+            isActive("#") ? "bg-gray-700 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"
+          }`}
         >
           <FaSignOutAlt size={20} />
           <span className={`ml-2 ${!isSidebarOpen && "hidden"}`}>

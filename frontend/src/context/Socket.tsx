@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import { endCallUser, setShowIncomingVideoCall, setRoomIdUser, setShowVideoCallUser, setVideoCallUser } from "../features/user/userSlice";
 import { endCallTrainer,setVideoCall, setShowVideoCall, setRoomId , setPrescription} from "../features/trainer/trainerSlice";
 import toast from "react-hot-toast";
+import { useNotification } from "./NotificationContext ";
 
 interface SocketContextType {
   socket: Socket | null;
@@ -25,7 +26,7 @@ export const SocketContextProvider = ({
   const { trainerInfo } = useSelector((state: RootState) => state.trainer);
   const loggedUser = userInfo?.id || trainerInfo?.id || null;
   const dispatch = useDispatch<AppDispatch>();
-
+ const {addTrainerNotification, addUserNotification} = useNotification()
   const newSocket = io("http://localhost:3000", {
     query: { userId: loggedUser },
     transports: ['websocket'],
@@ -99,7 +100,7 @@ export const SocketContextProvider = ({
     })
 
     newSocket.on("call-rejected", () => { 
-      toast.error("Call ended or rejected --------<<<>>>");
+      toast.error("Call ended or rejected ");
       dispatch(setVideoCall(null))
       dispatch(endCallTrainer());
       dispatch(endCallUser());
@@ -132,13 +133,32 @@ export const SocketContextProvider = ({
     //   console.log("Notification received:", data);
     // })
     // Cleanup event listeners on socket change or component unmount
+    newSocket.on('receiveCancelNotificationForTrainer', (data: string) => {
+      console.log('receiveCancelNotification from socket', data);
+      addTrainerNotification(data);
+    });
+    newSocket.on('receiveCancelNotificationForUser', (data: string) => {
+      console.log('receiveCancelNotification from socket', data);
+      addUserNotification(data);
+    });
+    
+    newSocket.on('receiveNewBooking', (data: string) => {
+      console.log('receive new booking', data);
+      addTrainerNotification(data);
+    });
+    
+    
     return () => {
       console.log("Cleaning up socket event listeners...");
       socket.off("incoming-video-call");
       socket.off("accepted-call");
       newSocket.off("call-rejected");
+      newSocket.off('receiveCancelNotificationForTrainer')
+      newSocket.off('receiveCancelNotificationForUser')
+      newSocket.off('receiveNewBooking')
+
     };
-  }, [newSocket, dispatch]);
+  }, [newSocket, dispatch,addUserNotification, addTrainerNotification]);
 
   return <SocketContext.Provider value={{ socket }}>{children}</SocketContext.Provider>;
 

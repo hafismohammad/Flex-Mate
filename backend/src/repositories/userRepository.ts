@@ -362,6 +362,7 @@ class UserRepository {
       {
         $project: {
           trainerId: '$trainerDetails._id',
+          userId: '$userId',
           trainerImage: '$trainerDetails.profileImage',
           trainerName: '$trainerDetails.name',
           trainerEmail: '$trainerDetails.email',
@@ -427,6 +428,8 @@ async cancelNotification(bookingDetails: IBooking) {
     createdAt: new Date()
   };
 
+  let trainerNotification, userNotification;
+
   // Add or update the trainer's notification
   const existingTrainerNotification = await this.notificationModel.findOne({
     receiverId: bookingDetails.trainerId,
@@ -434,13 +437,13 @@ async cancelNotification(bookingDetails: IBooking) {
 
   if (existingTrainerNotification) {
     existingTrainerNotification.notifications.push(trainerNotificationContent);
-    await existingTrainerNotification.save();
+    trainerNotification = await existingTrainerNotification.save();
   } else {
     const newTrainerNotification: INotification = {
       receiverId: bookingDetails.trainerId,
       notifications: [trainerNotificationContent],
     };
-    await this.notificationModel.create(newTrainerNotification);
+    trainerNotification = await this.notificationModel.create(newTrainerNotification);
   }
 
   // Add or update the user's notification
@@ -450,14 +453,23 @@ async cancelNotification(bookingDetails: IBooking) {
 
   if (existingUserNotification) {
     existingUserNotification.notifications.push(userNotificationContent);
-    await existingUserNotification.save();
+    userNotification = await existingUserNotification.save();
   } else {
     const newUserNotification: INotification = {
       receiverId: bookingDetails.userId,
       notifications: [userNotificationContent],
     };
-    await this.notificationModel.create(newUserNotification);
+    userNotification = await this.notificationModel.create(newUserNotification);
   }
+
+  // Return the created or updated notifications
+  const data = {
+    trainerNotification,
+    userNotification
+  }
+  console.log('data',data);
+  
+  return data
 }
 
 async createReview(

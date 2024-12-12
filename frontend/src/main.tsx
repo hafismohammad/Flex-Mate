@@ -5,13 +5,16 @@ import './index.css';
 import { Provider } from 'react-redux';
 import store from './app/store'; 
 import {SocketContextProvider} from './context/Socket'
+import { NotificationProvider } from './context/NotificationContext ';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  // <React.StrictMode>
-    <Provider store={store} >
+<NotificationProvider>
+<Provider store={store} >
       <SocketContextProvider>
     <App />
       </SocketContextProvider>
     </Provider>
-  // </React.StrictMode>
+</NotificationProvider>
+
+
 );

@@ -1,18 +1,14 @@
 // trainerServices.ts
-
 import TrainerRepository from "../repositories/trainerRepository";
 import { ITrainer, ILoginTrainer } from "../interface/trainer_interface";
-import {
-  generateAccessToken,
-  generateRefreshToken,
-  verifyRefreshToken,
-} from "../utils/jwtHelper";
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken,} from "../utils/jwtHelper";
 import sendOTPmail from "../config/email_config";
 import bcrypt from "bcryptjs";
 import { ISession } from "../interface/trainer_interface";
 import { createRecurringSessions } from "../utils/slotHelper";
 import { IBooking } from "../interface/common";
 import { deleteFromCloudinary, uploadToCloudinary } from "../config/cloudinary";
+import { differenceInHours } from 'date-fns';
 
 class TrainerService {
   private trainerRepository: TrainerRepository;
@@ -506,6 +502,40 @@ class TrainerService {
       throw new Error('failed to delete notifications')
     }
    }
+
+   async updatePrescription(bookingId: string, newPrescription: string) {
+    try {
+      await this.trainerRepository.updatePrescriptionContect(bookingId, newPrescription)
+     
+      // if(bookingDetails?.bookingDate )
+    } catch (error) {
+      throw new Error('failed to update prescription')
+    }
+  }
+
+  // async updatePrescription(bookingId: string, newPrescription: string) {
+  //   try {
+  //     const bookingDetails = await this.trainerRepository.updatePrescriptionContect(bookingId, newPrescription);
+  
+  //     if (!bookingDetails?.bookingDate) {
+  //       throw new Error("Invalid booking date or booking not found.");
+  //     }
+  
+  //     const hoursLeft = differenceInHours(new Date(bookingDetails.bookingDate), new Date());
+  
+  //     if (hoursLeft > 0 && hoursLeft <= 1) {
+  //       console.log(`Hours left to update prescription: ${hoursLeft}`);
+  //       return {
+  //         success: true,
+  //         message: "Prescription updated successfully!",
+  //       };
+  //     } else {
+  //       throw new Error("Prescription update time has expired.");
+  //     }
+  //   } catch (error: any) {
+  //     throw new Error(error.message || "Failed to update prescription.");
+  //   }
+  // }
   
 }
 

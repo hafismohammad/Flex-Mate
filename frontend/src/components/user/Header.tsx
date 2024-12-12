@@ -9,6 +9,7 @@ import { logoutUser } from "../../actions/userAction";
 import userAxiosInstance from "../../../axios/userAxionInstance";
 import { BsBell } from "react-icons/bs";
 import toast, { Toaster } from "react-hot-toast";
+import { useNotification } from "../../context/NotificationContext ";
 
 interface INotificationContent {
   content: string;
@@ -29,18 +30,23 @@ function Header() {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [image, setImage] = useState<string | null>(null);
-  const [notificationsData, setNotificationsData] = useState<INotification>({
-    receiverId: "",
-    notifications: [],
-  });
+
+  // const [notificationsData, setNotificationsData] = useState<INotification>({
+  //   receiverId: "",
+  //   notifications: [],
+  // });
 
   const { userInfo, token } = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const { addUserNotification, clearUserNotifications, userNotifications, updateUserNotificationReadStatus } =
+    useNotification();
 
   // Logout handler
   const handleLogout = () => {
+    console.log("Clearing notifications... in handleLogout"); 
     dispatch(logoutUser());
+    clearUserNotifications()
     navigate("/login");
   };
 
@@ -68,24 +74,34 @@ function Header() {
         const response = await userAxiosInstance.get(
           `/api/user/notifications/${userInfo?.id}`
         );
-        setNotificationsData(response.data || null);
+        // console.log('response.data.notifications ',response.data.notifications );
+        
+        const serverNotifications = response.data?.notifications ?? [];
+        serverNotifications.forEach((notif: any) => {
+          if (notif && notif.content) {
+            addUserNotification(notif.content);
+          }
+        });
       } catch (error) {
         console.error("Failed to fetch notifications:", error);
       }
     };
     fetchNotifications();
   }, [userInfo?.id]);
+  
 
   const handleClear = async () => {
     try {
-      
-      const response = await userAxiosInstance.delete(`/api/user/clear-notifications/${userInfo?.id}`);
+      const response = await userAxiosInstance.delete(
+        `/api/user/clear-notifications/${userInfo?.id}`
+      );
       if (response.status === 200) {
-        toast.success(response.data.message)
-        setNotificationsData((prev) => ({
-          ...prev,
-          notifications:[]
-        }))
+        toast.success(response.data.message);
+        // setNotificationsData((prev) => ({
+        //   ...prev,
+        //   notifications:[]
+        // }))
+        clearUserNotifications();
       } else {
         console.error("Failed to clear notifications. Please try again.");
       }
@@ -93,7 +109,12 @@ function Header() {
       console.error("Error clearing notifications:", error);
     }
   };
-  
+
+  const handleReadUnread = (notificationId: string) => {
+    updateUserNotificationReadStatus(notificationId);
+    
+  };
+
   return (
     <header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center bg-blue-800 text-white p-4 shadow-xl">
       <Toaster />
@@ -147,40 +168,51 @@ function Header() {
                 onClick={() => setIsNotificationOpen(!isNotificationOpen)}
               />
               <span className="absolute top-0 right-0 inline-flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-red-600 rounded-full">
-                {notificationsData?.notifications?.filter(
-                  (notification) => !notification.read
-                ).length || 0}
+                {userNotifications?.length}
               </span>
             </div>
 
             {isNotificationOpen && (
-  <div className="absolute top-10 right-0 w-[320px] bg-white shadow-lg rounded-md p-4">
-    <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">
-      Notifications
-    </h3>
-    {notificationsData?.notifications?.length ? (
-    <>
-      <ul className="space-y-3 mt-2 max-h-[200px] overflow-y-auto">
-        {notificationsData.notifications.map((notification, index) => (
-          <li
-            key={index}
-            className={`text-sm text-gray-700 border-b pb-2 ${
-              notification.read ? "opacity-50" : ""
-            }`}
-          >
-            {notification.content}
-          </li>
-        ))}
-      </ul>
-      <div onClick={handleClear} className="flex justify-end">
-        <button className="text-gray-800">Clear</button>
-      </div>
-    </>
-    ) : (
-      <p className="text-sm text-gray-500">No new notifications</p>
-    )}
-  </div>
-)}
+              <div className="absolute top-10 right-0 w-[320px] bg-white shadow-lg rounded-md p-4">
+                <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">
+                  Notifications
+                </h3>
+                {userNotifications?.length ? (
+                  <>
+                   <ul className="space-y-3 mt-2 max-h-64 overflow-y-auto">
+                        {userNotifications?.length > 0 ? (
+                          <>
+                            {userNotifications.map((notification, index) => (
+                              <li
+                                key={index}
+                                onClick={() => handleReadUnread(notification.id)}
+                                className={`text-sm text-gray-700 border-b pb-2 ${
+                                  notification.read
+                                    ? "opacity-50 bg-gray-100"
+                                    : "bg-yellow-100"
+                                }`}
+                              >
+                                {typeof notification.message === "string"
+                                  ? notification.message
+                                  : "Invalid message"}
+                              </li>
+                            ))}
+                          </>
+                        ) : (
+                          <p className="text-sm text-gray-500">
+                            No new notifications
+                          </p>
+                        )}
+                      </ul>
+                    <div onClick={handleClear} className="flex justify-end">
+                      <button className="text-gray-800">Clear</button>
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-sm text-gray-500">No new notifications</p>
+                )}
+              </div>
+            )}
 
             {/* User Profile */}
             <div className="relative">
