@@ -5,6 +5,7 @@ import { RootState } from "../../app/store";
 import { formatTime, formatPriceToINR } from "../../utils/timeAndPriceUtils";
 import axiosInstance from "../../../axios/trainerAxiosInstance";
 import toast, { Toaster } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 interface Specialization {
   _id: string;
@@ -44,6 +45,7 @@ function Bookings() {
 
   const { trainerInfo } = useSelector((state: RootState) => state.trainer);
   const trainerId = trainerInfo.id;
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchBookingDetails = async () => {
@@ -182,6 +184,10 @@ function Bookings() {
   //   }
   //   }
 
+  const setisOpenView = (bookingId: string) => {
+    navigate("/trainer/user-view", { state: { bookingId } });
+  };
+  
   useEffect(() => {
     if (isModalOpen && prescriptionData?.prescription != null) {
       setNewprescription(prescriptionData.prescription);
@@ -235,7 +241,9 @@ function Bookings() {
           <div className="text-center">End Time</div>
           <div className="text-center">Amount</div>
           <div className="text-center">Status</div>
-          <div className="text-center">Action</div>
+          <div className="text-center">View</div>
+          {/* <div className="text-center">Action</div> */}
+
         </div>
 
         {currentBooking.length > 0 ? (
@@ -288,13 +296,17 @@ function Bookings() {
               >
                 {booking.paymentStatus}
               </div>
-              {booking.paymentStatus === "Completed" && (
+              <div className="ml-4">
+                <button className="bg-blue-500 hover:bg-blue-700 font-bold text-white px-7 py-1 rounded-lg" onClick={() => setisOpenView(booking._id)}>view</button>
+              </div>
+              {/* {booking.paymentStatus === "Completed" && (
                 <div onClick={() => handleView(booking)}>
                   <button className="bg-blue-500 hover:bg-blue-700 font-bold text-white px-7 py-1 rounded-lg">
                     View
                   </button>
                 </div>
-              )}
+              )} */}
+            
             </div>
           ))
         ) : (
@@ -327,7 +339,7 @@ function Bookings() {
         </button>
       </div>
 
-      {isModalOpen && (
+      {/* {isModalOpen && (
         <div className="fixed inset-0  flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white rounded-lg p-6 w-[800px] shadow-lg">
             <h1 className="text-xl font-bold text-center mb-6">Prescription</h1>
@@ -401,7 +413,7 @@ function Bookings() {
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

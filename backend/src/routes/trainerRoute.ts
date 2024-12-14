@@ -48,6 +48,7 @@ router.post('/prescriptions/:bookingId', authMiddlewares(['trainer']), trainerCo
 router.get('/notifications/:trainerId', authMiddlewares(['trainer']), trainerController.getNotifications.bind(trainerController));
 router.delete('/clear-notifications/:trainerId', authMiddlewares(['trainer']), trainerController.clearNotifications.bind(trainerController))
 router.patch('/update-prescription/:bookingId', authMiddlewares(['trainer']), trainerController.updatePrescription.bind(trainerController))
+router.get('/booking/:bookingId',  authMiddlewares(['trainer']), trainerController.getUserBooking.bind(trainerController))
 
 
 

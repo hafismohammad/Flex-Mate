@@ -337,9 +337,9 @@ function CurrentSchedules() {
       />
 
       <div className="bg-white shadow-lg rounded-lg p-6">
-        <div className="grid grid-cols-8 gap-1 text-lg font-bold text-gray-600 mb-4 border-b border-gray-200 pb-2">
+        <div className="grid grid-cols-9 gap-1 text-lg font-bold text-gray-600 mb-4 border-b border-gray-200 pb-2">
           <div>Session Type</div>
-          {/* <div>Name</div> */}
+          <div>Name</div>
           <div>Date</div>
           <div>Start Time</div>
           <div>End Time</div>
@@ -352,14 +352,14 @@ function CurrentSchedules() {
           filteredSchedules.map((schedule) => (
             <div
               key={schedule._id}
-              className="grid grid-cols-8 gap-1 items-center p-2 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none mb-2"
+              className="grid grid-cols-9 gap-1 items-center p-2 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none mb-2"
             >
               <div className="text-gray-800 font-medium">
                 {schedule.isSingleSession ? "Single Session" : "Package"}
               </div>
-              {/* <div className="text-gray-800 font-medium">
+              <div className="text-gray-800 font-medium">
                 {schedule.specializationId.name}
-              </div> */}
+              </div>
               <div className="text-gray-800 font-medium mt-3">
                 {schedule.isSingleSession
                   ? new Date(schedule.startDate).toLocaleDateString()

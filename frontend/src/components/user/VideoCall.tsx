@@ -10,6 +10,7 @@ import {
   setVideoCallUser,
 } from "../../features/user/userSlice";
 import {useSocketContext} from '../../context/Socket'
+import { useNavigate } from "react-router-dom";
 
 // const socket = io("http://localhost:3000"); // Replace with your server URL
 
@@ -18,9 +19,9 @@ function VideoCall() {
   const { roomIdUser, showIncomingVideoCall, videoCall  } = useSelector((state: RootState) => state.user);
   let {socket}  = useSocketContext()
   const dispatch = useDispatch();
-
+  const navigate = useNavigate()
   console.log('videoCall',showIncomingVideoCall);
-  
+    
 
   useEffect(() => {
     // console.log("Room ID roomIdUser:", roomIdUser);
@@ -55,6 +56,10 @@ function VideoCall() {
       turnOnCameraWhenJoining: true,
       showPreJoinView: false,
       onLeaveRoom: () => {
+        // console.log('navigate');
+        
+        // navigate('/profile/bookings')
+        
         socket?.emit("leave-room", { to: showIncomingVideoCall?.trainerId});
         // alert('leave-room user')
         console.log('USER SOCKET ID', socket?.id);
@@ -64,30 +69,45 @@ function VideoCall() {
         dispatch(setRoomIdUser(null));
         dispatch(setVideoCallUser(null));
         dispatch(setShowIncomingVideoCall(null))
+        
+          // videoCallRef.current?.classList.add("hidden") // Clear all child elements
+          
+
+
         // localStorage.removeItem("roomId");
         // localStorage.removeItem("showVideoCall");
       },
     });
 
     socket?.on("user-left", () => {
-      console.log('hit user left');
-      alert('hit user left')
+      // console.log('hit user left');
+      // alert('hit user left')
       zp.destroy();
       dispatch(setShowVideoCallUser(false));
       dispatch(setRoomIdUser(null));
       dispatch(setVideoCallUser(null));
       dispatch(setShowIncomingVideoCall(null))
       localStorage.removeItem("roomId");
+      
       localStorage.removeItem("showVideoCall");
     });
 
     return () => {
+      // alert('call end')
+      window.location.reload()
+      
       zp.destroy();
-      socket?.off("user-left");
+      // socket?.off("user-left");
     };
-  }, [roomIdUser,  dispatch]);
+  }, [roomIdUser,  dispatch, socket]);
 
   
+
+
+  // if(!videoCall){
+  //   return ;
+  // }
+
 
   return (
     <div

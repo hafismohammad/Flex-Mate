@@ -301,8 +301,7 @@ class UserController {
   async getAllBookings(req: Request, res: Response, next: NextFunction) {
     try {
       const user_id = req.params.userId;
-
-      const bookings = await this.userService.getAllBookings(user_id);
+      const bookings = await this.userService.getAllBookings(user_id);      
       res.status(200).json(bookings);
     } catch (error) {
       next(error)
@@ -381,6 +380,8 @@ class UserController {
     try {
       const {userId} = req.params
       const notifications = await this.userService.getNotifications(userId)
+      // console.log('notifications',notifications);
+      
       res.status(200).json(notifications)
     } catch (error) {
       next(error)

@@ -9,6 +9,7 @@ import { createRecurringSessions } from "../utils/slotHelper";
 import { IBooking } from "../interface/common";
 import { deleteFromCloudinary, uploadToCloudinary } from "../config/cloudinary";
 import { differenceInHours } from 'date-fns';
+import moment from "moment";
 
 class TrainerService {
   private trainerRepository: TrainerRepository;
@@ -477,13 +478,53 @@ class TrainerService {
 
   async addPrescription(bookingId: string, prescription: string) {
     try {
-      const prescriptionInfo = await this.trainerRepository.addPrescription(bookingId, prescription)
-      await this.trainerRepository.updateSessionStatus(bookingId);
-      return prescriptionInfo
+      const prescriptionInfo = await this.trainerRepository.addPrescription(bookingId, prescription);
+  
+      if (prescriptionInfo?.sessionType === 'Single Session') {
+        await this.trainerRepository.updateSessionStatus(bookingId);
+      }
+  
+      if (prescriptionInfo?.sessionType === 'Package Session') {
+        const sessionData = await this.trainerRepository.getSession(prescriptionInfo.sessionId.toString());
+        console.log('sessionData', sessionData);
+  
+        if (sessionData) {
+          const startDate = moment(prescriptionInfo.startDate);
+          const endDate = moment(prescriptionInfo.endDate);
+  
+          const totalDays = endDate.diff(startDate, 'days');
+          const totalSessions = totalDays + 1;
+  
+          // Ensure `completedSessions` is defined
+          if (sessionData.completedSessions === undefined) {
+            sessionData.completedSessions = 0;
+          }
+          console.log('totalSessions', totalSessions);
+          console.log('sessionData.completedSessions before ', sessionData.completedSessions);
+          if (sessionData.completedSessions < totalSessions) {
+            let sessionCount = sessionData.completedSessions + 1; // Increment completed sessions
+            console.log('sessionData.completedSessions after increment', sessionCount);
+          
+            // Save updated session data to the database
+            await this.trainerRepository.updateSessionData(sessionData._id.toString(), sessionCount);
+          
+            if (sessionCount < totalSessions) {  
+              await this.trainerRepository.updateSessionStatus(bookingId);
+            }
+          }
+          
+        }
+      }
+  
+      return prescriptionInfo;
     } catch (error: any) {
-      throw new Error(error)
+      throw new Error(error);
     }
   }
+  
+  
+
+  
 
   async getNotifications(trainerId: string) {
     try {
@@ -511,6 +552,10 @@ class TrainerService {
     } catch (error) {
       throw new Error('failed to update prescription')
     }
+  }
+
+  async getBooking(bookingId: string) {
+    return await this.trainerRepository.fetchUserBooking(bookingId)
   }
 
   // async updatePrescription(bookingId: string, newPrescription: string) {

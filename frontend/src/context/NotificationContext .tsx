@@ -15,6 +15,7 @@ interface NotificationContextProps {
   clearTrainerNotifications: () => void;
   updateTrainerNotificationReadStatus: (notificationId: string) => void;
   updateUserNotificationReadStatus: (notificationId: string) => void;
+  countUnreadNotificationsUser:number
 }
 
 const NotificationContext = createContext<NotificationContextProps | undefined>(undefined);
@@ -43,6 +44,11 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
   useEffect(() => {
     localStorage.setItem("userNotifications", JSON.stringify(userNotifications));
   }, [userNotifications]);
+
+  const countUnreadNotifications = (notifications: Notification[]) => {
+    return notifications.filter(notif => !notif.read).length;
+  };
+  
 
   const addUserNotification = useCallback((message: string) => {
     setUserNotifications((prev) => {
@@ -107,6 +113,7 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
         clearTrainerNotifications,
         updateTrainerNotificationReadStatus,
         updateUserNotificationReadStatus,
+        countUnreadNotificationsUser: countUnreadNotifications(userNotifications),
       }}
     >
       {children}

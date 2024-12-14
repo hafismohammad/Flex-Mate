@@ -6,7 +6,7 @@ import Footer from '../../components/user/Footer'
 
 function HomePage() {
   return (
-    <div className="pt-16">
+    <div className="pt-14">
         <Header />
         <Banner />
         <Features />

@@ -63,6 +63,7 @@ export interface ISession {
   isSingleSession: boolean;
   numberOfSessions: number;
   price: number | undefined
+  completedSessions: number | undefined
   isBooked: boolean,
   status: 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled' | 'InProgress';
   paymentIntentId?: string; 

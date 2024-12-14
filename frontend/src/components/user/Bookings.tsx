@@ -6,7 +6,7 @@ import API_URL from "../../../axios/API_URL";
 import axiosInstance from "../../../axios/trainerAxiosInstance";
 import userAxiosInstance from "../../../axios/userAxionInstance";
 import Swal from "sweetalert2";
-import { formatTime } from "../../utils/timeAndPriceUtils";
+import { formatPriceToINR, formatTime } from "../../utils/timeAndPriceUtils";
 import { useSocketContext } from "../../context/Socket";
 
 interface Booking {
@@ -24,6 +24,7 @@ interface Booking {
   bookingDate: string;
   prescription?: string;
   trainerEmail: string
+  amount: number
 }
 
 function Bookings() {
@@ -44,6 +45,7 @@ function Bookings() {
         const response = await userAxiosInstance.get(
           `/api/user/bookings-details/${userInfo?.id}`
         );
+        // console.log('response.data',response.data);
         
         setBookings(response.data);
       } catch (error) {
@@ -89,9 +91,9 @@ const handleCancelBooking = async (bookingId: string) => {
       )
     );
     
-    console.log('Response Data:3', response.data); 
+    // console.log('Response Data:3', response.data); 
     
-    console.log('response4', response.data);
+    // console.log('response4', response.data);
     const bookingDetails = bookingToCancel
     const trainerNotification  = {
       recetriverId: bookingToCancel.trainerId,
@@ -135,7 +137,7 @@ const handleCancelBooking = async (bookingId: string) => {
     <div className="flex justify-center mt-5">
       <div className="h-[80vh] bg-white w-full shadow-md rounded-md p-3">
         <h1 className="p-2 font-bold text-2xl mb-5">Bookings</h1>
-        <div className="grid grid-cols-9 gap-2 text-lg font-bold text-gray-600 mb-4 border-b border-gray-200 pb-2">
+        <div className="grid grid-cols-10 gap-2 text-lg font-bold text-gray-600 mb-4 border-b border-gray-200 pb-2">
           <div>Trainer</div>
           <div>Booking Date</div>
           <div>Session Type</div>
@@ -143,6 +145,7 @@ const handleCancelBooking = async (bookingId: string) => {
           <div>Session Date</div>
           <div>Start Time</div>
           <div>End Time</div>
+          <div>Amount</div>
           <div>Status</div>
           <div>Action</div>
         </div>
@@ -150,7 +153,7 @@ const handleCancelBooking = async (bookingId: string) => {
         {currentBookings.map((booking) => (
           <div
             key={booking._id}
-            className="grid grid-cols-9 gap-2 items-center p-4 px-6 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none"
+            className="grid grid-cols-10 gap-2 items-center p-4 px-6 hover:bg-gray-100 transition-colors border-b border-gray-200 last:border-none"
           >
             <div className="flex items-center space-x-2">
               <img
@@ -179,6 +182,9 @@ const handleCancelBooking = async (bookingId: string) => {
             </div>
             <div className="text-gray-800 font-medium">
               {formatTime(booking.endTime)}
+            </div>
+            <div>
+              {formatPriceToINR(booking.amount)}
             </div>
             <div
               className={

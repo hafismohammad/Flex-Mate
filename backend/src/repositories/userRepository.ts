@@ -384,6 +384,7 @@ class UserRepository {
           sessionType: '$sessionType',
           bookingStatus: '$paymentStatus',
           bookingDate: '$bookingDate',
+          amount: '$amount',
           prescription: '$prescription'
         },
       },
@@ -619,19 +620,20 @@ async findBookings(user_id: string, trainer_id: string) {
 async fetchNotifications(userId: string) {
   try {
     const notificationsDoc = await this.notificationModel.findOne({ receiverId: userId });
-    
-    if (notificationsDoc && notificationsDoc.notifications) {
-      notificationsDoc.notifications.sort((a, b) => {
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      });
+
+    if (notificationsDoc?.notifications?.length) {
+      notificationsDoc.notifications.sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
     }
 
     return notificationsDoc;
   } catch (error) {
-    console.error('Error finding notifications');
+    console.error('Error finding notifications:', error);
     throw new Error('Failed to find notifications');
   }
 }
+
 
 async deleteUserNotifications(userId: string) {
   try {

@@ -345,6 +345,7 @@ class TrainerController {
         sessionData.startTime = startTime;
         sessionData.endTime = endTime;
         sessionData.price = price;
+        sessionData.completedSessions = 0; 
       }
 
       const createdSessionData = await this.trainerService.AddNewSession(
@@ -409,6 +410,7 @@ class TrainerController {
   async fetchBookingDetails(req: Request, res: Response, next: NextFunction) {
     try {
       const trainer_id = req.params.trainerId;
+console.log('booking-details');
 
       const bookingDetails = await this.trainerService.getBookingDetails(
         trainer_id
@@ -465,8 +467,9 @@ class TrainerController {
     try {
       const {bookingId} = req.params
       const prescriptions = req.body.data
+
       const prescriptionInfo = await this.trainerService.addPrescription(bookingId, prescriptions)
-      console.log('prescriptionInfo',prescriptionInfo);
+      // console.log('prescriptionInfo',prescriptionInfo);
       res.status(200).json({message: 'Prescription sent successfully'})
     } catch (error) {
       next(error)
@@ -507,6 +510,17 @@ class TrainerController {
       next(error)
     }
   } 
+
+  async getUserBooking(req: Request, res: Response) {
+    try {
+      const {bookingId} = req.params
+      const response = await this.trainerService.getBooking(bookingId)
+      res.status(200).json(response)
+    } catch (error) {
+      
+    }
+    
+  }
 
   // async updatePrescription(req: Request, res: Response, next: NextFunction) {
   //   try {

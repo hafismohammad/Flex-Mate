@@ -86,7 +86,6 @@ function TrainersList() {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="p-2 border w-[60%] border-gray-300 rounded-lg shadow-sm focus:outline-none"
         />
-       
       </div>
 
       <div

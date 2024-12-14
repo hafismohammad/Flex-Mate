@@ -586,6 +586,34 @@ class TrainerRepository {
     }
   }
 
+  async getSession(sessionId: string) {
+    try {
+      return await this.sessionModel.findById(sessionId, {isSingleSession:false})
+    } catch (error) {
+      
+    }
+  }
+  
+  async updateSessionData(sessionId: string, sessionCount: number) {
+    try {
+      const session = await this.sessionModel.findByIdAndUpdate(
+        sessionId,
+        { $set: { completedSessions: sessionCount } }, // Update the completedSessions field
+        { new: true } // Return the updated document
+      );
+  
+      if (!session) {
+        throw new Error("Session not found");
+      }
+      return session;
+    } catch (error) {
+      console.error("Error updating session data:", error);
+      throw error;
+    }
+  }
+  
+  
+
   async updateSessionStatus(bookingId: string) {
     try {
       const bookingDetails = await this.bookingModel.findByIdAndUpdate(
@@ -716,15 +744,128 @@ class TrainerRepository {
 
   async updatePrescriptionContect(bookingId: string, newPrescription: string) {
     try {
-      console.log('hit repo=====++++++', newPrescription, bookingId);
+      // console.log('hit repo=====++++++', newPrescription, bookingId);
       
       
      const data = await this.bookingModel.findByIdAndUpdate(bookingId, {prescription: newPrescription})
-console.log('data',data);
+// console.log('data',data);
 
     } catch (error) {
       console.error('Error delete notifications');
       throw new Error('Failed to delete notifications');
+    }
+  }
+
+  async fetchUserBooking(bookingId: string) {
+    try {
+      // const bookingDetails  await this.bookingModel.findById(bookingId)
+
+      const bookingDetails = await this.bookingModel.aggregate([
+        { $match: { _id: new mongoose.Types.ObjectId(bookingId) } },
+        {
+          $lookup: {
+            from: "users",
+            localField: "userId",
+            foreignField: "_id",
+            as: "userDetails",
+          },
+        },
+        {
+          $lookup: {
+            from: "trainers",
+            localField: "trainerId",
+            foreignField: "_id",
+            as: "trainerDetails",
+          },
+        },
+        {
+          $lookup: {
+            from: "sessions",
+            localField: "sessionId",
+            foreignField: "_id",
+            as: "sessionDetails",
+          },
+        },
+        {
+          $unwind: {
+            path: "$userDetails",
+            preserveNullAndEmptyArrays: true, // Preserve if user details are not found
+          },
+        },
+        {
+          $unwind: {
+            path: "$trainerDetails",
+            preserveNullAndEmptyArrays: true, // Preserve if trainer details are not found
+          },
+        },
+        {
+          $unwind: {
+            path: "$sessionDetails",
+            preserveNullAndEmptyArrays: true, // Preserve if session details are not found
+          },
+        },
+        {
+          $lookup: {
+            from: "specializations",
+            localField: "sessionDetails.specializationId", 
+            foreignField: "_id",
+            as: "specializationDetails",
+          },
+        },
+        {
+          $unwind: {
+            path: "$specializationDetails",
+            preserveNullAndEmptyArrays: true, 
+          },
+        },
+        {
+          $project: {
+            bookingId: "$_id",
+            userId: "$userDetails._id",
+            userName: "$userDetails.name",
+            userImage: "$userDetails.image",
+            userMail: '$userDetails.email',
+            trainerName: "$trainerDetails.name",
+            sessionDate: {
+              $ifNull: ["$sessionDetails.startDate", null], // If session is deleted, show as null
+            },
+            sessionType: "$sessionType",
+            sessionStartTime: "$startTime",
+            sessionEndTime: "$endTime",
+            bookingDate: "$bookingDate",
+            sessionDates: {
+              $cond: {
+                if: { $eq: ["$sessionDetails.isSingleSession", true] },
+                then: {
+                  startDate: { $ifNull: ["$sessionDetails.startDate", null] },
+                },
+                else: {
+                  startDate: { $ifNull: ["$sessionDetails.startDate", null] },
+                  endDate: { $ifNull: ["$sessionDetails.endDate", null] },
+                },
+              },
+            },
+            amount: "$amount",
+            paymentStatus: "$paymentStatus",
+            prescription: "$prescription",
+            specialization: {
+              id: "$specializationDetails._id",
+              name: "$specializationDetails.name",
+            },
+            sessionStatus: "$sessionDetails.status",
+          },
+        },
+        {
+          $sort: {
+            bookingDate: -1,
+          },
+        },
+      ]);
+      console.log('bookingDetails',bookingDetails);
+      
+      return bookingDetails
+    } catch (error) {
+      
     }
   }
 

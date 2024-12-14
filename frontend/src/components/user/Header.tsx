@@ -39,14 +39,19 @@ function Header() {
   const { userInfo, token } = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const { addUserNotification, clearUserNotifications, userNotifications, updateUserNotificationReadStatus } =
-    useNotification();
+  const {
+    addUserNotification,
+    clearUserNotifications,
+    userNotifications,
+    updateUserNotificationReadStatus,
+    countUnreadNotificationsUser
+  } = useNotification();
 
   // Logout handler
   const handleLogout = () => {
-    console.log("Clearing notifications... in handleLogout"); 
+    console.log("Clearing notifications... in handleLogout");
     dispatch(logoutUser());
-    clearUserNotifications()
+    clearUserNotifications();
     navigate("/login");
   };
 
@@ -75,7 +80,7 @@ function Header() {
           `/api/user/notifications/${userInfo?.id}`
         );
         // console.log('response.data.notifications ',response.data.notifications );
-        
+
         const serverNotifications = response.data?.notifications ?? [];
         serverNotifications.forEach((notif: any) => {
           if (notif && notif.content) {
@@ -88,7 +93,6 @@ function Header() {
     };
     fetchNotifications();
   }, [userInfo?.id]);
-  
 
   const handleClear = async () => {
     try {
@@ -112,7 +116,6 @@ function Header() {
 
   const handleReadUnread = (notificationId: string) => {
     updateUserNotificationReadStatus(notificationId);
-    
   };
 
   return (
@@ -132,26 +135,50 @@ function Header() {
       </div>
 
       {/* Nav Links */}
-      <nav className={`${isOpen ? "block" : "hidden"} md:flex space-x-8`}>
-        <ul className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-8">
+      <nav
+        className={`${
+          isOpen ? "block" : "hidden"
+        } md:flex md:space-x-8 absolute md:static bg-gray-800 md:bg-transparent w-full md:w-auto top-14 md:top-auto left-0 md:left-auto shadow-lg md:shadow-none`}
+      >
+        <ul className="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-8 p-4 md:p-0">
           <li>
-            <Link to="/" className="hover:text-gray-300">
+            <Link
+              to="/"
+              className="hover:text-gray-300 transition-colors duration-200"
+            >
               Home
             </Link>
           </li>
           <li>
-            <Link to="/aboutUs" className="hover:text-gray-300">
+            <Link
+              to="/aboutUs"
+              className="hover:text-gray-300 transition-colors duration-200"
+            >
               About
             </Link>
           </li>
           <li>
-            <Link to="/trainers" className="hover:text-gray-300">
+            <Link
+              to="/trainers"
+              className="hover:text-gray-300 transition-colors duration-200"
+            >
               Trainers
             </Link>
           </li>
           <li>
-            <Link to="#" className="hover:text-gray-300">
+            <Link
+              to="#"
+              className="hover:text-gray-300 transition-colors duration-200"
+            >
               Contact
+            </Link>
+          </li>
+          <li className="block md:hidden">
+            <Link
+              to="/login"
+              className="hover:text-gray-300 transition-colors duration-200"
+            >
+              Login
             </Link>
           </li>
         </ul>
@@ -168,7 +195,8 @@ function Header() {
                 onClick={() => setIsNotificationOpen(!isNotificationOpen)}
               />
               <span className="absolute top-0 right-0 inline-flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-red-600 rounded-full">
-                {userNotifications?.length}
+                {/* { userNotifications?.length} */}
+                {countUnreadNotificationsUser}
               </span>
             </div>
 
@@ -179,31 +207,31 @@ function Header() {
                 </h3>
                 {userNotifications?.length ? (
                   <>
-                   <ul className="space-y-3 mt-2 max-h-64 overflow-y-auto">
-                        {userNotifications?.length > 0 ? (
-                          <>
-                            {userNotifications.map((notification, index) => (
-                              <li
-                                key={index}
-                                onClick={() => handleReadUnread(notification.id)}
-                                className={`text-sm text-gray-700 border-b pb-2 ${
-                                  notification.read
-                                    ? "opacity-50 bg-gray-100"
-                                    : "bg-yellow-100"
-                                }`}
-                              >
-                                {typeof notification.message === "string"
-                                  ? notification.message
-                                  : "Invalid message"}
-                              </li>
-                            ))}
-                          </>
-                        ) : (
-                          <p className="text-sm text-gray-500">
-                            No new notifications
-                          </p>
-                        )}
-                      </ul>
+                    <ul className="space-y-3 mt-2 max-h-64 overflow-y-auto">
+                      {userNotifications?.length > 0 ? (
+                        <>
+                          {userNotifications.map((notification, index) => (
+                            <li
+                              key={index}
+                              onClick={() => handleReadUnread(notification.id)}
+                              className={`text-sm text-gray-700 border-b pb-2 ${
+                                notification.read
+                                  ? "opacity-50 bg-gray-100"
+                                  : "bg-yellow-100"
+                              }`}
+                            >
+                              {typeof notification.message === "string"
+                                ? notification.message
+                                : "Invalid message"}
+                            </li>
+                          ))}
+                        </>
+                      ) : (
+                        <p className="text-sm text-gray-500">
+                          No new notifications
+                        </p>
+                      )}
+                    </ul>
                     <div onClick={handleClear} className="flex justify-end">
                       <button className="text-gray-800">Clear</button>
                     </div>

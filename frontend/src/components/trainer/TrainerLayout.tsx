@@ -148,7 +148,7 @@ const TrainerLayout: React.FC = () => {
                       <div className="flex justify-end mt-2">
                         <button
                           onClick={handleClear}
-                          className="px-3 py-1 text-sm text-white bg-blue-500 rounded-md hover:bg-blue-600"
+                          className="text-gray-800"
                         >
                           Clear
                         </button>

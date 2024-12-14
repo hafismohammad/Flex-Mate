@@ -74,3 +74,16 @@ export interface INotification {
   receiverId: mongoose.Types.ObjectId;
   notifications: INotificationContent[];
 }
+
+
+export interface IPrescriptionInfo {
+  sessionId: {
+    _id: string;
+    completedSessions: number;
+    // other fields from the session schema
+  };
+  sessionType: string;
+  startDate: string;
+  endDate: string;
+  // other fields from the prescription schema
+}
