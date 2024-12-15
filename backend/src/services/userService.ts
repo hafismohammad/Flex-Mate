@@ -1,10 +1,6 @@
 import { IUser, ILoginUser, IBooking } from "../interface/common";
 import { differenceInHours } from 'date-fns';
-import {
-  generateAccessToken,
-  generateRefreshToken,
-  verifyRefreshToken,
-} from "../utils/jwtHelper";
+import {generateAccessToken, generateRefreshToken, verifyRefreshToken,} from "../utils/jwtHelper";
 import UserRepository from "../repositories/userRepository";
 import sendMail from "../config/email_config";
 import bcrypt from "bcryptjs";
@@ -21,76 +17,47 @@ class UserService {
     this.userRepository = userRepository;
   }
 
-  // User registration with OTP generation and sending logic
   async register(userData: IUser): Promise<void> {
     try {
       console.log("generate otp", userData);
       const existingUser = await this.userRepository.existsUser(userData.email);
-
       if (existingUser) {
         console.log("User already exists");
-        throw new Error("Email already exists");
+        throw new Error("Email already exists"); 
       }
-
-      // Generate random OTP
-      const generatedOTP: string = Math.floor(
-        1000 + Math.random() * 9000
-      ).toString();
+      const generatedOTP: string = Math.floor(1000 + Math.random() * 9000).toString();
       this.OTP = generatedOTP;
-
       console.log("Generated OTP is", this.OTP);
-
-      // Send OTP to user's email
-      // const isMailSent = await sendMail('otp',userData.email, this.OTP);
-      // if (!isMailSent) {
-      //   throw new Error("Email not sent");
-      // }
-
       const OTP_createdTime = new Date();
       this.expiryOTP_time = new Date(OTP_createdTime.getTime() + 1 * 60 * 1000);
-
-      // Save OTP in the database
-      await this.userRepository.saveOTP(
-        userData.email,
-        this.OTP,
-        this.expiryOTP_time
-      );
-
+      const isMailSent = await sendMail("otp", userData.email, this.OTP);
+      if (!isMailSent) {
+        throw new Error("Email not sent");
+      }
+      await this.userRepository.saveOTP(userData.email, this.OTP, this.expiryOTP_time);
       console.log(`OTP will expire at: ${this.expiryOTP_time}`);
     } catch (error) {
-      console.error("Error in service:", (error as Error).message);
-      throw new Error("Error in user service");
+      console.error("Error in user service:", error);
+      throw error; 
     }
   }
-
-  // OTP verification logic
+  
   async verifyOTP(userData: IUser, otp: string): Promise<void> {
     try {
-      // console.log("user service");
-
       const validOtps = await this.userRepository.getOtpsByEmail(
         userData.email
       );
-
       if (validOtps.length === 0) {
         console.log("No OTP found for this email");
         throw new Error("No OTP found for this email");
       }
-
       const latestOtp = validOtps.sort(
         (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
       )[0];
-
       if (latestOtp.otp === otp) {
         if (latestOtp.expiresAt > new Date()) {
-          console.log("otp expiration not working");
-
-          console.log("OTP is valid and verified", latestOtp.expiresAt);
-
           const hashedPassword = await bcrypt.hash(userData.password, 10);
           const newUserData = { ...userData, password: hashedPassword };
-
-          // Create new user
           await this.userRepository.createNewUser(newUserData);
 
           await this.userRepository.deleteOtpById(latestOtp._id);
@@ -100,13 +67,10 @@ class UserService {
           throw new Error("OTP has expired");
         }
       } else {
-        console.log("Invalid OTP");
         throw new Error("Invalid OTP");
       }
     } catch (error) {
-      const errorMessage =
-        (error as Error).message || "An unknown error occurred";
-      console.error("Error in OTP verification:", errorMessage);
+      const errorMessage = (error as Error).message || "An unknown error occurred";
       throw error;
     }
   }
@@ -117,17 +81,14 @@ class UserService {
         1000 + Math.random() * 9000
       ).toString();
       this.OTP = generatedOTP;
-
       const OTP_createdTime = new Date();
       this.expiryOTP_time = new Date(OTP_createdTime.getTime() + 1 * 60 * 1000);
-
       await this.userRepository.saveOTP(email, this.OTP, this.expiryOTP_time);
+      const isMailSent = await sendMail('otp',email, this.OTP);
 
-      // const isMailSent = await sendMail('otp',email, this.OTP);
-      // if (!isMailSent) {
-      //   throw new Error("Failed to resend OTP email.");
-      // }
-
+      if (!isMailSent) {
+        throw new Error("Failed to resend OTP email.");
+      }
       console.log(`Resent OTP ${this.OTP} to ${email}`);
     } catch (error) {
       console.error("Error in resendOTP:", (error as Error).message);
@@ -135,16 +96,13 @@ class UserService {
     }
   }
 
-  // login user
   async login({ email, password }: ILoginUser): Promise<any> {
     try {
       const userData: IUser | null = await this.userRepository.findUser(email);
-
       if (userData) {
         if (userData.isBlocked) {
           throw new Error("User is blocked");
         }
-
         const isPasswordMatch = await bcrypt.compare(
           password,
           userData.password || ""
@@ -154,8 +112,6 @@ class UserService {
           if (!userData._id) {
             throw new Error("User ID is missing");
           }
-          
-          // Generate access and refresh tokens
           const accessToken = generateAccessToken({
             id: userData._id.toString(),
             email: userData.email,
@@ -165,7 +121,6 @@ class UserService {
             id: userData._id.toString(),
             email: userData.email,
           });
-
           return {
             accessToken,
             refreshToken,
@@ -179,7 +134,6 @@ class UserService {
           };
         }
       }
-
       throw new Error("Invalid email or password");
     } catch (error) {
       throw error;
@@ -189,16 +143,12 @@ class UserService {
   async generateTokn(user_refresh_token: string) {
     try {
       const payload = verifyRefreshToken(user_refresh_token);
-      // console.log('payload', payload);
-
       let id: string | undefined;
       let email: string | undefined;
-
       if (payload && typeof payload === "object") {
         id = payload?.id;
         email = payload?.email;
       }
-
       if (id && email) {
         const role = 'user'
         const userNewAccessToken = generateAccessToken({ id, email,role });
@@ -214,13 +164,8 @@ class UserService {
   async fetchAllTrainers() {
     try {
       const trainers = await this.userRepository.fetchAllTrainers();
-
-      const approvedTrainers =
-        trainers?.filter(
-          (trainer) =>
-            trainer.kycStatus === "approved" && trainer.isBlocked === false
-        ) || [];
-
+      const approvedTrainers = trainers?.filter((trainer) => 
+      trainer.kycStatus === "approved" && trainer.isBlocked === false) || [];
       return approvedTrainers;
     } catch (error) {
       console.error("Error fetching trainers:", error);
@@ -241,30 +186,32 @@ class UserService {
   async getTrainer(trainerId: string) {
     try {
       return await this.userRepository.getTrainer(trainerId);
-    } catch (error) {}
+    } catch (error) {
+      throw new Error("Failed to retrieve trainer details. Please try again later.");
+    }
   }
-
+  
   async getSessionSchedules() {
     try {
       return await this.userRepository.fetchAllSessionSchedules();
-    } catch (error) {}
+    } catch (error) {
+      throw new Error("Failed to fetch session schedules. Please try again later.");
+    }
   }
+  
 
   async checkoutPayment(session_id: string, userId: string) {
     try {
       const sessionData = await this.userRepository.findSessionDetails(session_id);
-  
       if (!sessionData || !sessionData.trainerId || !sessionData.price) {
         throw new Error("Missing session data, trainer ID, or price");
       }
-  
       const trainer_id = sessionData.trainerId.toString();
       const trainerData = await this.userRepository.findTrainerDetails(trainer_id);
   
       if (!trainerData) {
         throw new Error("Trainer data not found");
       }
-  
       const lineItems = [
         {
           price_data: {
@@ -280,8 +227,6 @@ class UserService {
           quantity: 1,
         },
       ];
-  
-      // Now define `session` only once it is assigned a value
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
         line_items: lineItems,
@@ -289,7 +234,6 @@ class UserService {
         success_url: `http://localhost:5173/paymentSuccess?session_id=${sessionData._id}&user_id=${userId}&stripe_session_id={CHECKOUT_SESSION_ID}`,
         // cancel_url: `http://localhost:5173/paymentFailed`,
       });
-  
       return session;  
     } catch (error) {
       console.error("Error creating Stripe session:", error);
@@ -305,18 +249,16 @@ class UserService {
         await session.save();
       }
       const trainerId = session?.trainerId;
+
       if (!trainerId) {
         throw new Error("Trainer ID is not available in the session.");
       }
-  
       const trainer = await this.getTrainer(trainerId.toString());
-  
       const sessionData = await stripe.checkout.sessions.retrieve(stripe_session_id);
   
       if (!trainer || trainer.length === 0) {
         throw new Error("Trainer not found.");
       }
-  
       const bookingDetails: IBooking = {
         sessionId: new mongoose.Types.ObjectId(session._id),
         trainerId: new mongoose.Types.ObjectId(trainer[0]._id),
@@ -334,17 +276,13 @@ class UserService {
         updatedAt: new Date(),
         payment_intent: sessionData.payment_intent ? sessionData.payment_intent.toString() : undefined
       };
-  
       const existingBooking = await this.userRepository.findExistingBooking(bookingDetails);
       if (existingBooking) {
         console.log("Booking already exists:", existingBooking);
-        return existingBooking; // Return the existing booking and stop further execution
+        return existingBooking; 
       }
-  
-    const bookingData =  await this.userRepository.createBooking(bookingDetails);
-
+      const bookingData =  await this.userRepository.createBooking(bookingDetails);
       await this.userRepository.createNotification(bookingData)
-      
       return bookingData;
     } catch (error) {
       console.error("Error fetching booking details:", error);
@@ -352,7 +290,6 @@ class UserService {
     }
   }
   
-
   async fetchUserData(userId: string) {
     try {
       return await this.userRepository.fetchUser(userId);
@@ -388,20 +325,16 @@ class UserService {
   async cancelBooking(bookingId: string) {
     try {
       const bookingData = await this.userRepository.FetchBooking(bookingId);
-  
+
       if (!bookingData) throw new Error("Booking not found");
-  
       if (bookingData.paymentStatus !== 'Confirmed') {
         throw new Error("Booking is not confirmed or has already been canceled");
       }
-  
       if (typeof bookingData.amount !== 'number') {
         throw new Error("Booking amount is undefined or invalid");
       }
-  
       const sessionStartDate = new Date(bookingData.startDate);
       const hoursLeft = differenceInHours(sessionStartDate, new Date());
-      
       let refundPercentage = 0;
       if (hoursLeft > 24) {
         refundPercentage = 1; // 100% refund
@@ -414,10 +347,8 @@ class UserService {
       if (refundPercentage === 0) {
         bookingData.paymentStatus = 'Cancelled';
         await bookingData.save();
-        // console.log('booking cancelled without refund:', bookingData);
         return bookingData;
       }
-  
       const refundAmount = Math.floor(bookingData.amount * refundPercentage);
   
       const refund = await stripe.refunds.create({
@@ -431,7 +362,6 @@ class UserService {
       } else {
         throw new Error("Refund failed or is incomplete");
       }
-
       const cancelNotification =  await this.userRepository.cancelNotification(bookingData)
 
   
@@ -468,7 +398,6 @@ class UserService {
 
   async getReivewSummary(trainer_id: string) {
     try {      
-
       const avgReviewsRating = await this.userRepository.getAvgReviewsRating(trainer_id)
       return avgReviewsRating
     } catch (error) {
@@ -504,29 +433,23 @@ class UserService {
  async resetPassword(userId: string, currentPassword: string, newPassword: string) {
   try {
     const userData = await this.userRepository.fetchUser(userId);
-
     if (!userData?.password) {
       throw new Error('User password is null');
     }
-
     const isPasswordMatch = await bcrypt.compare(currentPassword, userData.password);
 
     if (!isPasswordMatch) {
       throw new Error('Old password is not correct');
     }
-
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     userData.password = hashedPassword;
     await userData.save();
-
     return { message: 'Password reset successfully' };
   } catch (error) {
     console.error('Failed to reset password:', error);
     throw new Error('Failed to reset password');
   }
 }
-
-
 }
 
 export default UserService;

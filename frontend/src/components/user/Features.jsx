@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios"; // Use axios instead of the authenticated instance
 import API_URL from "../../../axios/API_URL";
 
-function Features() {
+function Features({ servicesRef }) {
   const [specializations, setSpecializations] = useState([]);
   const navigate = useNavigate();
 
@@ -36,12 +36,12 @@ function Features() {
   };
 
   return (
-    <div className="bg-slate-100 rounded-md p-4 flex flex-col items-center">
+    <div ref={servicesRef} className="bg-slate-100 rounded-md p-4 flex flex-col items-center">
       <h1 className="text-4xl font-bold mb-10 mt-16 text-center">Services</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
         {specializations.length > 0 &&
           specializations.map((feature) => (
-            <div
+            <div 
               key={feature._id}
               className="flex flex-col justify-between h-full bg-white w-full max-w-xs mx-auto rounded-md shadow-md hover:shadow-[0px_10px_20px_-5px_rgba(0,0,0,0.4)] duration-300"
               data-aos="fade-up"

@@ -52,7 +52,7 @@ function UserProfile() {
 
     try {
       const response = await userAxiosInstance.patch(
-        "/api/user/users",
+        "/api/user/update-user",
         formData
       );
       setEditOpen(false);

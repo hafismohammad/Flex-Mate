@@ -13,8 +13,6 @@ class AdminController {
   async adminLogin(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, password }: ILoginAdmin = req.body;
-      // console.log("admin data", email, password);
-
       const admin = await this.adminService.adminLogin({ email, password });
       if (admin) {
         const { accessToken, refreshToken } = admin;
@@ -24,11 +22,8 @@ class AdminController {
           secure: true,
           maxAge: 7 * 24 * 60 * 60 * 1000,
         });
-
         console.log("Admin authenticated successfully");
-        res
-          .status(200)
-          .json({
+        res.status(200).json({
             message: "Login successful",
             admin: admin.admin,
             token: accessToken,
@@ -63,16 +58,12 @@ class AdminController {
     try {
       const specializationData = req.body;
       const imageFile = req.file;
-
       let imageUrl: string | null = null;
-
       if (imageFile) {
         const result = await uploadToCloudinary(imageFile.buffer, 'specializationImage');
         imageUrl = result.secure_url;
       }
-
       const specialization = await this.adminService.addSpecialization(specializationData, imageUrl);
-
       res.status(201).json({ message: "Specialization added successfully", specialization });
     } catch (error) {
       console.error('Adding specialization error', error);
@@ -82,26 +73,15 @@ class AdminController {
 
 
   async refreshToken(req: Request, res: Response, next: NextFunction) {
-    
     const admin_refresh_token = req.cookies?.admin_refresh_token;
-
     if (!admin_refresh_token) {
       res.status(403).json({ message: "Refresh token not found" });
       return;
     }
-
     try {
       const newAccessToken = await this.adminService.generateTokn(
         admin_refresh_token
       );
-
-      const AdminNewAccessToken = Object.assign(
-        {},
-        { accessToken: newAccessToken }
-      );
-
-      // console.log('new token', AdminNewAccessToken);
-
       res.status(200).json({ accessToken: newAccessToken });
     } catch (error) {
       console.error("Error generating new access token:", error);
@@ -112,10 +92,7 @@ class AdminController {
 
   async getAllTrainersKycDatas(req: Request, res: Response, next: NextFunction) {
     try {
-
       const allTrainersKycData = await this.adminService.TraienrsKycData();
-      // console.log(allTrainersKycData);
-
       res.status(200).json({ message: "Trainers KYC data fetched successfully", data: allTrainersKycData });
     } catch (error) {
       console.error("Error fetching KYC data:", error);
@@ -127,14 +104,10 @@ class AdminController {
     try {
       const trainerId = req.params.trainer_id;
       const trainerKycDetails = await this.adminService.fetchKycData(trainerId);
-
-      // Check if trainerKycDetails is null
       if (!trainerKycDetails) {
         res.status(404).json({ message: 'Trainer KYC details not found' });
         return;
       }
-
-
       res.status(200).json({
         message: 'Trainer KYC data fetched successfully',
         kycData: {
@@ -146,10 +119,6 @@ class AdminController {
       next(error)
     }
   }
-
-
-
-
 
   async changeKycStatus(req: Request, res: Response, next: NextFunction) {
     try {
@@ -169,7 +138,6 @@ class AdminController {
   async getAllSpecializations(req: Request, res: Response, next: NextFunction) {
     try {
       const allSpecializations = await this.adminService.getAllSpecializations();
-
       res.status(200).json(allSpecializations);
     } catch (error) {
       console.error('Error fetching specializations:', error);
@@ -181,9 +149,7 @@ class AdminController {
     try {
       const spec_id = req.params.spec_id;
       const status = req.body.isListed;
-
       const updateResult = await this.adminService.updateSpecStatus(spec_id, status);
-
       res.status(200).json({
         message: 'Specialization status updated successfully.',
         data: updateResult,
@@ -204,7 +170,6 @@ class AdminController {
   }
   async getAllTrainer(req: Request, res: Response, next: NextFunction) {
     try {
-      
       const allTrainer = await this.adminService.fetchAllTrainer()
       res.status(200).json({ message: 'Fetch all trainer successfully', trainer: allTrainer })
     } catch (error) {
@@ -216,8 +181,6 @@ class AdminController {
     try {
       const user_id = req.params.user_id
       const userStatus = req.body.status
-      // console.log('sta--', userStatus);
-
       const status = await this.adminService.updateUserStatus(user_id, userStatus)
       res.status(200).json({
         message: 'user status updated sucessfully',
@@ -230,13 +193,10 @@ class AdminController {
 
   async blockUnblockTrainer(req: Request, res: Response, next: NextFunction) {
     try {
-
       const trainer_id = req.params.trainer_id
       const trainerStatus = req.body.status
       console.log(trainer_id, trainerStatus);
-
       const status = await this.adminService.updateTrainerStatus(trainer_id, trainerStatus)
-
       res.status(200).json({
         message: 'trainer status updated sucessfully',
         data: status,
@@ -263,8 +223,6 @@ async getDashboardData(req: Request, res: Response, next: NextFunction) {
     next(error)
   }
 } 
-
-
 }
 
 export default AdminController;

@@ -7,6 +7,8 @@ import TrainerChat from "./TrainerChat"; // Import TrainerChat component
 import { useDispatch } from "react-redux";
 import { setPrescription } from "../../features/trainer/trainerSlice";
 import toast, { Toaster } from "react-hot-toast";
+import { formatPriceToINR, formatTime } from "../../utils/timeAndPriceUtils";
+import Loading from "../spinner/Loading";
 
 interface Specialization {
   _id: string;
@@ -35,25 +37,21 @@ interface BookingDetail {
 }
 
 function UserView() {
-  const [bookingDetails, setBookingDetails] = useState<BookingDetail | null>(
-    null
-  );
+  const [bookingDetails, setBookingDetails] = useState<BookingDetail | null>( null);
   const [chatOpen, setChatOpen] = useState(false); // State to track if chat is open
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(
-    null
-  );
+  const [selectedBookingId, setSelectedBookingId] = useState<string | null>( null);
   const [prescriptionInfo, setPrescriptionInfo] = useState<string | null>(null);
-  const [prescriptionData, setPrescriptionData] =
-    useState<BookingDetail | null>(null);
+  const [prescriptionData, setPrescriptionData] = useState<BookingDetail | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newPrescription, setNewprescription] = useState<string | null>(null);
   const [edtiOption, setEdtiOption] = useState(false);
+  
 
   const { trainerInfo, showPrescription } = useSelector(
     (state: RootState) => state.trainer
   );
-  const trainerId = trainerInfo?.id;
+  
 
   const location = useLocation();
   const bookingId = location.state?.bookingId;
@@ -139,9 +137,12 @@ function UserView() {
           response.data.message || "Prescription updated successfully"
         );
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating prescription:", error);
-      toast.error("Failed to update the prescription. Please try again.");
+      const errorMessage =
+      error.response?.data?.message || "Failed to update the prescription. Please try again.";
+
+    toast.error(errorMessage);
     } finally {
       handleClose();
     }
@@ -288,15 +289,15 @@ function UserView() {
               <div className="flex justify-between items-center">
                 <span className="text-gray-600 font-medium">Session Time:</span>
                 <span className="text-gray-800">
-                  {bookingDetails.sessionStartTime} -{" "}
-                  {bookingDetails.sessionEndTime}
+                  {formatTime(bookingDetails.sessionStartTime)} -{" "}
+                  {formatTime(bookingDetails.sessionEndTime)}
                 </span>
               </div>
 
               <div className="flex justify-between items-center">
                 <span className="text-gray-600 font-medium">Amount:</span>
                 <span className="text-gray-800 font-semibold">
-                  ${bookingDetails.amount.toFixed(2)}
+                  {formatPriceToINR(bookingDetails.amount.toFixed(2))}
                 </span>
               </div>
 
@@ -348,9 +349,7 @@ function UserView() {
             </button>
           </div>
         ) : (
-          <p className="text-gray-600 text-center">
-            Loading booking details...
-          </p>
+          <Loading />
         )}
       </div>
 

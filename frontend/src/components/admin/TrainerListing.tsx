@@ -35,9 +35,10 @@ function TrainerListing() {
     try {
         
       const response = await adminAxiosInstance.patch(
-        `/api/admin/${trainerId}/trainer-block-unblock`,
+        `/api/admin/trainers/${trainerId}/block-unblock`,
         { status: !currentStatus }
       );
+      
   
       console.log('Server response:', response);
   

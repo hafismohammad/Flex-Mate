@@ -24,18 +24,15 @@ export interface INotification {
   createdAt?: string;
   updatedAt?: string;
 }
+interface HeaderProps {
+  scrollToServices: () => void; 
+}
 
-function Header() {
+function Header({ scrollToServices }: HeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [image, setImage] = useState<string | null>(null);
-
-  // const [notificationsData, setNotificationsData] = useState<INotification>({
-  //   receiverId: "",
-  //   notifications: [],
-  // });
-
   const { userInfo, token } = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
@@ -166,13 +163,13 @@ function Header() {
             </Link>
           </li>
           <li>
-            <Link
-              to="#"
-              className="hover:text-gray-300 transition-colors duration-200"
-            >
-              Contact
-            </Link>
-          </li>
+          <button
+            onClick={scrollToServices}
+            className="hover:text-gray-300 transition-colors duration-200"
+          >
+            Services
+          </button>
+        </li>
           <li className="block md:hidden">
             <Link
               to="/login"

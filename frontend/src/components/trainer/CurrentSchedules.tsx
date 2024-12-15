@@ -148,7 +148,7 @@ function CurrentSchedules() {
     setSpecModal(true);
 
     const response = await axiosInstance.get(
-      `/api/trainer/${trainerInfo.id}/specializations`
+      `/api/trainer/trainers/${trainerInfo.id}/specializations`
     );
     setSpec(response.data.specializations);
   };

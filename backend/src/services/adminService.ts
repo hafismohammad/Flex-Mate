@@ -17,7 +17,6 @@ class AdminService {
         if(adminData.password !== password) {
          throw Error('Password is wrong')    
         }
-            // Generate access and refresh tokens
             const accessToken = generateAccessToken({ id: adminData._id.toString(), email: adminData.email, role: 'admin' });
             const refreshToken = generateRefreshToken({ id: adminData._id.toString(), email: adminData.email });
             return {
@@ -36,20 +35,15 @@ class AdminService {
     }
   }
 
-
   async generateTokn(admin_refresh_token: string) {
     try {
       const payload = verifyRefreshToken(admin_refresh_token);
-      // console.log('payload', payload);
-
       let id: string | undefined;
       let email: string | undefined;
-
       if (payload && typeof payload === "object") {
         id = payload?.id;
         email = payload?.email;
       }
-
       if (id && email) {
         const role = 'admin'
         const AdminNewAccessToken = generateAccessToken({ id, email , role});
@@ -66,14 +60,11 @@ class AdminService {
   async addSpecialization(specializationData: { name: string, description: string }, imageUrl: string | null) {
     const specialization = await this.adminRepository.addSpecialization({ ...specializationData, image: imageUrl  });
     return specialization;
-}
-
+  }
 
   async TraienrsKycData() {
     try {
       const allTrainersKycDatas = await this.adminRepository.getAllTrainersKycDatas();
-      // console.log('allTrainersKycDatas',allTrainersKycDatas);
-      
       return allTrainersKycDatas; 
     } catch (error) {
       console.error("Error fetching trainers KYC data:", error);
@@ -94,22 +85,15 @@ class AdminService {
   async updateKycStatus(status: string, trainer_id: string, rejectionReason: string | null): Promise<void> {
     try {
       const updatedKyc = await this.adminRepository.updateKycStatus(status, trainer_id, rejectionReason);
-
-
-  
       if (status === 'approved' || status === 'rejected') {
         await this.adminRepository.deleteKyc(trainer_id);
         console.log(`KYC data deleted for trainer ID: ${trainer_id}`);
       }
-  
-
       if(status === 'approved') {
         await sendMail('approve',updatedKyc, 'content')
       }else {
-
         await sendMail('reject',updatedKyc.trainerMail, updatedKyc.reason)
       }
-  
     } catch (error) {
       console.error('Error updating KYC status:', error);
     }
@@ -146,8 +130,8 @@ class AdminService {
   async getDashboardData() {
     try {
       return await this.adminRepository.getAllStatistics()
-    } catch (error) {
-      
+    } catch (error: any) {
+      throw Error(error)
     }
   }
 }

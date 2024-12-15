@@ -31,10 +31,10 @@ function UserListing() {
   const handleBlockUnblock = async (userId: string, currentStatus: boolean) => {
     try {
       const response = await adminAxiosInstance.patch(
-        `/api/admin/${userId}/block-unblock`,
+        `/api/admin/users/${userId}/block-unblock`,
         { status: !currentStatus }
       );
-
+      
       if (response.status === 200 && response.data && response.data.data) {
         const updatedUserStatus = response.data.data.isBlocked;
 

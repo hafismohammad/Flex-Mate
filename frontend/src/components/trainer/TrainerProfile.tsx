@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 import axiosInstance from "../../../axios/trainerAxiosInstance";
 import toast, { Toaster } from "react-hot-toast";
+import Loading from "../spinner/Loading";
 
 interface Specialization {
   name: string;
@@ -42,7 +43,6 @@ function TrainerProfile() {
     };
     fetchTrainer();
   }, [trainerId]);
-  console.log("trainer", trainer);
 
   const handleEditClick = () => {
     console.log("Edit button clicked!");
@@ -53,7 +53,7 @@ function TrainerProfile() {
   }
 
   if (!trainer) {
-    return <div>No trainer data available</div>;
+    return <div><Loading /></div>;
   }
 
   return (

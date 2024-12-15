@@ -11,9 +11,9 @@ import { useSocketContext } from "../../context/Socket";
 
 interface Booking {
   _id: string;
-  trainerId: string
+  trainerId: string;
   trainerName: string;
-  userId: string
+  userId: string;
   trainerImage: string;
   sessionType: string;
   specialization: string;
@@ -23,21 +23,23 @@ interface Booking {
   bookingStatus: string;
   bookingDate: string;
   prescription?: string;
-  trainerEmail: string
-  amount: number
+  trainerEmail: string;
+  amount: number;
 }
 
 function Bookings() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const { userInfo } = useSelector((state: RootState) => state.user);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [prescriptionData, setPrescriptionData] = useState<Booking | null>(null);
-  
-  const {socket} = useSocketContext()
-  
+  const [prescriptionData, setPrescriptionData] = useState<Booking | null>(
+    null
+  );
+
+  const { socket } = useSocketContext();
+
   // Pagination States
   const [currentPage, setCurrentPage] = useState(1);
-  const [bookingsPerPage] = useState(4); 
+  const [bookingsPerPage] = useState(4);
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -46,7 +48,7 @@ function Bookings() {
           `/api/user/bookings-details/${userInfo?.id}`
         );
         // console.log('response.data',response.data);
-        
+
         setBookings(response.data);
       } catch (error) {
         console.error("Error fetching bookings:", error);
@@ -55,68 +57,82 @@ function Bookings() {
     fetchBookings();
   }, [userInfo]);
 
+  // Handle Booking Cancellation
+  const handleCancelBooking = async (bookingId: string) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "This session will be cancelled!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, cancel it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const bookingToCancel = bookings.find(
+            (booking) => booking._id === bookingId
+          );
+          console.log("bookingToCancel", bookingToCancel);
 
-// Handle Booking Cancellation
-const handleCancelBooking = async (bookingId: string) => {
-  Swal.fire({
-    title: "Are you sure?",
-    text: "This session will be cancelled!",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#d33",
-    cancelButtonColor: "#3085d6",
-    confirmButtonText: "Yes, cancel it!",
-  }).then(async (result) => {
-    if (result.isConfirmed) {
-      try {
-        const bookingToCancel = bookings.find((booking) => booking._id === bookingId);
-        console.log('bookingToCancel',bookingToCancel);
-        
-        if (!bookingToCancel) {
-          Swal.fire("Error", "Booking not found.", "error");
-          return;
+          if (!bookingToCancel) {
+            Swal.fire("Error", "Booking not found.", "error");
+            return;
+          }
+
+          const response = await axios.patch(
+            `${API_URL}/api/user/cancel-booking/${bookingId}`
+          );
+
+          console.log("Response Data:1", response.data);
+
+          console.log("response2", response.data);
+          // Update booking status locally to 'Cancelled' instead of removing it
+          setBookings((prev) =>
+            prev.map((booking) =>
+              booking._id === bookingId
+                ? { ...booking, bookingStatus: "Cancelled" }
+                : booking
+            )
+          );
+
+          // console.log('Response Data:3', response.data);
+
+          // console.log('response4', response.data);
+          const bookingDetails = bookingToCancel;
+          const trainerNotification = {
+            recetriverId: bookingToCancel.trainerId,
+            content: `Booking for ${bookingDetails.sessionType} (${
+              bookingDetails.specialization
+            }) on ${new Date(
+              bookingDetails.sessionDates.startDate
+            ).toDateString()} at ${
+              bookingDetails.startTime
+            } has been cancelled.`,
+          };
+          const userNotification = {
+            userId: bookingToCancel.userId,
+            content: `Your booking for ${bookingDetails.sessionType} (${
+              bookingDetails.specialization
+            }) on ${new Date(
+              bookingDetails.sessionDates.startDate
+            ).toDateString()} at ${
+              bookingDetails.startTime
+            } has been cancelled.`,
+          };
+          console.log("userNotification", userNotification);
+
+          socket?.emit("cancelTrainerNotification", trainerNotification);
+          socket?.emit("cancelUserNotification", userNotification);
+
+          Swal.fire("Canceled!", "Your booking has been canceled.", "success");
+        } catch (error) {
+          console.error("Error canceling booking:", error);
+          Swal.fire("Error", "Could not cancel the booking.", "error");
         }
-
-       const response = await axios.patch(`${API_URL}/api/user/cancel-booking/${bookingId}`);
-       
-       console.log('Response Data:1', response.data); 
-     
-       console.log('response2', response.data);
-       // Update booking status locally to 'Cancelled' instead of removing it
-       setBookings((prev) =>
-        prev.map((booking) =>
-          booking._id === bookingId
-       ? { ...booking, bookingStatus: "Cancelled" }
-       : booking
-      )
-    );
-    
-    // console.log('Response Data:3', response.data); 
-    
-    // console.log('response4', response.data);
-    const bookingDetails = bookingToCancel
-    const trainerNotification  = {
-      recetriverId: bookingToCancel.trainerId,
-      content: `Booking for ${bookingDetails.sessionType} (${bookingDetails.specialization}) on ${new Date(bookingDetails.sessionDates.startDate).toDateString()} at ${bookingDetails.startTime} has been cancelled.`,
-    }
-        const userNotification = {
-          userId: bookingToCancel.userId,
-          content: `Your booking for ${bookingDetails.sessionType} (${bookingDetails.specialization}) on ${new Date(bookingDetails.sessionDates.startDate).toDateString()} at ${bookingDetails.startTime} has been cancelled.`,
-        }
-        console.log('userNotification',userNotification);
-        
-        socket?.emit('cancelTrainerNotification', trainerNotification);
-        socket?.emit('cancelUserNotification', userNotification);
-
-        Swal.fire("Canceled!", "Your booking has been canceled.", "success");
-      } catch (error) {
-        console.error("Error canceling booking:", error);
-        Swal.fire("Error", "Could not cancel the booking.", "error");
       }
-    }
-  });
-};
-
+    });
+  };
 
   // Handle Prescription View
   const handleView = (booking: Booking) => {
@@ -128,7 +144,10 @@ const handleCancelBooking = async (bookingId: string) => {
   // Pagination Logic: Get the current bookings slice
   const indexOfLastBooking = currentPage * bookingsPerPage;
   const indexOfFirstBooking = indexOfLastBooking - bookingsPerPage;
-  const currentBookings = bookings.slice(indexOfFirstBooking, indexOfLastBooking);
+  const currentBookings = bookings.slice(
+    indexOfFirstBooking,
+    indexOfLastBooking
+  );
 
   // Change Page
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
@@ -183,19 +202,17 @@ const handleCancelBooking = async (bookingId: string) => {
             <div className="text-gray-800 font-medium">
               {formatTime(booking.endTime)}
             </div>
-            <div>
-              {formatPriceToINR(booking.amount)}
-            </div>
+            <div>{formatPriceToINR(booking.amount)}</div>
             <div
-              className={
+              className={`px-2 py-1 text-center rounded-full font-medium ${
                 booking.bookingStatus === "Confirmed"
-                  ? "text-green-500 rounded-md font-medium"
+                  ? "text-green-500 bg-green-100"
                   : booking.bookingStatus === "Cancelled"
-                  ? "text-red-500 rounded-md font-medium"
+                  ? "text-red-500 bg-red-100"
                   : booking.bookingStatus === "Completed"
-                  ? "text-blue-500 rounded-md font-medium"
-                  : ""
-              }
+                  ? "text-blue-500 bg-blue-100"
+                  : "text-gray-500 bg-gray-100"
+              }`}
             >
               {booking.bookingStatus}
             </div>
@@ -210,7 +227,10 @@ const handleCancelBooking = async (bookingId: string) => {
                 </button>
               )}
               {booking.bookingStatus === "Completed" && (
-                <button onClick={() => handleView(booking)} className="bg-blue-500 hover:bg-blue-700 font-bold text-white px-7 py-1 rounded-lg">
+                <button
+                  onClick={() => handleView(booking)}
+                  className="bg-blue-500 hover:bg-blue-700 font-bold text-white px-7 py-1 rounded-lg"
+                >
                   View
                 </button>
               )}
@@ -232,7 +252,9 @@ const handleCancelBooking = async (bookingId: string) => {
           </span>
           <button
             onClick={() => paginate(currentPage + 1)}
-            disabled={currentPage === Math.ceil(bookings.length / bookingsPerPage)}
+            disabled={
+              currentPage === Math.ceil(bookings.length / bookingsPerPage)
+            }
             className="bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded-md"
           >
             Next
@@ -249,27 +271,37 @@ const handleCancelBooking = async (bookingId: string) => {
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
                   <img
-                    src={prescriptionData?.trainerImage || "/default-profile.png"}
+                    src={
+                      prescriptionData?.trainerImage || "/default-profile.png"
+                    }
                     alt="Trainer Profile"
                     className="w-full h-full object-cover"
                   />
                 </div>
                 <div className="text-gray-800">
                   <p>
-                    <strong>Name:</strong> {prescriptionData?.trainerName || "N/A"}
+                    <strong>Name:</strong>{" "}
+                    {prescriptionData?.trainerName || "N/A"}
                   </p>
                   <p>
-                    <strong>Email:</strong> {prescriptionData?.trainerEmail || "N/A"}
+                    <strong>Email:</strong>{" "}
+                    {prescriptionData?.trainerEmail || "N/A"}
                   </p>
                   <p>
-                    <strong>Specialization:</strong> {prescriptionData?.specialization || "N/A"}
+                    <strong>Specialization:</strong>{" "}
+                    {prescriptionData?.specialization || "N/A"}
                   </p>
                 </div>
               </div>
 
               <div className="mt-4">
-                <label className="block font-medium text-gray-700 mb-2">Prescription</label>
-                <p>{prescriptionData?.prescription || "No prescription provided."}</p>
+                <label className="block font-medium text-gray-700 mb-2">
+                  Prescription
+                </label>
+                <p>
+                  {prescriptionData?.prescription ||
+                    "No prescription provided."}
+                </p>
               </div>
             </div>
 

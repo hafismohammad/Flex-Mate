@@ -60,18 +60,22 @@ function TrainerDashboard() {
   }, []);
 
   const totalSessions = bookingDetails.length;
-  const totalUsers = new Set(bookingDetails.map((booking) => booking.userId)).size;
+  const totalUsers = new Set(bookingDetails.map((booking) => booking.userId))
+    .size;
 
   const indexOfLastBooking = currentPage * bookingsPerPage;
   const indexOfFirstBooking = indexOfLastBooking - bookingsPerPage;
-  const currentBooking = bookingDetails.slice(indexOfFirstBooking, indexOfLastBooking)
+  const currentBooking = bookingDetails.slice(
+    indexOfFirstBooking,
+    indexOfLastBooking
+  );
 
   const nextPage = () => {
     if (currentPage < Math.ceil(bookingDetails.length / bookingsPerPage)) {
       setCurrentPage(currentPage + 1);
     }
   };
-  
+
   const prevPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
@@ -146,14 +150,14 @@ function TrainerDashboard() {
                 {booking.specialization.name || "N/A"}
               </div>
               <div
-                className={`text-center font-medium ${
+                className={`text-center font-medium px-2 py-1 rounded-full ${
                   booking.paymentStatus === "Cancelled"
-                    ? "text-red-500"
+                    ? "text-red-500 bg-red-100"
                     : booking.paymentStatus === "Confirmed"
-                    ? "text-green-500"
+                    ? "text-green-500 bg-green-100"
                     : booking.paymentStatus === "Completed"
-                    ? "text-blue-500"
-                    : "text-gray-500"
+                    ? "text-blue-500 bg-blue-100"
+                    : "text-gray-500 bg-gray-100"
                 }`}
               >
                 {booking.paymentStatus}
@@ -187,11 +191,14 @@ function TrainerDashboard() {
           Previous
         </button>
         <span className="px-4 py-2 text-gray-700">
-          Page {currentPage} of {Math.ceil(bookingDetails.length / bookingsPerPage)}
+          Page {currentPage} of{" "}
+          {Math.ceil(bookingDetails.length / bookingsPerPage)}
         </span>
         <button
           onClick={nextPage}
-          disabled={currentPage === Math.ceil(bookingDetails.length / bookingsPerPage)}
+          disabled={
+            currentPage === Math.ceil(bookingDetails.length / bookingsPerPage)
+          }
           className="bg-gray-300 text-gray-700 px-4 py-2 rounded-r hover:bg-gray-400 disabled:opacity-50"
         >
           Next

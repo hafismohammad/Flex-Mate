@@ -1,14 +1,13 @@
 // trainerServices.ts
 import TrainerRepository from "../repositories/trainerRepository";
-import { ITrainer, ILoginTrainer } from "../interface/trainer_interface";
+import { ITrainer } from "../interface/trainer_interface";
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken,} from "../utils/jwtHelper";
 import sendOTPmail from "../config/email_config";
 import bcrypt from "bcryptjs";
 import { ISession } from "../interface/trainer_interface";
 import { createRecurringSessions } from "../utils/slotHelper";
-import { IBooking } from "../interface/common";
 import { deleteFromCloudinary, uploadToCloudinary } from "../config/cloudinary";
-import { differenceInHours } from 'date-fns';
+import { differenceInMinutes } from 'date-fns';
 import moment from "moment";
 
 class TrainerService {
@@ -34,36 +33,22 @@ class TrainerService {
       const existingTrainer = await this.trainerRepository.existsTrainer(
         trainerData.email
       );
-
       if (existingTrainer) {
         return null;
       }
-
-      // Generate random OTP
       const generatedOTP: string = Math.floor(
         1000 + Math.random() * 9000
       ).toString();
       this.OTP = generatedOTP;
-
       console.log("Generated OTP is", this.OTP);
-
       const OTP_createdTime = new Date();
       this.expiryOTP_time = new Date(OTP_createdTime.getTime() + 1 * 60 * 1000);
-
-      // Save OTP in the database
-      await this.trainerRepository.saveOTP(
-        trainerData.email,
-        this.OTP,
-        this.expiryOTP_time
-      );
-
       console.log(`OTP will expire at: ${this.expiryOTP_time}`);
-
-      // const isMailSent = await sendOTPmail('otp',trainerData.email, this.OTP);
-      // if (!isMailSent) {
-      //   throw new Error("Email not sent");
-      // }
-
+      const isMailSent = await sendOTPmail('otp',trainerData.email, this.OTP);
+      if (!isMailSent) {
+        throw new Error("Email not sent");
+      }
+      await this.trainerRepository.saveOTP(trainerData.email,this.OTP,this.expiryOTP_time);
       return { email: trainerData.email };
     } catch (error) {
       console.error("Error in service:", (error as Error).message);
@@ -76,38 +61,27 @@ class TrainerService {
       const validOtps = await this.trainerRepository.getOtpsByEmail(
         trainerData.email
       );
-  
       if (validOtps.length === 0) {
         console.log("No OTP found for this email");
         throw new Error("No OTP found for this email");
       }
-  
       const latestOtp = validOtps.sort(
-        (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
-      )[0];
-  
+        (a, b) => b.createdAt.getTime() - a.createdAt.getTime())[0];
       if (latestOtp.otp === otp) {
         if (latestOtp.expiresAt > new Date()) {
           console.log("OTP is valid and verified", latestOtp.expiresAt);
-  
-          // Get ObjectIds for the specializations
           const specializationIds = await this.trainerRepository.findTrainerSpecializations(
-            trainerData.specializations // Pass the ObjectId array
+            trainerData.specializations 
           );
-  
           if (!specializationIds || specializationIds.length !== trainerData.specializations.length) {
             throw new Error("One or more specializations not found");
           }
-  
           const hashedPassword = await bcrypt.hash(trainerData.password, 10);
-  
           const newTrainerData: ITrainer = {
             ...trainerData,
             password: hashedPassword,
             specializations: specializationIds, 
           };
-  
-          // Create new trainer
           await this.trainerRepository.createNewTrainer(newTrainerData);
           await this.trainerRepository.deleteOtpById(latestOtp._id);
         } else {
@@ -120,16 +94,11 @@ class TrainerService {
         throw new Error("Invalid OTP");
       }
     } catch (error) {
-      const errorMessage =
-        (error as Error).message || "An unknown error occurred";
+      const errorMessage = (error as Error).message || "An unknown error occurred";
       console.error("Error in OTP verification:", errorMessage);
       throw error;
     }
   }
-  
-  
-  
-  
 
   async resendOTP(email: string): Promise<void> {
     try {
@@ -137,21 +106,13 @@ class TrainerService {
         1000 + Math.random() * 9000
       ).toString();
       this.OTP = generatedOTP;
-
       const OTP_createdTime = new Date();
       this.expiryOTP_time = new Date(OTP_createdTime.getTime() + 1 * 60 * 1000);
-
       await this.trainerRepository.saveOTP(
         email,
         this.OTP,
         this.expiryOTP_time
       );
-
-      // const isMailSent = await sendOTPmail('otp',email, this.OTP);
-      // if (!isMailSent) {
-      //   throw new Error("Failed to resend OTP email.");
-      // }
-
       console.log(`Resent OTP ${this.OTP} to ${email}`);
     } catch (error) {
       console.error("Error in resendOTP:", (error as Error).message);
@@ -159,22 +120,17 @@ class TrainerService {
     }
   }
 
-  // login trainer
-
   async trainerLogin({ email, password }: { email: string; password: string }) {
     try {
       const trainerData = await this.trainerRepository.findTrainer(email);
-
       if (trainerData && trainerData._id) {
         const isPasswordValid = await bcrypt.compare(
           password,
           trainerData.password
         );
-
         if (!isPasswordValid) {
           throw new Error("Invalid email or password");
         }
-
         if (trainerData?.isBlocked) {
           throw new Error("Trainer is blocked");
         }
@@ -187,7 +143,6 @@ class TrainerService {
           id: trainerData._id.toString(),
           email: trainerData.email,
         });
-
         return {
           accessToken,
           refreshToken,
@@ -210,7 +165,6 @@ class TrainerService {
   async generateTokn(trainer_refresh_token: string) {
     try {
       const payload = verifyRefreshToken(trainer_refresh_token);
-      // console.log('payload', payload);
 
       let id: string | undefined;
       let email: string | undefined;
@@ -219,7 +173,6 @@ class TrainerService {
         id = payload?.id;
         email = payload?.email;
       }
-
       if (id && email) {
         const role = 'trainer'
         const TrainerNewAccessToken = generateAccessToken({ id, email, role });
@@ -232,15 +185,12 @@ class TrainerService {
       throw error;
     }
   }
+
   async kycSubmit(formData: any, files: { [fieldname: string]: Express.Multer.File[] }): Promise<any> {
     try {
       const documents: { [key: string]: string | undefined } = {};
-  
       const kycData = await this.trainerRepository.getOldImages(formData.trainer_id)
-
-  
       if (kycData) {
-        
         if (kycData.aadhaarFrontImage) await deleteFromCloudinary(kycData.aadhaarFrontImage);
         if (kycData.aadhaarBackImage) await deleteFromCloudinary(kycData.aadhaarBackImage);
         if (kycData.certificate) await deleteFromCloudinary(kycData.certificate);
@@ -277,12 +227,8 @@ class TrainerService {
         );
         documents.certificateUrl = certificateUrl.secure_url;
       }
-  
-      // Save KYC data in the repository
        await this.trainerRepository.saveKyc(formData, documents);
-     
-  
-      // Change KYC status in the repository
+
       return await this.trainerRepository.changeKycStatus(
         formData.trainer_id,
         documents.profileImageUrl
@@ -293,8 +239,6 @@ class TrainerService {
     }
   }
   
-  
-
   async kycStatus(trainerId: string) {
     try {
       const kycStatus = await this.trainerRepository.getTrainerStatus(
@@ -322,7 +266,6 @@ class TrainerService {
     return await this.trainerRepository.getTrainerProfile(trainer_id)
   }
 
-  // Service Method
   async updateTrainer(trainer_id: string, trainerData: Partial<ITrainer>) {
     try {
       const {
@@ -338,13 +281,9 @@ class TrainerService {
         specializations
       } = trainerData;
 
-      // console.log("profileimage", profileImage);
-
       const existingTrainer = await this.trainerRepository.updateTrainerData(
         trainer_id
       );
-      // console.log(existingTrainer);
-
       if (!existingTrainer) {
         throw new Error("Trainer not found");
       }
@@ -363,9 +302,7 @@ class TrainerService {
       if(Array.isArray(specializations)) {
         existingTrainer.specializations = specializations
       }
-
       await existingTrainer.save();
-
       return existingTrainer;
     } catch (error) {
       console.error("Error in service layer:", error);
@@ -389,34 +326,23 @@ class TrainerService {
     try {
       const startTimeInput = sessionData.startTime;
       const endTimeInput = sessionData.endTime;
-
       const startTime = new Date(`1970-01-01T${startTimeInput}`);
       const endTime = new Date(`1970-01-01T${endTimeInput}`);
 
       if (startTime >= endTime) {
         throw new Error("End time must be after start time");
       }
-
       const MINIMUM_SESSION_DURATION = 30;
       const duration = (endTime.getTime() - startTime.getTime()) / (1000 * 60);
-
       if (duration < MINIMUM_SESSION_DURATION) {
         throw new Error("Session duration must be at least 30 minutes");
       }
-
       if (recurrenceOption === 'oneWeek' || recurrenceOption === 'twoWeek') {
-        
-        // Generate recurring sessions for either one week or two weeks
         const recurringSessions = await createRecurringSessions(sessionData.startDate, recurrenceOption, sessionData);
-      
-        // Create all recurring sessions at once in the repository
         return await this.trainerRepository.createMultipleSessions(recurringSessions);
       } else {
-        // Handle single session creation
         return await this.trainerRepository.createNewSession(sessionData);
       }
-      
-
     } catch (error: any) {
       if (error.message.includes("Daily session limit")) {
         throw new Error(error.message);
@@ -461,7 +387,6 @@ class TrainerService {
   async fetchUser(userId: string) {
     return await this.trainerRepository.fetchUeserDetails(userId)
   }
-
   
   async getWallet(trainer_id: string) {
     return await this.trainerRepository.fetchWalletData(trainer_id)
@@ -470,49 +395,35 @@ class TrainerService {
   async withdraw (trainer_id:string, amount: number)  {
     try {
       return await this.trainerRepository.withdrawMoney(trainer_id, amount)
-
-    } catch (error) {
-      
+    } catch (error: any) {
+      throw Error(error)
     }
   }
 
   async addPrescription(bookingId: string, prescription: string) {
     try {
       const prescriptionInfo = await this.trainerRepository.addPrescription(bookingId, prescription);
-  
       if (prescriptionInfo?.sessionType === 'Single Session') {
         await this.trainerRepository.updateSessionStatus(bookingId);
       }
-  
       if (prescriptionInfo?.sessionType === 'Package Session') {
         const sessionData = await this.trainerRepository.getSession(prescriptionInfo.sessionId.toString());
-        console.log('sessionData', sessionData);
-  
         if (sessionData) {
           const startDate = moment(prescriptionInfo.startDate);
           const endDate = moment(prescriptionInfo.endDate);
-  
           const totalDays = endDate.diff(startDate, 'days');
           const totalSessions = totalDays + 1;
-  
-          // Ensure `completedSessions` is defined
+
           if (sessionData.completedSessions === undefined) {
             sessionData.completedSessions = 0;
           }
-          console.log('totalSessions', totalSessions);
-          console.log('sessionData.completedSessions before ', sessionData.completedSessions);
           if (sessionData.completedSessions < totalSessions) {
-            let sessionCount = sessionData.completedSessions + 1; // Increment completed sessions
-            console.log('sessionData.completedSessions after increment', sessionCount);
-          
-            // Save updated session data to the database
+            let sessionCount = sessionData.completedSessions + 1; 
             await this.trainerRepository.updateSessionData(sessionData._id.toString(), sessionCount);
-          
             if (sessionCount < totalSessions) {  
               await this.trainerRepository.updateSessionStatus(bookingId);
             }
           }
-          
         }
       }
   
@@ -522,14 +433,8 @@ class TrainerService {
     }
   }
   
-  
-
-  
-
   async getNotifications(trainerId: string) {
     try {
-      console.log('services');
-      
       return await this.trainerRepository.fetchNotifications(trainerId)
     } catch (error) {
       throw new Error('failed to find notifications')
@@ -546,42 +451,41 @@ class TrainerService {
 
    async updatePrescription(bookingId: string, newPrescription: string) {
     try {
-      await this.trainerRepository.updatePrescriptionContect(bookingId, newPrescription)
-     
-      // if(bookingDetails?.bookingDate )
-    } catch (error) {
-      throw new Error('failed to update prescription')
+      const bookingDetails = await this.trainerRepository.fetchUserBooking(bookingId);
+  
+      if (!bookingDetails || bookingDetails.length === 0) {
+        throw new Error("No booking details found.");
+      }
+      const { sessionCompletionTime } = bookingDetails[0];
+  
+      if (!sessionCompletionTime) {
+        throw new Error("Booking date is invalid.");
+      }
+      const currentTime = new Date();
+      const bookingTime = new Date(sessionCompletionTime);
+      const minutesPassed = differenceInMinutes(currentTime, bookingTime);
+      
+      if (minutesPassed >= 0 && minutesPassed <= 60) {
+        await this.trainerRepository.updatePrescriptionContect(bookingId, newPrescription);
+        return {
+          success: true,
+          message: "Prescription updated successfully!",
+        };
+      } else if (minutesPassed > 60) {
+        throw new Error("Prescription can no longer be updated. Time window expired.");
+      } else {
+        throw new Error("Prescription can only be updated after session completion.");
+      }
+    } catch (error: any) {
+      console.error(`Error updating prescription: ${error.message}`);
+      throw error;
     }
   }
-
+  
   async getBooking(bookingId: string) {
     return await this.trainerRepository.fetchUserBooking(bookingId)
   }
 
-  // async updatePrescription(bookingId: string, newPrescription: string) {
-  //   try {
-  //     const bookingDetails = await this.trainerRepository.updatePrescriptionContect(bookingId, newPrescription);
-  
-  //     if (!bookingDetails?.bookingDate) {
-  //       throw new Error("Invalid booking date or booking not found.");
-  //     }
-  
-  //     const hoursLeft = differenceInHours(new Date(bookingDetails.bookingDate), new Date());
-  
-  //     if (hoursLeft > 0 && hoursLeft <= 1) {
-  //       console.log(`Hours left to update prescription: ${hoursLeft}`);
-  //       return {
-  //         success: true,
-  //         message: "Prescription updated successfully!",
-  //       };
-  //     } else {
-  //       throw new Error("Prescription update time has expired.");
-  //     }
-  //   } catch (error: any) {
-  //     throw new Error(error.message || "Failed to update prescription.");
-  //   }
-  // }
-  
 }
 
 export default TrainerService;

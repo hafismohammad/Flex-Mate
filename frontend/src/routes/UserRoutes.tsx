@@ -20,7 +20,7 @@ function UserRoutes() {
     <Routes>
       <Route path='/' element={<Home />} />
       <Route path='/signup' element={<SignupPage />} />
-      <Route path='/otp' element={<Otp />} />
+      <Route path='/verityotp' element={<Otp />} />
       <Route path='/login' element={<Login />} />
       <Route path='/trainers' element={<Trainers />} />
       <Route path='/trainers/:specId' element={<Trainers />} />

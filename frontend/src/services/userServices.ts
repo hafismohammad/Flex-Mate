@@ -24,7 +24,7 @@ const verifyOtp = async ({
   userData: User;
   otp: string;
 }) => {
-  const response = await userAxiosInstance.post(`${API_URL}/api/user/otp`, { userData, otp });
+  const response = await userAxiosInstance.post(`${API_URL}/api/user/verifyotp`, { userData, otp });
 
   if (response.data) {
     // Store the user data in localStorage after successful OTP verification

@@ -552,7 +552,7 @@ function TrainerProfileView() {
   </div>
 )}
 
-<div className="flex justify-center">
+<div className="flex justify-center mt-8">
   <h1 className="text-2xl mt-5 font-bold sm:text-xl sm:mt-3">
     {bookingStatus === "Completed" ? "What clients are saying" : ""}
   </h1>
@@ -562,7 +562,7 @@ function TrainerProfileView() {
     {!hasUserReviewed ? (
       <button
         onClick={handleAddReview}
-        className="bg-red-500 px-3 py-2 text-white sm:px-2 sm:py-1 sm:text-sm"
+        className="bg-red-500 lg:mr-5 lg:px-4 lg:py-3 text-white sm:px-2 sm:py-1 sm:text-sm"
       >
         Add Review
       </button>

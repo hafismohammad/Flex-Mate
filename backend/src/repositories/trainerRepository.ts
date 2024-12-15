@@ -7,7 +7,6 @@ import TrainerModel from "../models/trainerModel";
 import OtpModel from "../models/otpModel";
 import KYCModel from "../models/KYC_Model";
 import KycRejectionReasonModel from "../models/kycRejectionReason";
-import { ISpecialization } from "../interface/trainer_interface";
 import SessionModel from "../models/sessionModel";
 import mongoose, { Types } from "mongoose";
 import moment from "moment";
@@ -27,12 +26,10 @@ class TrainerRepository {
   private walletModel = WalletModel;
   private notificationModel = NotificationModel
 
-  // Method to find all specializations
   async findAllSpecializations() {
     try {
       return await this.specializationModel.find({});
     } catch (error) {
-      console.error("Error fetching specializations:", error);
       throw error;
     }
   }
@@ -45,7 +42,6 @@ class TrainerRepository {
     }
   }
 
-  // Save OTP to the OTP collection with expiration time
   async saveOTP(email: string, OTP: string, OTPExpiry: Date): Promise<void> {
     try {
       const newOtp = new this.otpModel({
@@ -53,7 +49,6 @@ class TrainerRepository {
         otp: OTP,
         expiresAt: OTPExpiry,
       });
-
       await newOtp.save();
     } catch (error) {
       console.error("Error in saveOTP:", error);
@@ -70,18 +65,11 @@ class TrainerRepository {
     }
   }
 
-  async findTrainerSpecializations(
-    specializationNames: any
-  ): Promise<Types.ObjectId[]> {
+  async findTrainerSpecializations(specializationNames: any): Promise<Types.ObjectId[]> {
     try {
-      // console.log('specialization names in repo', specializationNames);
-
-      // Find all specializations by name and return their ObjectIds
       const specializations = await this.specializationModel.find({
         name: { $in: specializationNames },
       });
-
-      // If no specializations found, return an empty array
       return specializations.map((spec) => spec._id);
     } catch (error) {
       console.log("Error in finding trainer specializations:", error);
@@ -92,21 +80,17 @@ class TrainerRepository {
   async createNewTrainer(trainerData: ITrainer): Promise<void> {
     try {
       await this.trainerModel.create(trainerData);
-      console.log("Trainer created successfully.");
     } catch (error) {
       console.error("Error in creating User:", error);
       throw error;
     }
   }
 
-  // Delete OTP by ID
   async deleteOtpById(otpId?: mongoose.Types.ObjectId): Promise<void> {
     try {
       if (!otpId) {
         throw new Error("OTP ID is undefined");
       }
-
-      // Find OTP by ID and delete
       await this.otpModel.findByIdAndDelete(otpId.toString());
       console.log(`OTP with ID ${otpId} deleted successfully.`);
     } catch (error) {
@@ -115,11 +99,8 @@ class TrainerRepository {
     }
   }
 
-  // Find trainer for login
   async findTrainer(email: string): Promise<ITrainer | null> {
     try {
-      console.log("repository ", email);
-
       return await this.trainerModel.findOne({ email });
     } catch (error) {
       console.log("Error finding user:", error);
@@ -129,8 +110,6 @@ class TrainerRepository {
 
   async getOldImages(trainerId: string): Promise<any> {
     try {
-      
-      // Query KYC data using the trainerId field
       const kycData = await this.kycModel.findOne({trainerId: trainerId });
       return kycData;
     } catch (error) {
@@ -139,10 +118,8 @@ class TrainerRepository {
     }
   }
   
-
   async saveKyc(formData: any, documents: any): Promise<any> {
     try {
-      // Convert each specialization ID to an ObjectId instance
       const specializationIds = Array.isArray(formData.specialization)
         ? formData.specialization.map((id: string) => new Types.ObjectId(id))
         : [new Types.ObjectId(formData.specialization)];
@@ -159,7 +136,6 @@ class TrainerRepository {
       };
 
       const savedKyc = await this.kycModel.create(kycData);
-      console.log("KYC Data saved successfully:", savedKyc);
       return savedKyc;
     } catch (error) {
       console.error("Error in saveKyc repository:", error);
@@ -169,13 +145,10 @@ class TrainerRepository {
 
   async getTrainerStatus(trainerId: string) {
     try {
-      const trainer = await this.trainerModel
-        .findById(trainerId)
-        .select("kycStatus");
+      const trainer = await this.trainerModel.findById(trainerId).select("kycStatus");
       if (!trainer) {
         throw new Error(`Trainer with ID ${trainerId} not found`);
       }
-
       return trainer.kycStatus;
     } catch (error) {
       console.error("Error fetching trainer KYC status:", error);
@@ -188,7 +161,6 @@ class TrainerRepository {
 
   async changeKycStatus(trainerId: string, profileImage: string | undefined): Promise<string | undefined> {
     try {
-      // Update the trainer's profile image and KYC status
       const trainerUpdate = await this.trainerModel.findByIdAndUpdate(
         trainerId,
         {
@@ -201,8 +173,6 @@ class TrainerRepository {
       if (!trainerUpdate) {
         throw new Error("Trainer not found");
       }
-  
-      // Update the corresponding KYC record
       await this.kycModel.findOneAndUpdate(
         { trainerId: trainerId },
         { kycStatus: "submitted" },
@@ -250,8 +220,6 @@ class TrainerRepository {
           },
         },
       ]);
-
-      // console.log('trainerData', trainerData);
       return trainerData;
     } catch (error: any) {
       throw new Error(error);
@@ -267,7 +235,6 @@ class TrainerRepository {
     }
   }
 
-  // Repository Method
   async updateTrainerData(trainer_id: string) {
     try {
       const existingTrainer = await this.trainerModel.findById(trainer_id);
@@ -283,10 +250,7 @@ class TrainerRepository {
 
   async fetchSpec(traienr_id: string) {
     try {
-      const specializations = await this.trainerModel
-        .findById({ _id: traienr_id })
-        .populate("specializations");
-      // console.log('specializations', specializations);
+      const specializations = await this.trainerModel.findById({ _id: traienr_id }).populate("specializations");
       return specializations?.specializations;
     } catch (error) {}
   }
@@ -296,8 +260,6 @@ class TrainerRepository {
       const rejectionData = await this.kycRejectionModel.findOne({
         trainerId: trainerId,
       });
-      // console.log("rejectionData:", rejectionData);
-
       return rejectionData;
     } catch (error) {
       console.error("Error fetching rejection data:", error);
@@ -307,14 +269,10 @@ class TrainerRepository {
 
   async createMultipleSessions(sessions: ISession[]) {
     try {
-      // Ensure all sessions pass validation checks before inserting
       for (const session of sessions) {
-        // Validate each session (like checking time conflicts)
         const allSessions = await this.sessionModel.find({
           trainerId: session.trainerId,
         });
-
-        // Check for time conflicts with each session
         const hasConflict = allSessions.some((existingSession) => {
           const existingStartDate = moment(existingSession.startDate);
           const existingEndDate = existingSession.endDate
@@ -367,16 +325,6 @@ class TrainerRepository {
     try {
       const trainer = await this.trainerModel.findById(sessionData.trainerId);
       if (!trainer) throw new Error("Trainer not found.");
-
-      // const dailySessionLimit = trainer.dailySessionLimit;
-
-      // const allSessions = await this.sessionModel.find({
-      //   trainerId: sessionData.trainerId,
-      // });
-
-      // if (allSessions.length >= dailySessionLimit) {
-      //   throw new Error(`Daily session limit of ${dailySessionLimit} reached.`);
-      // }
 
       // Check for date and time conflicts
       const existingSessions = await this.sessionModel.find({
@@ -443,13 +391,7 @@ class TrainerRepository {
 
   async fetchSessionData(trainer_id: string) {
     try {
-      const sesseionData = await this.sessionModel
-        .find({
-          trainerId: trainer_id,
-        })
-        .populate("specializationId")
-        .sort({ createdAt: -1 });
-
+      const sesseionData = await this.sessionModel.find({ trainerId: trainer_id,}).populate("specializationId").sort({ createdAt: -1 });
       return sesseionData;
     } catch (error) {
       throw error;
@@ -598,8 +540,8 @@ class TrainerRepository {
     try {
       const session = await this.sessionModel.findByIdAndUpdate(
         sessionId,
-        { $set: { completedSessions: sessionCount } }, // Update the completedSessions field
-        { new: true } // Return the updated document
+        { $set: { completedSessions: sessionCount } }, 
+        { new: true } 
       );
   
       if (!session) {
@@ -675,17 +617,13 @@ class TrainerRepository {
   async withdrawMoney(trainer_id: string, amount: number) {
     try {
       const wallet = await this.walletModel.findOne({ trainerId: trainer_id });
-
       if (!wallet) {
         throw new Error("Wallet not found for the specified Trainer.");
       }
-
       if (wallet.balance < amount) {
         throw new Error("Insufficient balance for withdrawal.");
       }
-
       wallet.balance -= amount;
-
       const transactionId =
         "txn_" + Date.now() + Math.floor(Math.random() * 10000);
       const transaction: ITransaction = {
@@ -695,35 +633,43 @@ class TrainerRepository {
       };
       wallet.transactions.push(transaction);
       await wallet.save();
-
       return wallet;
     } catch (error: any) {
       console.error("Error processing withdrawal:", error.message);
       throw new Error(error.message);
     }
   }
-  async addPrescription(bookingId: string, prescriptions: string) {
-    try {
-      const prescriptionInfo = await this.bookingModel.findByIdAndUpdate(bookingId,
-        {prescription: prescriptions},
-        { new: true, runValidators: true }
-      )
-      return prescriptionInfo
-    } catch (error) {
-      
-    }
+
+async addPrescription(bookingId: string, prescriptions: string) {
+  try {
+    const prescriptionInfo = await this.bookingModel.findByIdAndUpdate(
+      bookingId,
+      {
+        $set: {
+          prescription: prescriptions,
+          sessionCompletionTime: Date.now(),
+        },
+      },
+      {
+        new: true, 
+        runValidators: true, 
+      }
+    );
+    return prescriptionInfo;
+  } catch (error) {
+    console.error("Error updating prescription:", error);
+    throw error;
   }
+}
 
   async fetchNotifications(trainerId: string) {
     try {
       const notificationsDoc = await this.notificationModel.findOne({ receiverId: trainerId });
-    
       if (notificationsDoc && notificationsDoc.notifications) {
         notificationsDoc.notifications.sort((a, b) => {
           return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         });
       }
-  
       return notificationsDoc;
     } catch (error) {
       console.error('Error finding notifications');
@@ -741,15 +687,9 @@ class TrainerRepository {
     }
   }
 
-
   async updatePrescriptionContect(bookingId: string, newPrescription: string) {
     try {
-      // console.log('hit repo=====++++++', newPrescription, bookingId);
-      
-      
      const data = await this.bookingModel.findByIdAndUpdate(bookingId, {prescription: newPrescription})
-// console.log('data',data);
-
     } catch (error) {
       console.error('Error delete notifications');
       throw new Error('Failed to delete notifications');
@@ -758,8 +698,6 @@ class TrainerRepository {
 
   async fetchUserBooking(bookingId: string) {
     try {
-      // const bookingDetails  await this.bookingModel.findById(bookingId)
-
       const bookingDetails = await this.bookingModel.aggregate([
         { $match: { _id: new mongoose.Types.ObjectId(bookingId) } },
         {
@@ -846,6 +784,7 @@ class TrainerRepository {
               },
             },
             amount: "$amount",
+            sessionCompletionTime: '$sessionCompletionTime',
             paymentStatus: "$paymentStatus",
             prescription: "$prescription",
             specialization: {
@@ -861,8 +800,6 @@ class TrainerRepository {
           },
         },
       ]);
-      console.log('bookingDetails',bookingDetails);
-      
       return bookingDetails
     } catch (error) {
       

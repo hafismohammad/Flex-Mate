@@ -16,13 +16,6 @@ const authMiddleware = (roles: string[] = []) => {
     try {
       const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET as string) as CustomRequest['user'];
       req.user = decoded;
-
-      // Role-based access control
-      // if (roles.length && !roles.includes(decoded.role)) {
-      //   res.status(403).json({ message: 'Access denied, insufficient role' });
-      //   return;
-      // }
-
       next();
     } catch (error) {
       res.status(401).json({ message: 'Invalid or expired token' });

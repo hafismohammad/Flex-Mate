@@ -67,29 +67,46 @@ const Signup = () => {
     }, 3000);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    const formErrors = validate();
-    setErrors(formErrors);
-
-    if (Object.keys(formErrors).length > 0) {
-      clearErrors();
-      return;
+  
+    try {
+      const formErrors = validate();
+      setErrors(formErrors);
+  
+      if (Object.keys(formErrors).length > 0) {
+        clearErrors();
+        return;
+      }
+  
+      setErrors({});
+  
+      const userData: User = {
+        name,
+        email,
+        phone,
+        password,
+      };
+  
+      // Dispatch the action to register the user and handle the response
+      const action = await dispatch(registerUser(userData));
+  
+      // Check if the action was rejected (due to email already existing or other errors)
+      if (registerUser.rejected.match(action)) {
+        const errorMessage = action.payload?.message || 'Something went wrong';
+  
+        // Display the error message using a toast
+        toast.error(errorMessage);
+  
+        return;
+      }
+  
+      // If successful, navigate to OTP page
+      navigate("/verityotp", { state: userData });
+    } catch (error) {
+      console.error("Registration error:", error);
+      toast.error("Something went wrong, please try again later.");
     }
-
-    setErrors({});
-
-    const userData: User = {
-      name,
-      email,
-      phone,
-      password,
-    };
-
-    // Dispatch the action to register the user
-    dispatch(registerUser(userData));
-    navigate("/otp", { state: userData });
   };
 
   return (

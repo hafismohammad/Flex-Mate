@@ -2,15 +2,11 @@ import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 
 import messageService from "../services/messageService";
-import ConversationModel from "../models/ConversationModel";
-import BookingModel from "../models/booking";
 
 class MessageController {
   async sendMessage(req: Request, res: Response) {
     try {
       const { token, receiverId, message } = req.body;
-// console.log('server', token,'---------', receiverId);
-
       if (!token) {
         res.status(400).json({ error: "Token is required" });
         return;
@@ -21,7 +17,6 @@ class MessageController {
         process.env.ACCESS_TOKEN_SECRET as string
       ) as { id: string };
       const senderId = decoded.id;
-
       const sendMessage = await messageService.sendMessage(
         senderId,
         receiverId,
@@ -40,23 +35,16 @@ class MessageController {
 
   async getMessage(req: Request, res: Response) {
     try {
-      // console.log('get message');
-      
       const {token, id} = req.params
-      // console.log(token,'==========', id);
-      
       const decoded = jwt.verify(
         token,
         process.env.ACCESS_TOKEN_SECRET as string
       ) as { id: string };
       const senderId = decoded.id;
-   
-      
       const getMessages = await messageService.getMessage(
         senderId,
         id
       );
-
       res.status(200).json(getMessages);
     } catch (error) {
       console.log("Error in sendMessage controller", error);
@@ -66,20 +54,12 @@ class MessageController {
 
 async getCallHistory(req: Request, res: Response) {
   const {trainerId} = req.params
-  
   const respons = await messageService.getCallHistory(trainerId)
-  
   res.status(200).json(respons)
 }
 async getCallHistoryUser(req: Request, res: Response) {
   const {userId} = req.params
-  console.log('hit controller historuy');
-  
-console.log('userid',userId);
-
   const respons = await messageService.getCallHistoryUser(userId)
-  console.log(respons);
-  
   res.status(200).json(respons)
 }
 

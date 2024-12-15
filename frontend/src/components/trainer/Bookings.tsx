@@ -36,16 +36,17 @@ function Bookings() {
   const [filterType, setFilterType] = useState<string>("all");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterStartDate, setFilterStartDate] = useState<string>("");
-  const [prescriptionData, setPrescriptionData] = useState<BookingDetail | null>(null);
+  const [prescriptionData, setPrescriptionData] =
+    useState<BookingDetail | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [edtiOption, setEdtiOption] = useState(false);
-  const [newPrescription, setNewprescription] = useState<string | null>(null)
+  const [newPrescription, setNewprescription] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const bookingsPerPage = 7;
 
   const { trainerInfo } = useSelector((state: RootState) => state.trainer);
   const trainerId = trainerInfo.id;
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchBookingDetails = async () => {
@@ -122,7 +123,6 @@ function Bookings() {
 
     return true;
   });
-  
 
   const handleView = (booking: BookingDetail) => {
     // console.log('booking', booking);
@@ -136,40 +136,44 @@ function Bookings() {
   };
 
   const handleClose = () => {
-    setIsModalOpen(false) 
-     setEdtiOption(false)
-  }
+    setIsModalOpen(false);
+    setEdtiOption(false);
+  };
 
   const handleSave = async (bookingId: string | undefined) => {
-  try {
-    const response = await axiosInstance.patch(`/api/trainer/update-prescription/${bookingId}`, {data: newPrescription})
-    if(response.status === 200) {
-      setBookingDetails((prev) =>
-        prev.map((booking) => 
-        booking._id === bookingId ? {...booking, prescription: newPrescription || ''} : booking
-        ) 
-      )
-      if(response.data.message === 'Prescription updated successfully') {
-        toast.success(response.data.message)
+    try {
+      const response = await axiosInstance.patch(
+        `/api/trainer/update-prescription/${bookingId}`,
+        { data: newPrescription }
+      );
+      if (response.status === 200) {
+        setBookingDetails((prev) =>
+          prev.map((booking) =>
+            booking._id === bookingId
+              ? { ...booking, prescription: newPrescription || "" }
+              : booking
+          )
+        );
+        if (response.data.message === "Prescription updated successfully") {
+          toast.success(response.data.message);
+        }
       }
-    }
-  } catch (error) {
-     toast.error("Failed to update the prescription. Please try again.");
+    } catch (error) {
+      toast.error("Failed to update the prescription. Please try again.");
       console.error("Error updating prescription:", error);
-  } finally {
-    handleClose();
-    
-  }
-  }
+    } finally {
+      handleClose();
+    }
+  };
 
   // const handleSave = async (bookingId: string | undefined) => {
   //   try {
   //     const response = await axiosInstance.patch(`/api/trainer/update-prescription/${bookingId}`, {data: newPrescription})
   //     if(response.status === 200) {
   //       setBookingDetails((prev) =>
-  //         prev.map((booking) => 
+  //         prev.map((booking) =>
   //         booking._id === bookingId ? {...booking, prescription: newPrescription || ''} : booking
-  //         ) 
+  //         )
   //       )
   //       toast.success(response.data.message)
   //     }
@@ -177,17 +181,17 @@ function Bookings() {
   //     const errorMessage = error.response?.data?.message || "An error occurred.";
   //     toast.error(errorMessage);
   //     console.error("Error updating prescription:", error);
-  
+
   //   } finally {
   //     handleClose();
-      
+
   //   }
   //   }
 
   const setisOpenView = (bookingId: string) => {
     navigate("/trainer/user-view", { state: { bookingId } });
   };
-  
+
   useEffect(() => {
     if (isModalOpen && prescriptionData?.prescription != null) {
       setNewprescription(prescriptionData.prescription);
@@ -243,7 +247,6 @@ function Bookings() {
           <div className="text-center">Status</div>
           <div className="text-center">View</div>
           {/* <div className="text-center">Action</div> */}
-
         </div>
 
         {currentBooking.length > 0 ? (
@@ -284,20 +287,26 @@ function Bookings() {
                 {formatPriceToINR(booking.amount)}
               </div>
               <div
-                className={`text-center font-medium ${
-                  booking.paymentStatus === "Cancelled"
-                    ? "text-red-500"
-                    : booking.paymentStatus === "Confirmed"
-                    ? "text-green-500"
-                    : booking.paymentStatus === "Completed"
-                    ? "text-blue-500"
-                    : "text-gray-500"
+                className={`text-sm px-2 py-1 rounded-full font-medium ${
+                  booking.paymentStatus.toLowerCase() === "cancelled"
+                    ? "text-red-500 bg-red-100"
+                    : booking.paymentStatus.toLowerCase() === "confirmed"
+                    ? "text-green-500 bg-green-100"
+                    : booking.paymentStatus.toLowerCase() === "completed"
+                    ? "text-blue-500  bg-blue-100"
+                    : "text-gray-500 bg-gray-100"
                 }`}
               >
                 {booking.paymentStatus}
               </div>
+
               <div className="ml-4">
-                <button className="bg-blue-500 hover:bg-blue-700 font-bold text-white px-7 py-1 rounded-lg" onClick={() => setisOpenView(booking._id)}>view</button>
+                <button
+                  className="bg-blue-500 hover:bg-blue-700 font-bold text-white px-7 py-1 rounded-lg"
+                  onClick={() => setisOpenView(booking._id)}
+                >
+                  view
+                </button>
               </div>
               {/* {booking.paymentStatus === "Completed" && (
                 <div onClick={() => handleView(booking)}>
@@ -306,7 +315,6 @@ function Bookings() {
                   </button>
                 </div>
               )} */}
-            
             </div>
           ))
         ) : (

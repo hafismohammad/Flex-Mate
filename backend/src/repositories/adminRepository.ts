@@ -26,13 +26,12 @@ class AdminRepository {
 
   async addSpecialization({ name, description, image }: { name: string; description: string; image: string | null }) {
     try {
-        // Include the image in the data being inserted into the database
         return await this.specializationModel.create({ name, description, image });
     } catch (error) {
         console.log('Error adding specialization:', error);
         throw error;
     }
-}
+  }
 
 
   async getAllTrainersKycDatas() {
@@ -65,10 +64,7 @@ class AdminRepository {
   async fetchKycData(trainerId: string) {
     try {
       const kycData = await KYCModel.findOne({ trainerId }).populate('specializationId').populate('trainerId')
-     
-      
       return kycData
-       
     } catch (error) {
       console.error('Error fetching KYC data:', error);
       throw new Error('Failed to fetch KYC data');
@@ -78,8 +74,6 @@ class AdminRepository {
 
   async updateKycStatus(status: string, trainer_id: string, rejectionReason: string | null): Promise<any> {
     try {
-      console.log('update kyc status repo', rejectionReason);
-      
       const updatedTrainer = await this.trainerModel.findByIdAndUpdate(
         trainer_id,
         { kycStatus: status },
@@ -96,9 +90,6 @@ class AdminRepository {
         );
   
         if (updatedKyc) {
-          console.log('KYC model status updated successfully:', updatedKyc);
-  
-          // Save the rejection reason if the status is 'rejected'
           if (status === 'rejected' && rejectionReason) {
            const reason =  await this.kycRejectionReasonModel.create({
               trainerId: trainer_id,
@@ -119,8 +110,6 @@ class AdminRepository {
               return updatedTrainer.email
             }
           }
-          
-  
         } else {
           console.log('KYC record not found for the given trainer ID:', trainer_id);
           return null;
@@ -134,12 +123,9 @@ class AdminRepository {
       throw error;
     }
   }
-  
 
   async deleteKyc(trainer_id: string) {
     try {
-      console.log('-------------------------->',trainer_id);
-      
       const result = await this.kycModel.findOneAndDelete({ trainerId: trainer_id });
       if (result) {
         console.log('KYC record deleted successfully:', result);
@@ -174,8 +160,6 @@ class AdminRepository {
     return trainers
   }
   async updateUserStatus(user_id: string, userStatus: boolean) {
-    // console.log(user_id, userStatus);
-    
    return  await this.userModel.findByIdAndUpdate(
       {_id: user_id},
       {isBlocked: userStatus},
@@ -185,7 +169,6 @@ class AdminRepository {
   }
 
   async updateTrainerStatus(trainer_id: string, trainerStatus: boolean) {
-    
    return  await this.trainerModel.findByIdAndUpdate(
       {_id: trainer_id},
       {isBlocked: trainerStatus},
@@ -196,14 +179,11 @@ class AdminRepository {
 
   async saveRejectionReason(trainerId: string, reason: string): Promise<void> {
     try {
-      console.log('save rejection reasonr');
-      
        await this.kycRejectionReasonModel.create({
         trainerId: trainerId,
         reason: reason,
         date: new Date(),
       });
-      console.log('Rejection reason saved successfully for trainer ID:', trainerId);
       
     } catch (error) {
       console.error('Error saving rejection reason:', error);
@@ -295,8 +275,6 @@ class AdminRepository {
           }
         }
       ])
-// console.log(allBookings);
-
       return allBookings
     } catch (error) {
       console.error('Error fetching all booking details:', error);
@@ -309,9 +287,8 @@ class AdminRepository {
     const totalUsers = await this.userModel.countDocuments();
     const activeUsers = await this.userModel.countDocuments({ isBlocked: false });
     const activeTrainers = await this.trainerModel.countDocuments({ isBlocked: false });
-  
     const revenueData = await BookingModel.aggregate([
-      { $match: { paymentStatus: "Confirmed" } },
+      { $match: { paymentStatus: "Completed" } },
       {
         $group: {
           _id: null,
@@ -321,17 +298,10 @@ class AdminRepository {
         }
       }
     ]);
-    // console.log("Revenue Data:", revenueData);
-    
-    
 
-    
-
-  
     const amount = revenueData.length > 0 ? revenueData[0].amount : 0;
     const trainerRevenue = revenueData.length > 0 ? revenueData[0].trainerRevenue : 0;
     const adminRevenue = revenueData.length > 0 ? revenueData[0].adminRevenue : 0;
-  
     const currentDate = new Date();
     const startDate = new Date();
     startDate.setMonth(currentDate.getMonth() - 12); // 12 months ago
@@ -378,8 +348,6 @@ class AdminRepository {
         adminRevenue: 0
       };
     }
-  // console.log('monthlyStatistics',monthlyStatistics);
-  
     usersAndDoctorsRegistrationData[0].forEach(userData => {
       const key = `${userData._id.year}-${userData._id.month < 10 ? '0' : ''}${userData._id.month}`;
       if (monthlyStatistics[key]) {
@@ -409,8 +377,6 @@ class AdminRepository {
       },
       { $sort: { "_id.year": 1, "_id.month": 1 } }
     ]);
-  // console.log('revenueByMonth',revenueByMonth);
-  
     revenueByMonth.forEach(revenueData => {
       const key = `${revenueData._id.year}-${revenueData._id.month < 10 ? '0' : ''}${revenueData._id.month}`;
       if (monthlyStatistics[key]) {
@@ -421,8 +387,6 @@ class AdminRepository {
       }
   });
   
-  
-    // Convert the object into an array for easier use in charts
     const userTrainerChartData = Object.keys(monthlyStatistics).map(key => {
       const [year, month] = key.split('-');
       return {
@@ -437,8 +401,6 @@ class AdminRepository {
       };
     });
   
-    console.log("userDoctorChartData", userTrainerChartData);
-  
     return {
       totalTrainers,
       totalUsers,
@@ -447,11 +409,9 @@ class AdminRepository {
       totalRevenue: amount,
       trainerRevenue,  
       adminRevenue,  
-      userTrainerChartData  // Data for the user/doctor registration chart
+      userTrainerChartData  
     };
   }
-  
-
 }
 
 
