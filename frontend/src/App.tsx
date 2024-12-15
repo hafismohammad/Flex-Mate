@@ -15,10 +15,6 @@ const App: React.FC = () => {
   const {videoCall, showVideoCallTrainer} = useSelector((state: RootState) => state.trainer)
   const {showIncomingVideoCall, showVideoCallUser} = useSelector((state: RootState) => state.user)
 
-
-console.log('showVideoCallUser',showVideoCallUser);
-
-  
   return (
     <>
       <Router>

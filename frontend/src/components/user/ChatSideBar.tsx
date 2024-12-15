@@ -20,20 +20,15 @@ function ChatSideBar() {
   const { userInfo } = useSelector((state: RootState) => state.user);
   const userId = userInfo?.id;
   const [trainers, setTrainers] = useState<Trainer[]>([]);
-  const [selectedTrainerId, setSelectedTrainerId] = useState<string | null>(
-    null
-  );
+  const [selectedTrainerId, setSelectedTrainerId] = useState<string | null>(null );
   const [callHistory, setCallHistory] = useState<IVideoCallUser[]>([]);
   const [isHistory, setIsHistory] = useState(false);
   const { socket } = useSocketContext();
-
-  // Helper to load message counts from local storage
   const loadMessageCounts = () => {
     const savedCounts = localStorage.getItem("messageCounts");
     return savedCounts ? JSON.parse(savedCounts) : {};
   };
-
-  // Helper to save message counts to local storage
+  
   const saveMessageCounts = (counts: Record<string, number>) => {
     localStorage.setItem("messageCounts", JSON.stringify(counts));
   };
@@ -44,7 +39,6 @@ function ChatSideBar() {
         const response = await axios.get(
           `${API_URL}/api/messages/call-history-user/${userId}`
         );
-
         setCallHistory(response.data || []);
       } catch (error) {
         console.error("Error fetching call history:", error);
@@ -59,7 +53,6 @@ function ChatSideBar() {
         const response = await userAxiosInstance.get(
           `/api/user/bookings-details/${userId}`
         );
-
         const seenTrainerIds = new Set();
         const uniqueTrainers = response.data.filter((booking: any) => {
           if (seenTrainerIds.has(booking.trainerId)) {
@@ -97,7 +90,6 @@ function ChatSideBar() {
         const updatedTrainers = [...prevTrainers];
         const messageCounts = loadMessageCounts();
   
-        // Find the index of the trainer who sent the message
         const index = updatedTrainers.findIndex(
           (trainer) => trainer.trainerId === data.userId
         );
@@ -105,18 +97,15 @@ function ChatSideBar() {
         if (index > -1) {
           const trainerId = updatedTrainers[index].trainerId;
   
-          // Increment and persist the message count
           messageCounts[trainerId] = (messageCounts[trainerId] || 0) + 1;
           saveMessageCounts(messageCounts);
   
-          // Update the trainer with new message info
           updatedTrainers[index] = {
             ...updatedTrainers[index],
             hasNewMessage: true,
             messageCount: messageCounts[trainerId],
           };
   
-          // Move the trainer to the top of the list
           const [trainer] = updatedTrainers.splice(index, 1);
           updatedTrainers.unshift(trainer);
         }
@@ -125,7 +114,6 @@ function ChatSideBar() {
       });
     };
   
-    // Listen for new message events from the socket
     socket?.on("messageUpdate", handleNewMessage);
   
     return () => {
@@ -235,7 +223,6 @@ function ChatSideBar() {
 
                     </div>
                   </div>
-                  {/* <h1>-{new Date(call.startedAt).toLocaleTimeString()}</h1> */}
                 </div>
               ))
             ) : (
@@ -247,7 +234,6 @@ function ChatSideBar() {
         )}
       </div>
 
-      {/* Chat Window */}
       <div className="w-[900px] h-[600px]  overflow-auto shadow-lg">
         {selectedTrainerId ? (
           <UserChat trainerId={selectedTrainerId} />

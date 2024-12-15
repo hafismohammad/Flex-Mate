@@ -26,7 +26,8 @@ export const SocketContextProvider = ({
   const { trainerInfo } = useSelector((state: RootState) => state.trainer);
   const loggedUser = userInfo?.id || trainerInfo?.id || null;
   const dispatch = useDispatch<AppDispatch>();
- const {addTrainerNotification, addUserNotification} = useNotification()
+  const {addTrainerNotification, addUserNotification} = useNotification()
+  
   const newSocket = io("http://localhost:3000", {
     query: { userId: loggedUser },
     transports: ['websocket'],
@@ -35,25 +36,22 @@ export const SocketContextProvider = ({
   useEffect(() => {
     if (!loggedUser) {
       console.warn("No loggedUser; skipping socket initialization.");
-      setSocket(null); // Ensure socket is cleared when user logs out
+      setSocket(null); 
       return;
     }
 
     console.log("Initializing socket for loggedUser:", loggedUser);
 
-    // Initialize socket
-    
 
     newSocket.on("connect", () => {
       console.log("Socket connected:", newSocket.id);
-      setSocket(newSocket); // Update the state after successful connection
+      setSocket(newSocket);
     });
 
-    // Cleanup on component unmount or loggedUser change
     return () => {
       console.log("Cleaning up socket...");
       newSocket.disconnect();
-      setSocket(null); // Clear the socket state
+      setSocket(null); 
     };
   }, [loggedUser]);
 
@@ -82,8 +80,6 @@ export const SocketContextProvider = ({
     });
 
     newSocket.on("accepted-call", (data: any) => {
-      // alert('hit accep call client')
-      console.log("Call accepted: -->", data);
       dispatch(setRoomId(data.roomId));
       dispatch(setShowVideoCall(true));
 
@@ -107,9 +103,7 @@ export const SocketContextProvider = ({
     });
 
     newSocket?.on("user-left", (data) => {
-      console.log("User left the room:", data);
     
-      // If the user who left is the logged-in user
       if (data === userInfo?.id) {
         dispatch(setPrescription(true))
         dispatch(setShowVideoCallUser(false));
@@ -118,7 +112,6 @@ export const SocketContextProvider = ({
         dispatch(setShowIncomingVideoCall(null));
       } 
       
-      // If the user who left is not the logged-in user (likely the other party in the call)
       else if (data === trainerInfo?.id) {
         
         dispatch(setPrescription(true))
@@ -128,22 +121,14 @@ export const SocketContextProvider = ({
       }
     });
 
-
-    // newSocket.on("receiveNotification", (data: Notification) => {
-    //   console.log("Notification received:", data);
-    // })
-    // Cleanup event listeners on socket change or component unmount
     newSocket.on('receiveCancelNotificationForTrainer', (data: string) => {
-      console.log('receiveCancelNotification from socket', data);
       addTrainerNotification(data);
     });
     newSocket.on('receiveCancelNotificationForUser', (data: string) => {
-      console.log('receiveCancelNotification from socket', data);
       addUserNotification(data);
     });
     
     newSocket.on('receiveNewBooking', (data: string) => {
-      console.log('receive new booking', data);
       addTrainerNotification(data);
     });
     

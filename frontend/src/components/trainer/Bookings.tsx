@@ -36,8 +36,7 @@ function Bookings() {
   const [filterType, setFilterType] = useState<string>("all");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterStartDate, setFilterStartDate] = useState<string>("");
-  const [prescriptionData, setPrescriptionData] =
-    useState<BookingDetail | null>(null);
+  const [prescriptionData, setPrescriptionData] = useState<BookingDetail | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [edtiOption, setEdtiOption] = useState(false);
   const [newPrescription, setNewprescription] = useState<string | null>(null);
@@ -107,12 +106,6 @@ function Bookings() {
       return false;
     }
 
-    // if (
-    //   filterStartDate &&
-    //   new Date(booking.bookingDate).toISOString().split("T")[0] !== filterStartDate
-    // ) {
-    //   return false;
-    // }
     if (
       filterStartDate &&
       new Date(booking.bookingDate).toISOString().split("T")[0] !==
@@ -125,8 +118,6 @@ function Bookings() {
   });
 
   const handleView = (booking: BookingDetail) => {
-    // console.log('booking', booking);
-
     setPrescriptionData(booking);
     setIsModalOpen(true);
   };
@@ -165,28 +156,6 @@ function Bookings() {
       handleClose();
     }
   };
-
-  // const handleSave = async (bookingId: string | undefined) => {
-  //   try {
-  //     const response = await axiosInstance.patch(`/api/trainer/update-prescription/${bookingId}`, {data: newPrescription})
-  //     if(response.status === 200) {
-  //       setBookingDetails((prev) =>
-  //         prev.map((booking) =>
-  //         booking._id === bookingId ? {...booking, prescription: newPrescription || ''} : booking
-  //         )
-  //       )
-  //       toast.success(response.data.message)
-  //     }
-  //   } catch (error: any) {
-  //     const errorMessage = error.response?.data?.message || "An error occurred.";
-  //     toast.error(errorMessage);
-  //     console.error("Error updating prescription:", error);
-
-  //   } finally {
-  //     handleClose();
-
-  //   }
-  //   }
 
   const setisOpenView = (bookingId: string) => {
     navigate("/trainer/user-view", { state: { bookingId } });
@@ -308,13 +277,6 @@ function Bookings() {
                   view
                 </button>
               </div>
-              {/* {booking.paymentStatus === "Completed" && (
-                <div onClick={() => handleView(booking)}>
-                  <button className="bg-blue-500 hover:bg-blue-700 font-bold text-white px-7 py-1 rounded-lg">
-                    View
-                  </button>
-                </div>
-              )} */}
             </div>
           ))
         ) : (
@@ -346,82 +308,6 @@ function Bookings() {
           Next
         </button>
       </div>
-
-      {/* {isModalOpen && (
-        <div className="fixed inset-0  flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg p-6 w-[800px] shadow-lg">
-            <h1 className="text-xl font-bold text-center mb-6">Prescription</h1>
-            <div className="p-4 bg-gray-100 shadow-md rounded-lg">
-              <div>
-                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
-                  <img
-                    src={prescriptionData?.userImage}
-                    alt="profile"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div>
-                  <p>
-                    <strong>Name:</strong> {prescriptionData?.userName}
-                  </p>
-                  <p>
-                    <strong>Email</strong> {prescriptionData?.userMail}
-                  </p>
-                  <p>
-                    <strong>Specializtion</strong>{" "}
-                    {prescriptionData?.specialization.name}
-                  </p>
-                </div>
-                <div className="mt-4">
-                  <label className="block font-medium text-gray-700 mb-2">
-                    Prescription
-                  </label>
-                  {edtiOption ? (
-                   <textarea
-                   onChange={(e) => setNewprescription(e.target.value)}
-                  //  id={`prescription-${index}`}
-                  //  value={prescriptionData?.prescription || ""}
-                  value={newPrescription || ''}
-                   className="w-full border rounded-md p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                   placeholder="Write the prescription here..."
-                   rows={10}
-                 />
-                  ) : (
-                    <p>
-                    {prescriptionData?.prescription ||
-                      "No prescription provided."}
-                  </p>
-                  )}
-                  
-                </div>
-              </div>
-            </div>
-            <div className="mt-6 text-end">
-              <button
-                onClick={handleClose}
-                className="bg-red-500 mr-5 hover:bg-red-700 font-bold text-white py-2 px-6 rounded-lg"
-              >
-                Close
-              </button>
-            {edtiOption ? (
-                <button
-                onClick={() => handleSave(prescriptionData?._id)}
-                className="bg-blue-500 hover:bg-blue-700 font-bold text-white py-2 px-6 rounded-lg"
-              >
-                Save
-              </button>
-            ): (
-              <button
-              onClick={handleEdit}
-              className="bg-blue-500 hover:bg-blue-700 font-bold text-white py-2 px-6 rounded-lg"
-            >
-              Edit
-            </button>
-            )}
-            </div>
-          </div>
-        </div>
-      )} */}
     </div>
   );
 }

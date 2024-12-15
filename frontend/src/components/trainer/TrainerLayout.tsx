@@ -21,23 +21,15 @@ const TrainerLayout: React.FC = () => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const {
-    trainerNotifications,
-    addTrainerNotification,
-    clearTrainerNotifications,
-    updateTrainerNotificationReadStatus
-  } = useNotification();
+  const {trainerNotifications, addTrainerNotification, clearTrainerNotifications, updateTrainerNotificationReadStatus} = useNotification();
   const { trainerInfo } = useSelector((state: RootState) => state.trainer);
 
-
-  // Logout handler
   const handleLogout = () => {
     dispatch(logoutTrainer());
     clearTrainerNotifications()
     navigate("/trainer/login");
   };
 
-  // Toggle dropdowns
   const toggleProfileDropdown = () => {
     setIsProfileDropdownOpen((prev) => !prev);
   };
@@ -46,7 +38,6 @@ const TrainerLayout: React.FC = () => {
     setIsNotificationOpen((prev) => !prev);
   };
 
-  // Fetch notifications
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
@@ -54,11 +45,7 @@ const TrainerLayout: React.FC = () => {
           const response = await axiosInstance.get(
             `/api/trainer/notifications/${trainerInfo.id}`
           );
-          // console.log("response.data", response.data);
-
           const serverNotifications = response.data.notifications || [];
-          console.log("serverNotifications", serverNotifications);
-
           serverNotifications.forEach((notif: { content: string }) => {
             addTrainerNotification(notif.content);
           });
@@ -70,7 +57,6 @@ const TrainerLayout: React.FC = () => {
     fetchNotifications();
   }, [trainerInfo?.id]);
 
-  // Clear notifications
   const handleClear = async () => {
     try {
       const response = await axiosInstance.delete(
@@ -90,7 +76,6 @@ const TrainerLayout: React.FC = () => {
   };
 
   const handleReadUnread = (notificationId: string) => {
-    console.log('notificainoid',notificationId);
     updateTrainerNotificationReadStatus(notificationId);
     
   };

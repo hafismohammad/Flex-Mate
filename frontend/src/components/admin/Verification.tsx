@@ -23,13 +23,8 @@ interface Errors {
 
 function Verification() {
   const [trainersKycData, setTrainersKycData] = useState<Trainer[]>([]);
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [errors, setErrors] = useState<Errors>({});
 
-  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -44,7 +39,6 @@ function Verification() {
           status: trainer.kycData?.status || "Pending", 
         }));
         setTrainersKycData(trainersData);
-        console.log('all pending trainers',trainersKycData);
 
       } catch (error) {
         console.error('Error fetching KYC data:', error);
@@ -113,7 +107,6 @@ function Verification() {
         )}
       </div>
 
-      {/* Modal code can remain the same */}
     </div>
   );
 }

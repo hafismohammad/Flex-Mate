@@ -23,7 +23,6 @@ function TrainerListing() {
     };
     fetchData();
   }, []);
-// console.log('trainers', trainers);
 
   const filteredTrainers = trainers.filter((trainer) =>
     trainer._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -39,8 +38,6 @@ function TrainerListing() {
         { status: !currentStatus }
       );
       
-  
-      console.log('Server response:', response);
   
       if (response.status === 200 && response.data && response.data.data) {
         const updatedTrainerStatus = response.data.data.isBlocked;
@@ -68,7 +65,6 @@ function TrainerListing() {
   const closeModal = () => {
     setIsModalOpen(false)
   }
-console.log('trainer', selectedTrainer);
 
   return (
     <div className="p-8 bg-gray-100 min-h-screen">

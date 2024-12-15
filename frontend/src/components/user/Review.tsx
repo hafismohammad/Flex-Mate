@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import {} from "react-icons";
-import {
-  FaArrowLeft,
-  FaArrowRight,
-} from "react-icons/fa";
+import { FaArrowLeft, FaArrowRight,} from "react-icons/fa";
 import userAxiosInstance from "../../../axios/userAxionInstance";
 import { IReview } from "../../types/common";
 
@@ -12,15 +9,12 @@ interface ReviewProps {
   reload: boolean; 
   currentUeser: string | undefined
   onReviewCheck: (hasReview: boolean) => void
-  // reivewId: ()
 }
 function Review({ trainerId, reload, currentUeser, onReviewCheck }: ReviewProps) {
   const [reviews, setReviews] = useState<IReview[]>([]);
   const [currentCard, setCurrentCard] = useState(1)
+
   const reviewShows = 3;
-
-
-
   const indexOfLastCard = currentCard * reviewShows
   const indexOfFirstCard = indexOfLastCard -  reviewShows
   const currentReviewCards = reviews.slice(indexOfFirstCard, indexOfLastCard)
@@ -42,14 +36,11 @@ function Review({ trainerId, reload, currentUeser, onReviewCheck }: ReviewProps)
       const response = await userAxiosInstance.get(
         `/api/user/reviews/${trainerId}`
       );
-
       setReviews(response.data);
-
       const userHasReviewed = response.data.some(
         (review: IReview) => review.userId === currentUeser
       );
       onReviewCheck(userHasReviewed)
-      
     };
     fetchTrainerReviews();
   }, [reload,trainerId, currentUeser ,onReviewCheck]);

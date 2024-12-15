@@ -13,14 +13,12 @@ interface MessageProps {
 function Message({ sender, message, time, userImage, trainerImage, }: MessageProps)  {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    // Import DaisyUI styles dynamically
     import('daisyui/dist/styled.css');
   }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
-
 
   return (
     <div className={`chat ${sender === 'User' ? 'chat-end' : 'chat-start'}`}>
@@ -29,11 +27,9 @@ function Message({ sender, message, time, userImage, trainerImage, }: MessagePro
           <img alt="Avatar" src={ sender === 'User'? userImage : trainerImage} />
         </div>
       </div>
-
       <div className={`chat-bubble text-white ${sender === 'User' ? 'bg-blue-500' : 'bg-gray-500'}`}>
         {message}
       </div>
-
       <div className="chat-footer opacity-50 text-xs flex gap-1 items-center">
         {formatTime(time)}
       </div>

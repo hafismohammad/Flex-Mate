@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; 
 import { GrMoney } from "react-icons/gr";
 import { FaUser, FaUsers } from "react-icons/fa";
-// import { FaUser } from "react-icons/fa";
 import RevenueChart from "./RevenueChart";
 import UserTrainerChart from "./UserTrainerChart";
 import adminAxiosInstance from "../../../axios/adminAxiosInstance";
@@ -29,7 +28,6 @@ function AdminDashboard() {
     const fetchDashboardData = async () => {
       try {
         const response = await adminAxiosInstance.get(`/api/admin/dashboardData`); 
-        console.log("Dashboard Response:", response.data.data);
 
         setDashboardData({
           totalRevenue: response.data.data.totalRevenue,
@@ -55,7 +53,6 @@ function AdminDashboard() {
       navigate('/admin/login'); 
     }
   }, [adminToken, navigate]);
-console.log('dashboardData',dashboardData);
 
   return (
     <div className="flex flex-col p-4  space-y-8">

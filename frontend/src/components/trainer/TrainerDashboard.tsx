@@ -6,9 +6,7 @@ import axiosInstance from "../../../axios/trainerAxiosInstance";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 import { formatPriceToINR, formatTime } from "../../utils/timeAndPriceUtils";
-import { useNavigate } from "react-router-dom";
 import { IWallet } from "../../types/trainer";
-import toast, { Toaster } from "react-hot-toast";
 
 interface Specialization {
   name: string;
@@ -162,17 +160,6 @@ function TrainerDashboard() {
               >
                 {booking.paymentStatus}
               </div>
-
-              {/* {booking.paymentStatus === "Confirmed" ? (
-                <button
-                  onClick={() => handleAction(booking._id)}
-                  className="px-2 py-1 bg-blue-500 shadow-lg hover:bg-blue-700 rounded-lg text-white font-medium"
-                >
-                  Session Complete
-                </button>
-              ) : (
-                ""
-              )} */}
             </div>
           ))
         ) : (

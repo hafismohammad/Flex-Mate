@@ -12,7 +12,6 @@ function TrainersList() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Fetch trainers
   useEffect(() => {
     const fetchAllTrainers = async () => {
       try {
@@ -20,14 +19,11 @@ function TrainersList() {
           `${API_URL}/api/user/trainers`
         );
         const trainers = response.data;
-
-        // Parse query parameters
         const params = new URLSearchParams(location.search);
         const selectedGender = params.get("gender")?.toLowerCase();
         const selectedLanguage = params.get("language")?.toLowerCase();
         const selectedSpecialization = params.get("specialization");
 
-        // Filter trainers based on query parameters
         const filteredTrainers = trainers.filter((trainer) => {
           const matchesGender = selectedGender
             ? trainer.gender?.toLowerCase() === selectedGender
@@ -44,7 +40,6 @@ function TrainersList() {
                 (spec) => spec._id === selectedSpecialization
               )
             : true;
-
           return matchesGender && matchesLanguage && matchesSpecialization;
         });
 
@@ -57,7 +52,6 @@ function TrainersList() {
     fetchAllTrainers();
   }, [location.search]);
 
-  // Filter trainers based on search term
   const filteredTrainers = trainersData.filter(
     (trainer) =>
       trainer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -65,8 +59,6 @@ function TrainersList() {
         spec.name.toLowerCase().includes(searchTerm.toLowerCase())
       )
   );
-
-
 
   const handleTrainerProfileView = (trainerId: string) => {
     navigate(`/trainer-profile/${trainerId}`);
@@ -87,7 +79,6 @@ function TrainersList() {
           className="p-2 border w-[60%] border-gray-300 rounded-lg shadow-sm focus:outline-none"
         />
       </div>
-
       <div
         className="grid grid-cols-1 w-[95%] sm:grid-cols-2 md:grid-cols-3 gap-6"
         style={{ minHeight: "300px" }}

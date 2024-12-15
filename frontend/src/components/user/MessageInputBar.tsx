@@ -30,17 +30,14 @@ function MessageInputBar({ trainerId, onNewMessage }: MessageInputBarProps) {
       userId: userId
     };
 
-    // Emit the message through the socket if it is available
     if (socket) {
       socket.emit("sendMessage", newMessage); 
     } else {
       console.error("Socket is not initialized");
     }
 
-    // Call sendMessage API (if needed)
     await sendMessage({ message, receiverId, token: validToken });
 
-    // Callback to update the UI with the new message
     onNewMessage(newMessage);
     setMessage(""); // Reset the message input
   };

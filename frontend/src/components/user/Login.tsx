@@ -74,7 +74,6 @@ const Login = () => {
         }, 1000);
       })
       .catch((error: any) => {
-        // Check for specific backend error messages
         if (error?.message === "User is blocked") {
           toast.error("Your account is blocked.");
         } else if (error?.message === "Invalid email or password") {
@@ -91,7 +90,6 @@ const Login = () => {
     <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4">
       <Toaster />
       <div className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col lg:flex-row w-full max-w-4xl">
-        {/* Left section */}
         <div
           className="w-full lg:w-1/2 flex flex-col items-center justify-center p-8 bg-cover bg-center"
           style={{
@@ -105,8 +103,6 @@ const Login = () => {
             Log in to continue your journey with FlexMate.
           </p>
         </div>
-
-        {/* Right section */}
         <div className="w-full lg:w-1/2 p-8 overflow-y-auto">
           <div className="flex justify-center mb-6">
             <img src={logo} alt="Logo" className="w-21 h-10" />
@@ -115,7 +111,6 @@ const Login = () => {
             Login
           </h2>
           <form onSubmit={handleSubmit}>
-            {/* Email Field */}
             <div className="mb-4">
               <input
                 type="text"
@@ -128,7 +123,6 @@ const Login = () => {
               )}
             </div>
 
-            {/* Password Field */}
             <div className="mb-4">
               <input
                 type="password"

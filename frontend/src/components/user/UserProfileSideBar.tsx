@@ -21,7 +21,6 @@ function UserProfileSideBar() {
   const {clearUserNotifications, addUserNotification} = useNotification()
 
   const handleLogout = () => {
-    console.log("Clearing notifications... in handleLogout"); 
     dispatch(logoutUser());
     clearUserNotifications()
     navigate("/login");

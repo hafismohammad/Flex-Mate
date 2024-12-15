@@ -27,11 +27,11 @@ import {
       .filter((item) => {
         const monthsDiff =
           (currentYear - item.year) * 12 + (currentMonth - item.month);
-        return monthsDiff >= 0 && monthsDiff < 12; // Last 12 months
+        return monthsDiff >= 0 && monthsDiff < 12; 
       })
       .map((item) => ({
         ...item,
-        name: `${item.month}/${item.year}`, // Format month/year for the x-axis
+        name: `${item.month}/${item.year}`, 
       }))
       .sort(
         (a, b) =>

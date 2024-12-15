@@ -4,7 +4,6 @@ import { RootState } from "../../app/store";
 import { useEffect, useRef } from "react";
 import { setRoomIdUser, setShowIncomingVideoCall, setShowVideoCallUser, setVideoCallUser,} from "../../features/user/userSlice";
 import { useSocketContext } from "../../context/Socket";
-import { useNavigate } from "react-router-dom";
 
 
 function VideoCall() {
@@ -14,8 +13,6 @@ function VideoCall() {
   );
   let { socket } = useSocketContext();
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  console.log("videoCall", showIncomingVideoCall);
 
   useEffect(() => {
     if (!roomIdUser) return;
@@ -48,8 +45,6 @@ function VideoCall() {
       showPreJoinView: false,
       onLeaveRoom: () => {
         socket?.emit("leave-room", { to: showIncomingVideoCall?.trainerId });
-        console.log("USER SOCKET ID", socket?.id);
-
         dispatch(setShowVideoCallUser(false));
         dispatch(setRoomIdUser(null));
         dispatch(setVideoCallUser(null));
@@ -69,17 +64,11 @@ function VideoCall() {
     });
 
     return () => {
-      // alert('call end')
       window.location.reload();
 
       zp.destroy();
-      // socket?.off("user-left");
     };
   }, [roomIdUser, dispatch, socket]);
-
-  // if(!videoCall){
-  //   return ;
-  // }
 
   return (
     <div

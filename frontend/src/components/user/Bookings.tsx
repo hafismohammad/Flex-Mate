@@ -3,7 +3,6 @@ import axios from "axios";
 import { RootState } from "../../app/store";
 import { useSelector } from "react-redux";
 import API_URL from "../../../axios/API_URL";
-import axiosInstance from "../../../axios/trainerAxiosInstance";
 import userAxiosInstance from "../../../axios/userAxionInstance";
 import Swal from "sweetalert2";
 import { formatPriceToINR, formatTime } from "../../utils/timeAndPriceUtils";
@@ -36,8 +35,6 @@ function Bookings() {
   );
 
   const { socket } = useSocketContext();
-
-  // Pagination States
   const [currentPage, setCurrentPage] = useState(1);
   const [bookingsPerPage] = useState(4);
 
@@ -47,8 +44,6 @@ function Bookings() {
         const response = await userAxiosInstance.get(
           `/api/user/bookings-details/${userInfo?.id}`
         );
-        // console.log('response.data',response.data);
-
         setBookings(response.data);
       } catch (error) {
         console.error("Error fetching bookings:", error);
@@ -57,7 +52,6 @@ function Bookings() {
     fetchBookings();
   }, [userInfo]);
 
-  // Handle Booking Cancellation
   const handleCancelBooking = async (bookingId: string) => {
     Swal.fire({
       title: "Are you sure?",
@@ -73,21 +67,13 @@ function Bookings() {
           const bookingToCancel = bookings.find(
             (booking) => booking._id === bookingId
           );
-          console.log("bookingToCancel", bookingToCancel);
-
           if (!bookingToCancel) {
             Swal.fire("Error", "Booking not found.", "error");
             return;
           }
-
           const response = await axios.patch(
             `${API_URL}/api/user/cancel-booking/${bookingId}`
           );
-
-          console.log("Response Data:1", response.data);
-
-          console.log("response2", response.data);
-          // Update booking status locally to 'Cancelled' instead of removing it
           setBookings((prev) =>
             prev.map((booking) =>
               booking._id === bookingId
@@ -95,10 +81,6 @@ function Bookings() {
                 : booking
             )
           );
-
-          // console.log('Response Data:3', response.data);
-
-          // console.log('response4', response.data);
           const bookingDetails = bookingToCancel;
           const trainerNotification = {
             recetriverId: bookingToCancel.trainerId,
@@ -120,11 +102,8 @@ function Bookings() {
               bookingDetails.startTime
             } has been cancelled.`,
           };
-          console.log("userNotification", userNotification);
-
           socket?.emit("cancelTrainerNotification", trainerNotification);
           socket?.emit("cancelUserNotification", userNotification);
-
           Swal.fire("Canceled!", "Your booking has been canceled.", "success");
         } catch (error) {
           console.error("Error canceling booking:", error);
@@ -134,14 +113,11 @@ function Bookings() {
     });
   };
 
-  // Handle Prescription View
   const handleView = (booking: Booking) => {
     setPrescriptionData(booking);
-    // console.log('booking', booking);
     setIsModalOpen(true);
   };
 
-  // Pagination Logic: Get the current bookings slice
   const indexOfLastBooking = currentPage * bookingsPerPage;
   const indexOfFirstBooking = indexOfLastBooking - bookingsPerPage;
   const currentBookings = bookings.slice(
@@ -149,7 +125,6 @@ function Bookings() {
     indexOfLastBooking
   );
 
-  // Change Page
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   return (

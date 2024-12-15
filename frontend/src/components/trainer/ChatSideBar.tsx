@@ -42,8 +42,6 @@ function ChatSideBar() {
         const response = await axios.get(
           `${API_URL}/api/messages/call-history/${trainerId}`
         );
-        console.log("history", response);
-
         setCallHistory(response.data || []);
       } catch (error) {
         console.error("Error fetching call history:", error);
@@ -58,7 +56,6 @@ function ChatSideBar() {
         const response = await axiosInstance.get(
           `/api/trainer/booking-details/${trainerId}`
         );
-  
         const seenUserId = new Set();
         const uniqueUsers = response.data.filter((booking: any) => {
           if (seenUserId.has(booking.userId)) {
@@ -67,12 +64,12 @@ function ChatSideBar() {
           seenUserId.add(booking.userId);
           return true;
         });
-  
         const messageCounts = JSON.parse(
           localStorage.getItem("messageCounts") || "{}"
         );
-        const savedOrder = JSON.parse(localStorage.getItem("usersOrder") || "[]");
-  
+        const savedOrder = JSON.parse(
+          localStorage.getItem("usersOrder") || "[]"
+        );
         const userMap = new Map(
           uniqueUsers.map((booking: any) => [
             booking.userId,
@@ -87,24 +84,21 @@ function ChatSideBar() {
             },
           ])
         );
-  
-        // Restore saved order or default to unique users
         const reorderedUsers =
           savedOrder.length > 0
             ? savedOrder
                 .map((savedUser: User) => userMap.get(savedUser.userId))
                 .filter(Boolean)
             : Array.from(userMap.values());
-  
+
         setUsers(reorderedUsers);
       } catch (error) {
         console.error("Error fetching users:", error);
       }
     };
-  
+
     fetchUsers();
   }, [trainerId, axiosInstance]);
-  
 
   useEffect(() => {
     const handleNewMessage = (data: { userId: string }) => {
@@ -112,58 +106,51 @@ function ChatSideBar() {
         const updatedUsers = prevUsers.map((user) =>
           user.userId === data.userId ? { ...user, hasNewMessage: true } : user
         );
-  
-        // Move the user with the new message to the top
         const userWithNewMessage = updatedUsers.find(
           (user) => user.userId === data.userId
         );
         const remainingUsers = updatedUsers.filter(
           (user) => user.userId !== data.userId
         );
-  
         const reorderedUsers = [
           ...(userWithNewMessage ? [userWithNewMessage] : []),
           ...remainingUsers,
         ];
-  
-        // Update localStorage with the new order and message count
-        const messageCounts = JSON.parse(localStorage.getItem("messageCounts") || "{}");
+
+        const messageCounts = JSON.parse(
+          localStorage.getItem("messageCounts") || "{}"
+        );
         messageCounts[data.userId] = (messageCounts[data.userId] || 0) + 1;
         localStorage.setItem("messageCounts", JSON.stringify(messageCounts));
         localStorage.setItem("usersOrder", JSON.stringify(reorderedUsers));
-  
+
         return reorderedUsers;
       });
     };
-  
+
     socket?.on("messageUpdate", handleNewMessage);
-  
+
     return () => {
       socket?.off("messageUpdate", handleNewMessage);
     };
   }, [socket]);
-  
-  
 
   const handleUserSelect = (userId: string, booking: string) => {
     setSelectedUserId(userId);
     setBookingId(booking);
-  
-    // Reset `hasNewMessage` and count to 0 in state
+
     setUsers((prevUsers) =>
       prevUsers.map((user) =>
         user.userId === userId ? { ...user, hasNewMessage: false } : user
       )
     );
-  
-    // Reset count to 0 in localStorage for the selected user
-    const messageCounts = JSON.parse(localStorage.getItem("messageCounts") || "{}");
-    messageCounts[userId] = 0; // Reset the count to 0
+
+    const messageCounts = JSON.parse(
+      localStorage.getItem("messageCounts") || "{}"
+    );
+    messageCounts[userId] = 0;
     localStorage.setItem("messageCounts", JSON.stringify(messageCounts));
   };
-  
-  
-  
 
   const handleClick = (type: string) => {
     setIsHistory(type === "history");
@@ -186,8 +173,6 @@ function ChatSideBar() {
       setPrescriptionInfo(null);
     } catch (error) {}
   };
-
-
 
   return (
     <div className="flex ">
@@ -235,10 +220,11 @@ function ChatSideBar() {
 
                       {user.hasNewMessage && (
                         <span className="text-sm text-red-500 ml-2">
-                       
-                            New Message (   {JSON.parse(
+                          New Message ({" "}
+                          {JSON.parse(
                             localStorage.getItem("messageCounts") || "{}"
-                          )[user.userId] || 0}{" "})
+                          )[user.userId] || 0}{" "}
+                          )
                         </span>
                       )}
                     </div>
@@ -265,7 +251,9 @@ function ChatSideBar() {
                     <h3 className="font-semibold">
                       {call.userId?.name || "Unknown User"}
                     </h3>
-                  <h1 className="text-sm text-gray-500">{new Date(call.startedAt).toLocaleTimeString()}</h1>
+                    <h1 className="text-sm text-gray-500">
+                      {new Date(call.startedAt).toLocaleTimeString()}
+                    </h1>
 
                     <p className="text-sm text-gray-500">Outgoing</p>
                   </div>

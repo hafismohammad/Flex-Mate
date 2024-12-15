@@ -27,7 +27,6 @@ function TrainerSignup() {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  // Fetch specializations from Redux store
   const specializationsData = useSelector(
     (state: RootState) => state.trainer.specializations
   );
@@ -37,10 +36,8 @@ function TrainerSignup() {
     dispatch(fetchSpecializations());
   }, [dispatch]);
 
-  // Toggle dropdown visibility
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
-  // Handle specialization selection
   const handleSpecializationChange = (specialization: string) => {
     setSpecializations((prev) =>
       prev.includes(specialization)
@@ -74,12 +71,10 @@ function TrainerSignup() {
     return newErrors;
   };
 
-  // Clear errors after display
   const clearErrors = () => {
     setTimeout(() => setErrors({}), 3000);
   };
 
-  // Handle form submission
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formErrors = validate();

@@ -98,7 +98,6 @@ function UserView() {
   };
 
   const handleView = (bookingDetails: BookingDetail) => {
-    // console.log('booking', booking);
 
     setPrescriptionData(bookingDetails);
     setIsModalOpen(true);

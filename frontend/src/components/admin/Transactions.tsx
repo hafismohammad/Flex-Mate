@@ -5,31 +5,28 @@ import { formatPriceToINR } from "../../utils/timeAndPriceUtils";
 
 function Transactions() {
   const [bookingDetails, setBookingDetails] = useState<IBookingDetails[]>([]);
-  const [filteredTransactions, setFilteredTransactions] = useState<IBookingDetails[]>([]);
-  const [filter, setFilter] = useState<"all" | "credit" | "paid" | "refund">("all");
+  const [filteredTransactions, setFilteredTransactions] = useState< IBookingDetails[] >([]);
+  const [filter, setFilter] = useState<"all" | "credit" | "paid" | "refund">("all" );
   const [currentPage, setCurrentPage] = useState(1);
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
-  const transactionsPerPage = 10; // Items per page
+  const transactionsPerPage = 10;
 
-  // Function to calculate depreciation (10% reduction)
   const calculateDepreciation = (amount: number) => {
-    const depreciation = amount * 0.10; // 10% depreciation
-    return amount - depreciation; // Returning the amount after applying depreciation
+    const depreciation = amount * 0.1;
+    return amount - depreciation;
   };
 
-  // Fetch booking details from API
   const fetchBookingDetails = async () => {
     try {
       const response = await adminAxiosInstance.get(`/api/admin/bookings`);
       setBookingDetails(response.data);
-      setFilteredTransactions(response.data); // Initially show all transactions
+      setFilteredTransactions(response.data);
     } catch (error) {
       console.error("Error fetching booking details:", error);
     }
   };
 
-  // Filter transactions based on the selected filter type
   const applyFilter = () => {
     let filtered = bookingDetails;
 
@@ -47,10 +44,9 @@ function Transactions() {
     }
 
     setFilteredTransactions(filtered);
-    setCurrentPage(1); // Reset pagination when filters change
+    setCurrentPage(1);
   };
 
-  // Filter transactions by date
   const filterByDate = (transactions: IBookingDetails[]) => {
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -60,7 +56,6 @@ function Transactions() {
     });
   };
 
-  // Handle date range search
   const handleDateSearch = () => {
     if (!startDate || !endDate) {
       alert("Please select both start and end dates.");
@@ -95,9 +90,13 @@ function Transactions() {
           {["all", "credit", "paid", "refund"].map((type) => (
             <button
               key={type}
-              onClick={() => setFilter(type as "all" | "credit" | "paid" | "refund")}
+              onClick={() =>
+                setFilter(type as "all" | "credit" | "paid" | "refund")
+              }
               className={`py-1 px-3 rounded-sm shadow-md ${
-                filter === type ? "bg-blue-500 text-white" : "bg-white text-black"
+                filter === type
+                  ? "bg-blue-500 text-white"
+                  : "bg-white text-black"
               }`}
             >
               {type.charAt(0).toUpperCase() + type.slice(1)}
@@ -117,7 +116,10 @@ function Transactions() {
             onChange={(e) => setEndDate(e.target.value)}
             className="border p-2 rounded-md"
           />
-          <button onClick={handleDateSearch} className="bg-green-500 text-white px-4 py-2 rounded-md">
+          <button
+            onClick={handleDateSearch}
+            className="bg-green-500 text-white px-4 py-2 rounded-md"
+          >
             Search
           </button>
         </div>
@@ -139,9 +141,13 @@ function Transactions() {
               {currentTransactions.map((booking) => (
                 <tr key={booking._id}>
                   <td className="px-4 py-2">{booking._id}</td>
-                  <td className="px-4 py-2">{formatPriceToINR(booking.amount)}</td>
                   <td className="px-4 py-2">
-                    {formatPriceToINR(calculateDepreciation(Number(booking.amount)))}
+                    {formatPriceToINR(booking.amount)}
+                  </td>
+                  <td className="px-4 py-2">
+                    {formatPriceToINR(
+                      calculateDepreciation(Number(booking.amount))
+                    )}
                   </td>
                   <td className="px-4 py-2">
                     {booking.bookingDate
@@ -168,7 +174,10 @@ function Transactions() {
             </span>
             <button
               onClick={nextPage}
-              disabled={currentPage === Math.ceil(filteredTransactions.length / transactionsPerPage)}
+              disabled={
+                currentPage ===
+                Math.ceil(filteredTransactions.length / transactionsPerPage)
+              }
               className="bg-gray-300 text-gray-700 px-4 py-2 rounded-r hover:bg-gray-400 disabled:opacity-50"
             >
               Next

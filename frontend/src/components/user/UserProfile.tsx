@@ -65,8 +65,6 @@ function UserProfile() {
     }
   };
 
-
-
   const handleResetPassword = async (e: React.FormEvent) => {
     try {
       e.preventDefault();

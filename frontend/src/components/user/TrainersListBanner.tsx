@@ -17,8 +17,6 @@ function TrainersListBanner() {
         </p>
       </div>
 
-      {/* Top black overlay */}
-      {/* <div className="absolute top-0 left-0 w-full h-16 bg-black opacity-70"></div> */}
     </div>
   );
 }

@@ -24,9 +24,6 @@ const TrainerKyc: React.FC = () => {
   const trainer_id = trainerInfo?.id;
   const specialization = trainerInfo?.specialization;
 
-  // console.log('specialization', specialization);
-  
-
   const dispatch = useDispatch<AppDispatch>();
 
   // Validate form

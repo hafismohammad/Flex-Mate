@@ -5,15 +5,7 @@ import { useDispatch } from "react-redux";
 import { logoutTrainer } from "../../actions/trainerAction";
 import { IoChatbubbleEllipsesSharp } from "react-icons/io5";
 import { FaAddressBook } from "react-icons/fa6";
-import {
-  FaBars,
-  FaListAlt,
-  FaTimes,
-  FaChartPie,
-  FaUser,
-  FaSignOutAlt,
-  FaWallet
-} from "react-icons/fa";
+import {FaBars, FaListAlt, FaTimes, FaChartPie, FaUser, FaSignOutAlt, FaWallet} from "react-icons/fa";
 import { AppDispatch } from "../../app/store";
 import { useSocketContext } from "../../context/Socket";
 import { useNotification } from "../../context/NotificationContext ";
@@ -32,7 +24,6 @@ function TrainerSidebar() {
 
   const handleLogout = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault(); 
-    console.log('hit logout');
     clearTrainerNotifications()
     dispatch(logoutTrainer());
     

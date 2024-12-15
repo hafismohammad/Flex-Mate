@@ -64,7 +64,6 @@ function TrainerOtp() {
 
   const resendOtp = async () => {
     try {
-      console.log(trainerData.email, 'traienrdata');
       
       await axios.post(`${API_URL}/api/trainer/resend-otp`, { email: trainerData.email });
       setSeconds(60);

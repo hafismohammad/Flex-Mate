@@ -2,8 +2,6 @@ import React, { useEffect, useState } from "react";
 import adminAxiosInstance from "../../../axios/adminAxiosInstance";
 import { User } from "../../types/user";
 
-
-
 function UserListing() {
   const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -52,7 +50,6 @@ function UserListing() {
   };
 
   const handleView = (user: User) => {
-    console.log('user',user);
     
     setSelectedUser(user); 
     setIsModalOpen(true);

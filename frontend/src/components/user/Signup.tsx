@@ -22,16 +22,12 @@ const Signup = () => {
   const [email, setEmail] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-
   const [errors, setErrors] = useState<Errors>({});
 
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const { userInfo, loading, error } = useSelector(
-    (state: RootState) => state.user
-  );
 
-  // console.log("userInfo register------------->", userInfo);
+
   
   const validate = (): Errors => {
     const newErrors: Errors = {};
@@ -88,20 +84,14 @@ const Signup = () => {
         password,
       };
   
-      // Dispatch the action to register the user and handle the response
       const action = await dispatch(registerUser(userData));
   
-      // Check if the action was rejected (due to email already existing or other errors)
       if (registerUser.rejected.match(action)) {
         const errorMessage = action.payload?.message || 'Something went wrong';
-  
-        // Display the error message using a toast
         toast.error(errorMessage);
-  
         return;
       }
   
-      // If successful, navigate to OTP page
       navigate("/verityotp", { state: userData });
     } catch (error) {
       console.error("Registration error:", error);

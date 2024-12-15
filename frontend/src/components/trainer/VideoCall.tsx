@@ -2,12 +2,7 @@ import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../app/store";
 import { useEffect, useRef } from "react";
-import {
-  setPrescription,
-  setRoomId,
-  setShowVideoCall,
-  setVideoCall,
-} from "../../features/trainer/trainerSlice";
+import { setPrescription, setRoomId, setShowVideoCall, setVideoCall,} from "../../features/trainer/trainerSlice";
 import { useSocketContext } from "../../context/Socket";
 
 function TrainerVideoCall() {

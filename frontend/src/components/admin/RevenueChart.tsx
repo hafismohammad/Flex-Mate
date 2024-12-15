@@ -22,20 +22,18 @@ import {
   const RevenueChart: React.FC<RevenueChartProps> = ({ data }) => {
     const today = new Date();
     const currentYear = today.getFullYear();
-    const currentMonth = today.getMonth(); // 0-indexed months
-    const oneYearAgo = new Date(currentYear, currentMonth - 12, 1); // Set to the first day of the month, 12 months ago
-  console.log('data',data);
+    const currentMonth = today.getMonth(); 
+    const oneYearAgo = new Date(currentYear, currentMonth - 12, 1); 
   
     const last12MonthsData = (data || [])
       .map((item) => ({
-        name: `${item.month}/${item.year}`, // Format as "month/year"
-        trainerRevenue: item.trainerRevenue, // Use trainerRevenue
-        adminRevenue: item.adminRevenue, // Use adminRevenue
+        name: `${item.month}/${item.year}`, 
+        trainerRevenue: item.trainerRevenue, 
+        adminRevenue: item.adminRevenue, 
       }))
       .filter((item) => {
-        // Split "month/year" and convert to numbers
         const [month, year] = item.name.split('/').map(Number);
-        const itemDate = new Date(year, month - 1, 1); // Create date for the item's month and year
+        const itemDate = new Date(year, month - 1, 1); 
         return itemDate >= oneYearAgo && itemDate <= today;
       })
       .sort((a, b) => {

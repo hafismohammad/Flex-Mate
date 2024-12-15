@@ -7,21 +7,14 @@ import { endCallUser, setRoomIdUser, setShowVideoCallUser } from '../../features
 import { MdCallEnd } from "react-icons/md"
 
 function IncomingVideocall() {
-
     const {showIncomingVideoCall} = useSelector((state: RootState) => state.user)
-    console.log('showIncomingVideoCall',showIncomingVideoCall);
-    
     const dispatch = useDispatch<AppDispatch>()
     const {socket} = useSocketContext()
-
     const handleEndCall = async () => {
-      console.log('showIncomingVideoCall', showIncomingVideoCall);
-      
         if (!showIncomingVideoCall) {
           console.error("No incoming call to end.");
           return;
         }
-      
         await socket?.emit("reject-call", {            
           to: showIncomingVideoCall._id,
           sender: "user",
@@ -29,7 +22,6 @@ function IncomingVideocall() {
         });
         dispatch(endCallUser());
       };
-      
       const handleAcceptCall = async () => {
         if (!showIncomingVideoCall) {
           console.error("No incoming call to accept.");
@@ -50,8 +42,6 @@ function IncomingVideocall() {
         dispatch(setShowVideoCallUser(true));
       };
       
-      
-
   return (
     <>
     <div className='w-full h-full flex justify-center items-center z-40 fixed top-1'>

@@ -23,7 +23,6 @@ const Otp = () => {
 
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const { userInfo, error } = useSelector((state: RootState) => state.user);
 
   const startCountdown = () => {
     setSeconds(60);

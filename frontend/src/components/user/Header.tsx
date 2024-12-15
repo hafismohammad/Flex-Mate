@@ -36,13 +36,7 @@ function Header({ scrollToServices }: HeaderProps) {
   const { userInfo, token } = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const {
-    addUserNotification,
-    clearUserNotifications,
-    userNotifications,
-    updateUserNotificationReadStatus,
-    countUnreadNotificationsUser
-  } = useNotification();
+  const {addUserNotification,clearUserNotifications, userNotifications, updateUserNotificationReadStatus, countUnreadNotificationsUser} = useNotification();
 
   // Logout handler
   const handleLogout = () => {
@@ -52,7 +46,6 @@ function Header({ scrollToServices }: HeaderProps) {
     navigate("/login");
   };
 
-  // Fetch user image if logged in
   useEffect(() => {
     if (!userInfo?.id) return;
 
@@ -69,15 +62,12 @@ function Header({ scrollToServices }: HeaderProps) {
     fetchUserDetails();
   }, [userInfo?.id]);
 
-  // Fetch notifications
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
         const response = await userAxiosInstance.get(
           `/api/user/notifications/${userInfo?.id}`
         );
-        // console.log('response.data.notifications ',response.data.notifications );
-
         const serverNotifications = response.data?.notifications ?? [];
         serverNotifications.forEach((notif: any) => {
           if (notif && notif.content) {
@@ -98,10 +88,6 @@ function Header({ scrollToServices }: HeaderProps) {
       );
       if (response.status === 200) {
         toast.success(response.data.message);
-        // setNotificationsData((prev) => ({
-        //   ...prev,
-        //   notifications:[]
-        // }))
         clearUserNotifications();
       } else {
         console.error("Failed to clear notifications. Please try again.");
@@ -124,14 +110,12 @@ function Header({ scrollToServices }: HeaderProps) {
         </Link>
       </div>
 
-      {/* Mobile Menu Toggle */}
       <div className="md:hidden">
         <button onClick={() => setIsOpen(!isOpen)} className="text-white">
           {isOpen ? <FiX size={24} /> : <FiMenu size={24} />}
         </button>
       </div>
 
-      {/* Nav Links */}
       <nav
         className={`${
           isOpen ? "block" : "hidden"

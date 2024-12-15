@@ -3,16 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import LOGO from "../../assets/LOGO-2.png";
 import { useDispatch } from "react-redux";
 import { adminLogout } from '../../actions/adminAction'
-import {
-  FaBars,
-  FaListAlt,
-  FaTimes,
-  FaChartPie,
-  FaExchangeAlt ,
-  FaSignOutAlt,
-  FaCheckCircle,
-  FaUsers,
-} from "react-icons/fa";
+import { FaBars, FaListAlt, FaTimes, FaChartPie, FaSignOutAlt, FaCheckCircle, FaUsers,} from "react-icons/fa";
 import { AppDispatch } from "../../app/store";
 import { FaAddressBook } from "react-icons/fa6";
 
@@ -111,15 +102,6 @@ const location = useLocation()
               Trainers
             </span>
           </Link>
-          {/* <Link
-            to="/admin/transactions"
-            className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"
-          >
-            <FaExchangeAlt  size={20} />
-            <span className={`ml-2 ${!isSidebarOpen && "hidden"}`}>
-              Transactions
-            </span>
-          </Link> */}
           <Link
             to="/admin/login"
             className="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-md transition"

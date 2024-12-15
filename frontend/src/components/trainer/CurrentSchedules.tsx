@@ -8,11 +8,7 @@ import axiosInstance from "../../../axios/trainerAxiosInstance";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 import { ISessionSchedule, ISpec } from "../../types/trainer";
-import {
-  formatTime,
-  calculateDuration,
-  formatPriceToINR,
-} from "../../utils/timeAndPriceUtils";
+import { formatTime, calculateDuration, formatPriceToINR,} from "../../utils/timeAndPriceUtils";
 import Swal from "sweetalert2";
 
 function CurrentSchedules() {
@@ -34,20 +30,16 @@ function CurrentSchedules() {
   const [filterType, setFilterType] = useState<string>("all");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterStartDate, setFilterStartDate] = useState<string>("");
-  const [sessionSchedules, setSessionSchedules] = useState<ISessionSchedule[]>(
-    []
-  );
+  const [sessionSchedules, setSessionSchedules] = useState<ISessionSchedule[]>([]);
 
   const { trainerInfo } = useSelector((state: RootState) => state.trainer);
   const trainerId = trainerInfo.id;
 
   const handleAdd = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     const today = new Date();
     const maxDate = new Date(today);
     maxDate.setDate(today.getDate() + 20);
-
     const clearSessionData = () => {
       setSelectedDate(null);
       setStartDate(null);
@@ -111,7 +103,6 @@ function CurrentSchedules() {
         sessionData
       );
       const newSchedule = response.data.createdSessionData;
-      // console.log("newSchedule", newSchedule);
 
       setSessionSchedules((prevSchedules) =>
         Array.isArray(newSchedule)
@@ -170,8 +161,6 @@ function CurrentSchedules() {
           `${API_URL}/api/trainer/schedules/${trainerId}`
         );
         const schedules = response.data.sheduleData;
-        // console.log("schedules", schedules);
-
         setSessionSchedules(schedules);
       } catch (error) {
         console.error("Failed to fetch schedules:", error);
@@ -198,7 +187,6 @@ function CurrentSchedules() {
           const response = await axiosInstance.delete(
             `api/trainer/sessions/${sessionId}`
           );
-          console.log(response.data);
           setSessionSchedules((schedule) =>
             schedule.filter((schedule) => schedule._id != sessionId)
           );
@@ -236,7 +224,6 @@ function CurrentSchedules() {
 
     return true;
   });
-// console.log('sessionSchedules', sessionSchedules);
 
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
