@@ -3,7 +3,7 @@ import http from "http";
 import express from "express";
 import dotenv from "dotenv";
 import chatService from '../services/messageService';
-import { IVideoCall } from "../interface/common";
+
 
 dotenv.config();
 
@@ -46,7 +46,6 @@ io.on("connection", (socket) => {
 
     socket.on('sendMessage', (data) => {
       if (userId) {
-        // console.log('sendMessage', data);
         io.emit('messageUpdate',data) 
       } else {
         console.error("receiverId is missing in sendMessage data");
@@ -72,14 +71,11 @@ io.on("connection", (socket) => {
   });
 
   socket.on("accept-incoming-call", async (data) => {
-    console.log("accept-incoming-call", data);
-  
+    // console.log("accept-incoming-call", data);
     try {
       const friendSocketId = await getReceiverSocketId(data.to);
-  
       if (friendSocketId) {
         const startedAt = new Date();
-
         const videoCall = {
           trainerId: data.from,
           userId: data.to,
@@ -90,10 +86,8 @@ io.on("connection", (socket) => {
           createdAt: new Date(),
           updatedAt: new Date(),
         };
-  
         // Save call details to the database (simplified saving)
         await chatService.createVideoCallHistory(videoCall);
-  
         socket.to(friendSocketId).emit("accepted-call", { ...data, startedAt });
       } else {
         console.error(`No socket ID found for the receiver with ID: ${data.to}`);
@@ -106,9 +100,7 @@ io.on("connection", (socket) => {
 
   socket.on('trainer-call-accept',async (data) => {
     const trainerSocket = await getReceiverSocketId(data.trainerId)
-    
     if(trainerSocket) {
-
       socket.to(trainerSocket).emit('trianer-accept', data)
     }
   })
@@ -117,7 +109,6 @@ io.on("connection", (socket) => {
   socket.on('reject-call', (data) => {
     const friendSocketId = getReceiverSocketId(data.to);
     if (friendSocketId) {
-      
       socket.to(friendSocketId).emit('call-rejected');
     } else {
       console.error(`No socket ID found for the receiver with ID: ${data.to}`);
@@ -126,22 +117,18 @@ io.on("connection", (socket) => {
 
   socket.on("leave-room", (data) => {
     const friendSocketId = getReceiverSocketId(data.to);
-    console.log('friendSocketId',friendSocketId, 'data', data.to);
+    // console.log('friendSocketId',friendSocketId, 'data', data.to);
     if (friendSocketId) {
       socket.to(friendSocketId).emit("user-left",data.to);
     }
   });
 
   socket.on("newBookingNotification", (data) => {
-    console.log('hit sendNotification',data);
 
     
     const receiverSocketId = getReceiverSocketId(data.receiverId);
   
     if (receiverSocketId) {
-      console.log("Sending notification to:", receiverSocketId);
-      console.log('receiveNewBooking',data);
-      
       io.to(receiverSocketId).emit("receiveNewBooking", data.content);
     } else {
       console.warn("Receiver not connected:", data.receiverId);
@@ -150,11 +137,7 @@ io.on("connection", (socket) => {
   
 
   socket.on('cancelTrainerNotification', (data) => {
-    // console.log('hit cancel notification', data);
-  
     const receiverSocketId = getReceiverSocketId(data.recetriverId);
-    console.log('receiverSocketId trainer', receiverSocketId);
-  
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("receiveCancelNotificationForTrainer", data.content);
       console.log("Notification sent to client:", data);
@@ -164,11 +147,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on('cancelUserNotification', (data) => {
-console.log('cancelUserNotification',data);
-
     const receiverSocketId = getReceiverSocketId(data.userId);
-    console.log('receiverSocketId user---', receiverSocketId);
-  
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("receiveCancelNotificationForUser", data.content);
       console.log("Notification sent to client:", data);
@@ -178,20 +157,6 @@ console.log('cancelUserNotification',data);
   });
   
 
-
-  // socket.on('cancelNotificationForUser', (data) => {
-  //   // console.log('hit cancel notification', data);
-  
-  //   const receiverSocketId = getReceiverSocketId(data.userId);
-  //   // console.log("Receiver Socket ID:", receiverSocketId);
-  
-  //   if (receiverSocketId) {
-  //     // console.log("Sending notification to ******:", receiverSocketId);
-  //     io.to(receiverSocketId).emit("receiveCancelNotificationForUser", data);
-  //   } else {
-  //     console.log("No socket ID found for receiver:", data.userId);
-  //   }
-  // });
   
   socket.on("disconnect", () => {
     console.log("User disconnected:", socket.id);

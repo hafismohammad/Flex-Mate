@@ -19,7 +19,6 @@ class UserService {
 
   async register(userData: IUser): Promise<void> {
     try {
-      console.log("generate otp", userData);
       const existingUser = await this.userRepository.existsUser(userData.email);
       if (existingUser) {
         console.log("User already exists");

@@ -16,13 +16,13 @@ function UserProfileSideBar() {
 
   const { userInfo } = useSelector((state: RootState) => state.user);
   const navigate = useNavigate();
-  const location = useLocation()
+  const location = useLocation();
   const dispatch = useDispatch<AppDispatch>();
-  const {clearUserNotifications, addUserNotification} = useNotification()
+  const { clearUserNotifications } = useNotification();
 
   const handleLogout = () => {
     dispatch(logoutUser());
-    clearUserNotifications()
+    clearUserNotifications();
     navigate("/login");
   };
 
@@ -77,25 +77,36 @@ function UserProfileSideBar() {
     }
   };
 
-  const isActive = (path: string) => location.pathname === path
+  const isActive = (path: string) => location.pathname === path;
 
   return (
-    <div className="w-[17%] bg-blue-500 h-[70vh] mt-28 ml-10 flex flex-col items-center">
+    <div
+      className={`lg:flex lg:flex-col lg:w-[20%] xl:w-[100%] h-[75vh] mt-24 bg-blue-500 shadow-lg transition-transform duration-300 ease-in-out transform ${
+        !preview && "flex-grow" 
+      }`}
+    >
       <nav className="flex flex-col space-y-4 w-full">
-        <div className="flex justify-center">
-          <img
-            src={preview || profileDummy}
-            alt="profile"
-            className="bg-black mt-9 h-40 w-40 object-cover rounded-full"
-          />
-          {loading && <Loading />}
+        <div className="flex justify-center mt-6">
+          <div className="relative">
+            <img
+              src={preview || profileDummy}
+              alt="profile"
+              className="h-32 w-32 object-cover rounded-full bg-black"
+            />
+            {loading && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Loading />
+              </div>
+            )}
+          </div>
         </div>
-        <div className="flex justify-center mt-4">
+
+        <div className="flex justify-center mt-3">
           {!selectedImage ? (
             <>
               <label
                 htmlFor="profileImage"
-                className="text-gray-800 hover:text-gray-950 cursor-pointer"
+                className="text-white cursor-pointer hover:text-gray-300"
               >
                 Update Photo
               </label>
@@ -111,42 +122,58 @@ function UserProfileSideBar() {
           ) : (
             <button
               onClick={handleImageUpdate}
-              className="text-gray-800 cursor-pointer hover:text-gray-950"
+              className="text-white hover:text-gray-300"
             >
               Upload
             </button>
           )}
         </div>
-        <div className="w-full flex flex-col space-y-2 mt-6">
+
+        <div className="w-full flex flex-col space-y-2 mt-4">
           <Link
             to="/profile"
-            className={`flex items-center pl-8 p-2 ${isActive('/profile') ? ' bg-gray-700 text-white' : 'hover:text-white rounded-md transition'}  `}
+            className={`flex items-center pl-6 p-2 ${
+              isActive("/profile")
+                ? "bg-gray-700 text-white"
+                : "text-white hover:bg-gray-700 hover:text-gray-300"
+            } rounded-md transition`}
           >
             <span>Profile</span>
           </Link>
           <Link
             to="/profile/sessions"
-            className={`flex items-center pl-8 p-2 ${isActive('/profile/sessions') ? ' bg-gray-700 text-white' : 'hover:text-white rounded-md transition'}  `}
+            className={`flex items-center pl-6 p-2 ${
+              isActive("/profile/sessions")
+                ? "bg-gray-700 text-white"
+                : "text-white hover:bg-gray-700 hover:text-gray-300"
+            } rounded-md transition`}
           >
             <span>Sessions</span>
           </Link>
           <Link
             to="/profile/bookings"
-            className={`flex items-center pl-8 p-2 ${isActive('/profile/bookings') ? ' bg-gray-700 text-white' : 'hover:text-white rounded-md transition'}  `}
+            className={`flex items-center pl-6 p-2 ${
+              isActive("/profile/bookings")
+                ? "bg-gray-700 text-white"
+                : "text-white hover:bg-gray-700 hover:text-gray-300"
+            } rounded-md transition`}
           >
             <span>Bookings</span>
           </Link>
-
           <Link
             to="/profile/message"
-            className={`flex items-center pl-8 p-2 ${isActive('/profile/message') ? ' bg-gray-700 text-white' : 'hover:text-white rounded-md transition'}  `}
+            className={`flex items-center pl-6 p-2 ${
+              isActive("/profile/message")
+                ? "bg-gray-700 text-white"
+                : "text-white hover:bg-gray-700 hover:text-gray-300"
+            } rounded-md transition`}
           >
             <span>Message</span>
           </Link>
 
           <div
-            className={`flex items-center pl-8 p-2 text-gray-800 hover:bg-gray-700 hover:text-white rounded-md transition`}
             onClick={handleLogout}
+            className="flex items-center pl-6 p-2 text-white hover:bg-gray-700 hover:text-gray-300 rounded-md transition cursor-pointer"
           >
             <span>Logout</span>
           </div>

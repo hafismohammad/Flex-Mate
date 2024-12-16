@@ -87,9 +87,11 @@ function UserChat({ trainerId }: TrainerChatProps) {
             src={trainerData?.profileImage}
             alt="profile"
           />
+          <div className="">
           <h1 className="text-lg font-medium text-white">
             {trainerData?.name}
           </h1>
+          </div>
         </div>
       </div>
       <div className="px-4 flex-1 overflow-y-auto mt-2 overflow-x-hidden ">

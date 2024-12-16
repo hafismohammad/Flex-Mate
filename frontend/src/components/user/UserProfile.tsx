@@ -288,7 +288,7 @@ function UserProfile() {
                   type={passwordVisibility.current ? "text" : "password"}
                   name="oldPassword"
                   className="border border-gray-500 p-2 rounded-md w-full"
-                  placeholder="••••••••"
+                  // placeholder="••••••••"
                 />
                 <button
                   type="button"
@@ -309,7 +309,7 @@ function UserProfile() {
                   type={passwordVisibility.new ? "text" : "password"}
                   name="newPassword"
                   className="border border-gray-500 p-2 rounded-md w-full"
-                  placeholder="••••••••"
+                  // placeholder="••••••••"
                 />
                 <button
                   type="button"
@@ -330,7 +330,7 @@ function UserProfile() {
                   type={passwordVisibility.confirm ? "text" : "password"}
                   name="confirmPassword"
                   className="border border-gray-500 p-2 rounded-md w-full"
-                  placeholder="••••••••"
+                  // placeholder="••••••••"
                 />
                 <button
                   type="button"

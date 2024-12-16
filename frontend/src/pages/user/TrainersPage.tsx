@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import TrainersList from "../../components/user/TrainersList";
 import Header from "../../components/user/Header";
 import Footer from "../../components/user/Footer";
@@ -11,10 +11,14 @@ function TrainersPage() {
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
+const servicesRef = useRef<HTMLDivElement>(null);
+  const scrollToServices = () => {
+    servicesRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   return (
     <div className="min-h-screen flex flex-col pt-14">
-      <Header />
+      <Header  scrollToServices={scrollToServices}/>
 
       <TrainersListBanner />
 

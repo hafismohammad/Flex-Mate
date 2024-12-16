@@ -10,7 +10,6 @@ import FailedPaymentPage from '../pages/user/FailedPaymentPage';
 import UserProfilePage from '../pages/user/UserProfilePage';
 import UserLayout from '../components/user/UserLayout';
 import Sessions from '../components/user/Sessions';
-// import UserChatPage from '../pages/user/UserChatPage';
 import Bookings from '../components/user/Bookings';
 import AboutUsPage from '../pages/user/AboutUsPage';
 import ChatSideBarPage from '../pages/user/ChatSideBarPage';
