@@ -4,6 +4,7 @@ import { AppDispatch, RootState } from "../../app/store";
 import { submitKyc } from "../../actions/trainerAction";
 import { useNavigate } from "react-router-dom";
 import Loading from "../spinner/Loading";
+import toast, { Toaster } from "react-hot-toast";
 
 const TrainerKyc: React.FC = () => {
   const [name, setName] = useState<string>("");
@@ -15,7 +16,6 @@ const TrainerKyc: React.FC = () => {
   const [certificate, setCertificate] = useState<File | null>(null);
   
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
-  const [submissionError, setSubmissionError] = useState<string>("");
 
   const { trainerToken, trainerInfo , loading} = useSelector(
     (state: RootState) => state.trainer
@@ -41,6 +41,8 @@ const TrainerKyc: React.FC = () => {
     return Object.keys(errors).length === 0;
   };
 
+  const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
   
@@ -48,13 +50,29 @@ const TrainerKyc: React.FC = () => {
       return;
     }
   
+    const isValidImage = (file: File | null) => {
+      if (file && !allowedTypes.includes(file.type)) {
+        return false;
+      }
+      return true;
+    };
+  
+    if (
+      !isValidImage(profileImage) ||
+      !isValidImage(aadhaarFrontSide) ||
+      !isValidImage(aadhaarBackSide) ||
+      !isValidImage(certificate)
+    ) {
+      toast.error("Invalid file type. Only JPEG, PNG, and GIF are allowed.");
+      return;
+    }
+  
     const formData = new FormData();
     formData.append('trainer_id', trainer_id!);
-    
-    // Append multiple specializations
+  
     if (Array.isArray(specialization)) {
       specialization.forEach((spec) => {
-        formData.append('specialization[]', spec); 
+        formData.append('specialization[]', spec);
       });
     } else {
       formData.append('specialization', specialization!);
@@ -71,16 +89,17 @@ const TrainerKyc: React.FC = () => {
     if (certificate) formData.append('certificate', certificate);
   
     if (!token) {
-      setSubmissionError("Authorization token is required.");
+      toast.error("Authorization token is required.");
       return;
     }
   
     try {
-      await dispatch(submitKyc({ formData })); 
+      await dispatch(submitKyc({ formData }));
     } catch (error) {
-      setSubmissionError("Failed to submit KYC. Please try again.");
+      toast.error("Failed to submit KYC. Please try again.");
     }
   };
+  
   
 
   const handleFileChange = (
@@ -93,6 +112,7 @@ const TrainerKyc: React.FC = () => {
   
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
+      <Toaster />
       {loading && <Loading />}
       <h1 className="text-3xl font-bold mb-6 text-center">KYC Submission</h1>
       <p className="mb-6 text-center text-gray-600">
@@ -206,7 +226,6 @@ const TrainerKyc: React.FC = () => {
         >
           Submit KYC
         </button>
-        {submissionError && <p className="text-red-500">{submissionError}</p>}
       </form>
     </div>
   );

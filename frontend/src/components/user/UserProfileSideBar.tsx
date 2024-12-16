@@ -48,6 +48,23 @@ function UserProfileSideBar() {
       toast.error("Please select an image first");
       return;
     }
+
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+    if (!allowedTypes.includes(selectedImage.type)) {
+      toast.error(
+        "Invalid file type. Please select a JPEG, PNG, or GIF image."
+      );
+      return;
+    }
+
+    const maxSize = 5 * 1024 * 1024;
+    if (selectedImage.size > maxSize) {
+      toast.error(
+        "File size is too large. Please select an image smaller than 5MB."
+      );
+      return;
+    }
+
     setLoading(true);
     const formData = new FormData();
     formData.append("profileImage", selectedImage);
@@ -82,7 +99,7 @@ function UserProfileSideBar() {
   return (
     <div
       className={`lg:flex lg:flex-col lg:w-[20%] xl:w-[100%] h-[75vh] mt-24 bg-blue-500 shadow-lg transition-transform duration-300 ease-in-out transform ${
-        !preview && "flex-grow" 
+        !preview && "flex-grow"
       }`}
     >
       <nav className="flex flex-col space-y-4 w-full">
@@ -101,12 +118,12 @@ function UserProfileSideBar() {
           </div>
         </div>
 
-        <div className="flex justify-center mt-3">
+        <div className="flex justify-center mt-3 gap-4">
           {!selectedImage ? (
             <>
               <label
                 htmlFor="profileImage"
-                className="text-white cursor-pointer hover:text-gray-300"
+                className="text-white cursor-pointer hover:bg-gray-700 bg-black rounded-xl px-4 py-2 transition duration-200"
               >
                 Update Photo
               </label>
@@ -120,12 +137,29 @@ function UserProfileSideBar() {
               />
             </>
           ) : (
-            <button
-              onClick={handleImageUpdate}
-              className="text-white hover:text-gray-300"
-            >
-              Upload
-            </button>
+            <div className="flex gap-4">
+              <button
+                onClick={handleImageUpdate}
+                className="text-white bg-gray-700 hover:bg-gray-800 rounded-xl px-4 py-2 transition duration-200"
+              >
+                Upload
+              </button>
+
+              <label
+                htmlFor="profileImage"
+                className="text-white bg-gray-500 hover:bg-gray-600 rounded-xl px-4 py-2 cursor-pointer transition duration-200"
+              >
+                Upload Again
+              </label>
+              <input
+                id="profileImage"
+                type="file"
+                name="profileImage"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+            </div>
           )}
         </div>
 

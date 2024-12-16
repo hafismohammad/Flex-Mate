@@ -11,7 +11,7 @@ import errorMiddleware from "./middlewares/errorMiddleware";
 import dotenv from 'dotenv';
 import path from "path";
 import { startDeleteExpiredSessionsCron } from './corn/deleteExpiredSessions';
-import { app, server } from './socket/socket'; // Import app and server from socket.ts
+import { app, server } from './socket/socket';
 
 dotenv.config();
 
