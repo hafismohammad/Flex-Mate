@@ -1,5 +1,5 @@
-// const API_URL = import.meta.env.BASE_URL
-const API_URL = "https://api.flexmate.space"
+
+const API_URL = import.meta.env.BASE_URL
 
 
 export default API_URL;
