@@ -23,7 +23,8 @@ function TrainerSidebar() {
   };
 
   const handleLogout = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault(); 
+    e.preventDefault();
+     
     clearTrainerNotifications()
     dispatch(logoutTrainer());
     
@@ -42,7 +43,7 @@ function TrainerSidebar() {
     setHasMessage(false);
   };
 
-  const isActive = (path: string) => location.pathname === path; // Check active route
+  const isActive = (path: string) => location.pathname === path; 
 
   return (
     <div className={`h-screen bg-blue-800 text-white flex flex-col p-4 shadow-md transition-all duration-300 ${isSidebarOpen ? "w-64" : "w-16"} sticky top-0`}>

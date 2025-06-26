@@ -29,7 +29,10 @@ const useGetMessage = (token: string, id: string) => {
           `${API_URL}/api/messages/${token}/${id}`
         );
 
-        setMessages(response.data);
+        // setMessages(response.data);
+        setMessages(response.data.data || []);
+
+        // console.log('get message', response.data.data)
       } catch (error) {
         console.error("Failed to fetch messages:", error);
       } finally {

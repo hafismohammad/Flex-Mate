@@ -16,7 +16,7 @@ function UserLayout() {
   };
 
   return (
-    <div className="flex h-screen bg-blue-50">
+    <div className="flex h-screen bg-blue-50 ">
       <div className="hidden lg:block w-[250px] ml-6 h-[80vh] bg-white shadow-lg">
         <UserProfileSideBar />
       </div>

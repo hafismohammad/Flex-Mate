@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BsSend } from "react-icons/bs";
 import useSendMessage from "../../hooks/useSendMessage";
 import { useSelector } from "react-redux";
 import { RootState } from "../../app/store";
 import { useSocketContext } from "../../context/Socket";
+import API_URL from "../../../axios/API_URL";
+import axios from "axios";
 
 interface MessageInputBarProps {
   userId?: string;
@@ -13,12 +15,50 @@ interface MessageInputBarProps {
 function MessageInputBar({ userId, onNewMessage }: MessageInputBarProps) {
   const [message, setMessage] = useState("");
   const { sendMessage } = useSendMessage();
+  const [user, setUser] = useState('')
+  const [trainer, setTrainer] = useState('')
   const { trainerToken, trainerInfo } = useSelector(
     (state: RootState) => state.trainer
   );
   const { socket } = useSocketContext();
 
   const validToken = trainerToken ?? "";
+
+  useEffect(() => {
+    const fetchTrainer = async () => {
+      try {
+        const response = await axios.get(
+          `${API_URL}/api/trainer/users/${userId}`,
+          {
+            headers: { Authorization: `Bearer ${validToken}` }, 
+          }
+        );
+        setUser(response.data.name)
+      } catch (error) {
+        console.error("Error fetching trainer:", error);
+      }
+    };
+    fetchTrainer();
+  }, [userId]);
+
+  useEffect(() => {
+    const fetchTrainer = async () => {
+      try {
+        const response = await axios.get(
+          `${API_URL}/api/trainer/${trainerInfo.id}`,
+          {
+            headers: { Authorization: `Bearer ${validToken}` }, 
+          }
+        );
+        
+        setTrainer(response.data.trainerData[0].name)
+      } catch (error) {
+        console.error("Error fetching trainer:", error);
+      }
+    };
+    fetchTrainer();
+  }, [userId]);
+
 
   const handleSendMessage = async (e: React.FormEvent<HTMLElement>) => {
     e.preventDefault();
@@ -28,10 +68,12 @@ function MessageInputBar({ userId, onNewMessage }: MessageInputBarProps) {
     const newMessage = {
       message,
       receiverId,
+      userName: trainer,
       senderModel: "Trainer",
       createdAt: new Date().toISOString(),
       userId: trainerInfo.id,
     };
+
 
     if (socket) {
       socket.emit("sendMessage", newMessage);
@@ -39,7 +81,11 @@ function MessageInputBar({ userId, onNewMessage }: MessageInputBarProps) {
       console.error("Socket is not initialized");
     }
 
-    await sendMessage({ message, receiverId, token: validToken });
+    if(socket) {
+      socket.emit('chatNotificationFromTrainer', newMessage)
+    }
+
+    await sendMessage({ message, receiverId, token: validToken , senderName: trainer});
 
     onNewMessage(newMessage);
     setMessage("");

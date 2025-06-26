@@ -55,7 +55,6 @@ const userSlice = createSlice({
       state.roomIdUser = action.payload;
     },
     endCallUser: (state) => {
-      console.log('hit  user sclice-------->');
       
       state.videoCall = null;
       state.showIncomingVideoCall = null;

@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import profileDummy from "../../assets/profile-dummy.webp";
 import Loading from "../spinner/Loading";
 import { useNotification } from "../../context/NotificationContext ";
+import { useSocketContext } from "../../context/Socket";
 
 function UserProfileSideBar() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -18,9 +19,14 @@ function UserProfileSideBar() {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch<AppDispatch>();
+   let { socket } = useSocketContext();
   const { clearUserNotifications } = useNotification();
 
   const handleLogout = () => {
+    if (socket) {
+      socket.emit("logout", userInfo?.id); 
+    }
+  
     dispatch(logoutUser());
     clearUserNotifications();
     navigate("/login");

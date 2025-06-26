@@ -90,8 +90,8 @@ function Review({ trainerId, reload, currentUeser, onReviewCheck }: ReviewProps)
     <>
       <div className="flex justify-center p-10 gap-5">
         {
-          currentReviewCards?.map((review) => (
-            <div className="flex w-full p-4 max-w-lg flex-col rounded-lg bg-white shadow-sm border border-slate-200 my-6">
+          currentReviewCards?.map((review, index) => (
+            <div key={index} className="flex w-full p-4 max-w-lg flex-col rounded-lg bg-white shadow-sm border border-slate-200 my-6">
             <div className="flex items-center gap-4 text-slate-800">
               <img
                 src={review.userImage}

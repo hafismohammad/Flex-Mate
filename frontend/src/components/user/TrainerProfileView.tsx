@@ -47,7 +47,8 @@ function TrainerProfileView() {
         const response = await axios.get(
           `${API_URL}/api/user/trainers/${trainerId}`
         );
-        setTrainer(response.data[0]);
+        // console.log('________**',response.data)
+        setTrainer(response.data);
       } catch (error) {
         console.error("Error fetching trainer:", error);
       }
